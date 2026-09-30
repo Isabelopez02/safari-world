@@ -64,7 +64,9 @@ flutter:
    - assets/images/logo_zoologico.png
    - assets/images/planta_1.png
    - assets/images/planta_2.png
-  #   - images/a_dot_ham.jpeg
+   - assets/images/pantalla_principal/bano.png
+   - assets/images/pantalla_principal/emergencia.png
+   - assets/images/pantalla_principal/header.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -1,17 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-// 🎨 PALETA EXTRAÍDA DE LA IMAGEN
-class AppColors {
-  static const fondo       = Color(0xFFFDF6EC);
-  static const verde       = Color(0xFF5C8D3E);
-  static const verdeOscuro = Color(0xFF4A7C2F);
-  static const verdeClaro  = Color(0xFFE8F0DD);
-  static const amarillo    = Color(0xFFD4E157);
-  static const textoOsc   = Color(0xFF3E2F1C);
-  static const textoGris  = Color(0xFF8B7D6B);
-  static const cardBlanco = Colors.white;
-}
+import 'package:zoologico_front/core/theme/app_colors.dart';
 
 class PantallaMapa extends StatefulWidget {
   const PantallaMapa({super.key});
@@ -44,8 +33,11 @@ class _PantallaMapaState extends State<PantallaMapa> {
     final newScale = (currentScale * factor).clamp(0.1, 5.0);
     final ratio = newScale / currentScale;
 
+    // ignore: deprecated_member_use
     matrix.translate(focalPoint.dx, focalPoint.dy);
+    // ignore: deprecated_member_use
     matrix.scale(ratio, ratio);
+    // ignore: deprecated_member_use
     matrix.translate(-focalPoint.dx, -focalPoint.dy);
 
     _transformationController.value = matrix;
@@ -75,12 +67,12 @@ class _PantallaMapaState extends State<PantallaMapa> {
         decoration: BoxDecoration(
           color: isSelected ? AppColors.verdeClaro : Colors.white,
           border: Border.all(
-            color: isSelected ? AppColors.verde : Colors.transparent,
+            color: isSelected ? AppColors.verdePrincipal : Colors.transparent,
             width: 2,
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: isSelected 
-            ? [BoxShadow(color: AppColors.verde.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))]
+            ? [BoxShadow(color: AppColors.verdePrincipal.withAlpha((255 * 0.3).toInt()), blurRadius: 8, offset: const Offset(0, 4))]
             : [const BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
         ),
         child: Column(
@@ -89,7 +81,7 @@ class _PantallaMapaState extends State<PantallaMapa> {
             Icon(
               icon,
               size: 32,
-              color: isSelected ? AppColors.verdeOscuro : AppColors.textoGris,
+              color: isSelected ? AppColors.verdeAzulado : AppColors.textoGris,
             ),
             const SizedBox(height: 8),
             Text(
@@ -98,7 +90,7 @@ class _PantallaMapaState extends State<PantallaMapa> {
               style: TextStyle(
                 fontSize: 10, 
                 fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600, 
-                color: isSelected ? AppColors.verdeOscuro : Colors.black87
+                color: isSelected ? AppColors.verdeAzulado : Colors.black87
               ),
             )
           ],
@@ -140,37 +132,36 @@ class _PantallaMapaState extends State<PantallaMapa> {
                   child: SafeArea(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: const BoxDecoration(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
                               color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: const [
                                 BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
                               ]
                             ),
-                            child: IconButton(
-                              icon: const Icon(Icons.arrow_back, color: Colors.black),
-                              onPressed: () {},
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.arrow_back, color: Colors.black),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Regresar',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: const [
-                                  BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
-                                ]
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),

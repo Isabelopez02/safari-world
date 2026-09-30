@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:zoologico_front/features/pantalla_layout.dart';
+import 'package:zoologico_front/core/theme/app_colors.dart';
+import 'package:zoologico_front/features/pantalla_principal/pantalla_principal.dart';
 
 class PantallaInicio extends StatefulWidget {
   const PantallaInicio({super.key});
@@ -30,8 +31,8 @@ class _PantallaInicioState extends State<PantallaInicio> {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const PantallaLayout(),
-            transitionsBuilder: (_, animation, __, child) {
+            pageBuilder: (context, animation, secondaryAnimation) => const PantallaPrincipal(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
             transitionDuration: const Duration(milliseconds: 800),
@@ -50,7 +51,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
         duration: const Duration(milliseconds: 1500),
         curve: Curves.easeInOut,
         // Cambio de color de fondo: de verde a blanco puro en fase 2
-        color: _fase2 ? Colors.white : const Color(0xFFA6CDAE),
+        color: _fase2 ? Colors.white : AppColors.verdeClaro,
         child: Stack(
           children: [
             // ==========================================
