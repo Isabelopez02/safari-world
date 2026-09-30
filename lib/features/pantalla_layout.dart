@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:zoologico_front/core/widgets/footer.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
 
 class PantallaLayout extends StatefulWidget {

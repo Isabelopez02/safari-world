@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:zoologico_front/features/pantalla_layout.dart';
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+class PantallaInicio extends StatefulWidget {
+  const PantallaInicio({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  State<PantallaInicio> createState() => _PantallaInicioState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _PantallaInicioState extends State<PantallaInicio> {
   // Estado para controlar la animación
   bool _fase2 = false;
 

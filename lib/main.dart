@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zoologico_front/features/splash/screens/splash_screen.dart';
-
+import 'package:zoologico_front/features/carga_pagina/pantalla_inicio.dart';
 void main() {
   runApp(const MiApp());
 }
@@ -17,7 +16,7 @@ class MiApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: const SplashScreen(), // Inicia la app con el SplashScreen animado
+      home: const PantallaInicio(), // Inicia la app con la PantallaInicio animado
     );
   }
 }
