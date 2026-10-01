@@ -35,6 +35,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   hugeicons: ^1.2.0
+  google_fonts: ^6.2.0
 
 dev_dependencies:
   flutter_test:
@@ -64,9 +65,11 @@ flutter:
    - assets/images/logo_zoologico.png
    - assets/images/planta_1.png
    - assets/images/planta_2.png
-   - assets/images/pantalla_principal/bano.png
+   - assets/images/pantalla_principal/foca.png
    - assets/images/pantalla_principal/emergencia.png
    - assets/images/pantalla_principal/header.png
+   - assets/images/pantalla_principal/hero_fondo.png
+   - assets/images/pantalla_principal/investigador.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
