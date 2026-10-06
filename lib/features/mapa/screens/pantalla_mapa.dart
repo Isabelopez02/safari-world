@@ -5,6 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
+import '../utils/pathfinding.dart';
+import '../utils/datos_rutas.dart';
+
+import '../widgets/tutorial_overlay.dart';
+import '../widgets/marcador_animado.dart';
+import '../widgets/ruta_painter.dart';
+
 class PantallaMapa extends StatefulWidget {
   const PantallaMapa({super.key});
 
@@ -16,7 +23,6 @@ class _PantallaMapaState extends State<PantallaMapa> {
   final TransformationController _transformationController =
       TransformationController();
 
-  // Keys for tutorial highlights
   final GlobalKey _keyAnimales = GlobalKey();
   final GlobalKey _keySearch = GlobalKey();
   final GlobalKey _keyHelp = GlobalKey();
@@ -24,10 +30,183 @@ class _PantallaMapaState extends State<PantallaMapa> {
 
   int _tutorialStep = 0;
 
+  final double mapaAncho = 1920;
+  final double mapaAlto = 1080;
+
+  List<Offset> _rutaActual = [];
+  MarcadorMapa? _marcadorSeleccionado;
+  String _nodoActual = 'entrada';
+  bool _isNavigating = false;
+
+  final List<MarcadorMapa> marcadores = [
+    MarcadorMapa(
+      id: 'A01',
+      nombre: 'Chimpancé',
+      x: 346.0,
+      y: 287.0,
+      icono: Icons.pets,
+    ),
+    MarcadorMapa(
+      id: 'A02',
+      nombre: 'Mono',
+      x: 438.0,
+      y: 305.0,
+      icono: Icons.pets,
+    ),
+    MarcadorMapa(
+      id: 'A03',
+      nombre: 'Cebra',
+      x: 570.0,
+      y: 214.0,
+      icono: Icons.pets,
+    ),
+    MarcadorMapa(
+      id: 'A04',
+      nombre: 'Camello',
+      x: 634.0,
+      y: 273.0,
+      icono: Icons.pets,
+    ),
+    MarcadorMapa(
+      id: 'A05',
+      nombre: 'Jirafa',
+      x: 709.0,
+      y: 277.0,
+      icono: Icons.pets,
+    ),
+    MarcadorMapa(
+      id: 'A06',
+      nombre: 'Oso 1',
+      x: 904.0,
+      y: 308.0,
+      icono: Icons.pets,
+    ),
+    MarcadorMapa(
+      id: 'A07',
+      nombre: 'Oso 2',
+      x: 1026.0,
+      y: 292.0,
+      icono: Icons.pets,
+    ),
+    MarcadorMapa(
+      id: 'A08',
+      nombre: 'Delfín',
+      x: 1170.0,
+      y: 233.0,
+      icono: Icons.water_drop,
+    ),
+    MarcadorMapa(
+      id: 'A09',
+      nombre: 'Foca',
+      x: 1279.0,
+      y: 277.0,
+      icono: Icons.water_drop,
+    ),
+    MarcadorMapa(
+      id: 'A10',
+      nombre: 'León',
+      x: 1451.0,
+      y: 414.0,
+      icono: Icons.pets,
+    ),
+    MarcadorMapa(
+      id: 'A11',
+      nombre: 'Tigre',
+      x: 1378.0,
+      y: 474.0,
+      icono: Icons.pets,
+    ),
+    MarcadorMapa(
+      id: 'A12',
+      nombre: 'Leopardo',
+      x: 1518.0,
+      y: 494.0,
+      icono: Icons.pets,
+    ),
+    MarcadorMapa(
+      id: 'A13',
+      nombre: 'Elefante',
+      x: 1123.0,
+      y: 539.0,
+      icono: Icons.pets,
+    ),
+    MarcadorMapa(
+      id: 'A14',
+      nombre: 'Pingüino',
+      x: 1270.0,
+      y: 647.0,
+      icono: Icons.ac_unit,
+    ),
+    MarcadorMapa(
+      id: 'A15',
+      nombre: 'Nutria',
+      x: 1369.0,
+      y: 603.0,
+      icono: Icons.water_drop,
+    ),
+    MarcadorMapa(
+      id: 'A16',
+      nombre: 'Pelícano',
+      x: 1466.0,
+      y: 638.0,
+      icono: Icons.flutter_dash,
+    ),
+    MarcadorMapa(
+      id: 'A17',
+      nombre: 'Cocodrilo',
+      x: 664.0,
+      y: 554.0,
+      icono: Icons.pets,
+    ),
+    MarcadorMapa(
+      id: 'A18',
+      nombre: 'Vaca',
+      x: 273.0,
+      y: 638.0,
+      icono: Icons.cruelty_free,
+    ),
+    MarcadorMapa(
+      id: 'A19',
+      nombre: 'Oveja',
+      x: 377.0,
+      y: 650.0,
+      icono: Icons.cruelty_free,
+    ),
+    MarcadorMapa(
+      id: 'A20',
+      nombre: 'Cerdo',
+      x: 458.0,
+      y: 635.0,
+      icono: Icons.cruelty_free,
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final size = MediaQuery.of(context).size;
+      final scale = size.height / mapaAlto;
+      final matrix = Matrix4.identity()
+        ..scale(scale)
+        ..translate(-(mapaAncho * scale - size.width) / 2 / scale, 0.0);
+      _transformationController.value = matrix;
+    });
+  }
+
   @override
   void dispose() {
     _transformationController.dispose();
     super.dispose();
+  }
+
+  void _mostrarInfoMarcador(MarcadorMapa marcador) {
+    final nuevaRuta = grafoMapa.encontrarRutaMasCorta(_nodoActual, marcador.id);
+    setState(() {
+      _marcadorSeleccionado = marcador;
+      _isNavigating = false;
+      _rutaActual = nuevaRuta;
+    });
   }
 
   Rect _getRect(GlobalKey key) {
@@ -85,7 +264,6 @@ class _PantallaMapaState extends State<PantallaMapa> {
           child: Column(
             children: [
               const SizedBox(height: 12),
-              // Drag handle
               Container(
                 width: 50,
                 height: 4,
@@ -95,7 +273,6 @@ class _PantallaMapaState extends State<PantallaMapa> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Tarjeta del pingüino
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Container(
@@ -139,7 +316,6 @@ class _PantallaMapaState extends State<PantallaMapa> {
                 ),
               ),
               const SizedBox(height: 24),
-              // Grid de animales
               Expanded(
                 child: GridView.builder(
                   padding: const EdgeInsets.symmetric(
@@ -151,12 +327,53 @@ class _PantallaMapaState extends State<PantallaMapa> {
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
                   ),
-                  itemCount: 16,
+                  itemCount: marcadores.length,
                   itemBuilder: (context, index) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        shape: BoxShape.circle,
+                    final marcador = marcadores[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        _mostrarInfoMarcador(marcador);
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppColors.verdeAzulado,
+                                  width: 2,
+                                ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                marcador.icono,
+                                color: AppColors.verdeAzulado,
+                                size: 28,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            marcador.nombre,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textoOscuro,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     );
                   },
@@ -169,6 +386,304 @@ class _PantallaMapaState extends State<PantallaMapa> {
     );
   }
 
+  Widget _buildBarraInferior() {
+    if (_marcadorSeleccionado == null) {
+      return GestureDetector(
+        onTap: () => _mostrarAnimalesPorVisitar(context),
+        child: Container(
+          height: 100,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 8,
+                offset: Offset(0, -2),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 50,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const Spacer(),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24.0,
+                  vertical: 20.0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Column(
+                      key: _keyAnimales,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Animales por visitar',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.verdeAzulado,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          height: 2,
+                          width: 80,
+                          color: AppColors.verdeAzulado.withValues(alpha: 0.5),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: List.generate(
+                        marcadores.length > 4 ? 4 : marcadores.length,
+                        (index) {
+                          final marcador = marcadores[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppColors.verdeAzulado,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Icon(
+                                marcador.icono,
+                                color: AppColors.verdeAzulado,
+                                size: 18,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else if (!_isNavigating) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: AppColors.verdeAzulado.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    _marcadorSeleccionado!.icono,
+                    color: AppColors.verdeAzulado,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _marcadorSeleccionado!.nombre,
+                        style: GoogleFonts.urbanist(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      Text(
+                        'Vista previa de ruta',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.grey),
+                  onPressed: () {
+                    setState(() {
+                      _marcadorSeleccionado = null;
+                      _rutaActual = [];
+                    });
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      // TODO: Navegar a la pantalla de información del animal
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.verdeAzulado,
+                      side: const BorderSide(color: AppColors.verdeAzulado),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      'Ver información',
+                      style: GoogleFonts.urbanist(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _isNavigating = true;
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.verdeAzulado,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.directions_walk,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Ir allí',
+                          style: GoogleFonts.urbanist(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.navigation,
+                        color: Colors.blueAccent,
+                        size: 28,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '150 m',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    'Llegarás en 2 min a ${_marcadorSeleccionado!.nombre}',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 13,
+                      color: Colors.grey[700],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _isNavigating = false;
+                  _marcadorSeleccionado = null;
+                  _rutaActual = [];
+                });
+              },
+              style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
+              child: Text(
+                'Cancelar',
+                style: GoogleFonts.urbanist(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,19 +691,81 @@ class _PantallaMapaState extends State<PantallaMapa> {
       extendBody: true,
       body: Stack(
         children: [
-          // 1. SECCIÓN DEL MAPA INTERACTIVO
           Positioned.fill(
             child: InteractiveViewer(
               transformationController: _transformationController,
               minScale: 0.1,
               maxScale: 5.0,
-              boundaryMargin: EdgeInsets.zero,
+              boundaryMargin: const EdgeInsets.all(500),
               constrained: false,
-              child: Image.asset('assets/images/mapa_zoologico.png'),
+              child: SizedBox(
+                width: mapaAncho,
+                height: mapaAlto,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: GestureDetector(
+                        onTapUp: (details) {
+                          final x = details.localPosition.dx.round();
+                          final y = details.localPosition.dy.round();
+                          print('📍 COORDENADA MAPA: x: $x, y: $y');
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Copiado: x: $x, y: $y'),
+                              backgroundColor: Colors.black87,
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        child: Image.asset(
+                          'assets/images/mapa_zoologico.png',
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: RutaPainter(_rutaActual, _isNavigating),
+                      ),
+                    ),
+                    ...marcadores.map((marcador) {
+                      return Positioned(
+                        left: marcador.x - 40,
+                        top: marcador.y - 40,
+                        child: MarcadorAnimado(
+                          marcador: marcador,
+                          onTap: () => _mostrarInfoMarcador(marcador),
+                        ),
+                      );
+                    }).toList(),
+                    if (grafoMapa.nodos.containsKey(_nodoActual))
+                      Positioned(
+                        left: grafoMapa.nodos[_nodoActual]!.posicion.dx - 12,
+                        top: grafoMapa.nodos[_nodoActual]!.posicion.dy - 12,
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 3),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black38,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
           ),
-
-          // 2. BARRA SUPERIOR FLOTANTE
           Positioned(
             top: 0,
             left: 0,
@@ -284,8 +861,6 @@ class _PantallaMapaState extends State<PantallaMapa> {
               ),
             ),
           ),
-
-          // 3. BOTONES FLOTANTES DE ACCIÓN
           Positioned(
             right: 16,
             bottom: 120,
@@ -332,97 +907,12 @@ class _PantallaMapaState extends State<PantallaMapa> {
               ],
             ),
           ),
-
-          // 4. BARRA INFERIOR PERSISTENTE
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            child: GestureDetector(
-              onTap: () => _mostrarAnimalesPorVisitar(context),
-              child: Container(
-                height: 100,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 8,
-                      offset: Offset(0, -2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 12),
-                    Container(
-                      width: 50,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0,
-                        vertical: 20.0,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Column(
-                            key: _keyAnimales,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Animales por visitar',
-                                style: GoogleFonts.urbanist(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.verdeAzulado,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Container(
-                                height: 2,
-                                width: 80,
-                                color: AppColors.verdeAzulado.withValues(
-                                  alpha: 0.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: List.generate(
-                              4,
-                              (index) => Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[300],
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            child: _buildBarraInferior(),
           ),
-
-          // 5. TUTORIAL OVERLAY
           if (_tutorialStep > 0)
             TutorialOverlay(
               step: _tutorialStep,
@@ -442,210 +932,4 @@ class _PantallaMapaState extends State<PantallaMapa> {
       ),
     );
   }
-}
-
-class TutorialOverlay extends StatelessWidget {
-  final Rect targetRect;
-  final String text;
-  final VoidCallback onNext;
-  final int step;
-
-  const TutorialOverlay({
-    super.key,
-    required this.targetRect,
-    required this.text,
-    required this.onNext,
-    required this.step,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {}, // Evita clics en los elementos de fondo
-      child: Stack(
-        children: [
-          CustomPaint(
-            size: MediaQuery.of(context).size,
-            painter: HolePainter(holeRect: targetRect),
-          ),
-          CustomPaint(
-            size: MediaQuery.of(context).size,
-            painter: ArrowPainter(targetRect: targetRect, step: step),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).size.height / 2 - 60,
-            left: 20,
-            right: 20,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  text,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.urbanist(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    height: 1.3,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: onNext,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.verdeAzulado,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 14,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: Text(
-                      'Entendido',
-                      style: GoogleFonts.urbanist(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class HolePainter extends CustomPainter {
-  final Rect holeRect;
-  HolePainter({required this.holeRect});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final path = Path.combine(
-      PathOperation.difference,
-      Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height)),
-      Path()..addRRect(
-        RRect.fromRectAndRadius(
-          holeRect.inflate(12),
-          const Radius.circular(30),
-        ),
-      ),
-    );
-    canvas.drawPath(
-      path,
-      Paint()..color = Colors.black.withValues(alpha: 0.75),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant HolePainter oldDelegate) =>
-      oldDelegate.holeRect != holeRect;
-}
-
-class ArrowPainter extends CustomPainter {
-  final Rect targetRect;
-  final int step;
-
-  ArrowPainter({required this.targetRect, required this.step});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 3.0
-      ..style = PaintingStyle.stroke;
-
-    final path = Path();
-    final center = Offset(size.width / 2, size.height / 2 + 50);
-
-    if (step == 1) {
-      path.moveTo(center.dx, center.dy);
-      path.quadraticBezierTo(
-        center.dx,
-        targetRect.top - 40,
-        targetRect.center.dx,
-        targetRect.top - 10,
-      );
-    } else if (step == 2) {
-      path.moveTo(center.dx, center.dy);
-      path.quadraticBezierTo(
-        center.dx,
-        targetRect.top - 40,
-        targetRect.left - 10,
-        targetRect.center.dy,
-      );
-    } else if (step == 3) {
-      path.moveTo(center.dx, center.dy);
-      path.quadraticBezierTo(
-        center.dx + 40,
-        center.dy + 40,
-        targetRect.left - 10,
-        targetRect.center.dy,
-      );
-    } else if (step == 4) {
-      final start = Offset(size.width / 2, size.height / 2 - 80);
-      path.moveTo(start.dx, start.dy);
-      path.quadraticBezierTo(
-        start.dx + 60,
-        targetRect.bottom + 40,
-        targetRect.center.dx,
-        targetRect.bottom + 10,
-      );
-    }
-
-    for (PathMetric measurePath in path.computeMetrics()) {
-      double distance = 0.0;
-      while (distance < measurePath.length) {
-        final double nextDistance = distance + 8.0;
-        canvas.drawPath(measurePath.extractPath(distance, nextDistance), paint);
-        distance = nextDistance + 6.0;
-      }
-
-      final tangent = measurePath.getTangentForOffset(measurePath.length);
-      if (tangent != null) {
-        final arrowPaint = Paint()
-          ..color = Colors.white
-          ..style = PaintingStyle.fill;
-
-        canvas.save();
-        canvas.translate(tangent.position.dx, tangent.position.dy);
-        canvas.rotate(tangent.angle);
-
-        final arrowPath = Path();
-        arrowPath.moveTo(0, 0);
-        arrowPath.lineTo(-14, -8);
-        arrowPath.quadraticBezierTo(-10, 0, -14, 8);
-        arrowPath.close();
-
-        canvas.drawPath(arrowPath, arrowPaint);
-
-        final splashPaint = Paint()
-          ..color = Colors.white
-          ..strokeWidth = 2.0
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round;
-
-        canvas.drawLine(
-          const Offset(6, -6),
-          const Offset(12, -10),
-          splashPaint,
-        );
-        canvas.drawLine(const Offset(8, 0), const Offset(14, 0), splashPaint);
-        canvas.drawLine(const Offset(6, 6), const Offset(12, 10), splashPaint);
-
-        canvas.restore();
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant ArrowPainter oldDelegate) =>
-      oldDelegate.step != step;
 }
