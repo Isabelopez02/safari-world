@@ -155,13 +155,13 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
     final sound = SoundService.instance.getSoundReaction(
       widget.marcador.nombre,
     );
-    final borderColor = widget.marcador.visitado
-        ? const Color(0xFF2E7D32)
-        : (widget.isSelected
-              ? AppColors.verdeAzulado
+    final borderColor = widget.isSelected
+        ? const Color(0xFFFF9800) // Naranja dorado brillante al seleccionar
+        : (widget.marcador.visitado
+              ? const Color(0xFF2E7D32)
               : AppColors.verdePrincipal);
 
-    final double pinSize = widget.isSelected ? 68.0 : 58.0;
+    final double pinSize = widget.isSelected ? 72.0 : 58.0;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -357,49 +357,98 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
   }
 
   Widget _buildBathroomPin() {
+    final Color pinColor = widget.isSelected
+        ? const Color(0xFFFF9800) // Naranja dorado brillante al seleccionar
+        : Colors.blue.shade600;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _handleTap,
       child: SizedBox(
-        width: 60,
-        height: 70,
+        width: 68,
+        height: 78,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: Colors.blue.shade600,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2.5),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 6,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.wc_rounded,
-                color: Colors.white,
-                size: 22,
-              ),
+            AnimatedBuilder(
+              animation: _pulseAnimation,
+              builder: (_, __) {
+                return Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Halo expansivo de selección
+                    if (widget.isSelected)
+                      Transform.scale(
+                        scale: _pulseAnimation.value,
+                        child: Container(
+                          width: 58,
+                          height: 58,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: pinColor.withValues(alpha: 0.25),
+                          ),
+                        ),
+                      ),
+                    AnimatedBuilder(
+                      animation: _bounceAnimation,
+                      builder: (_, __) => Transform.scale(
+                        scale: _bounceAnimation.value,
+                        child: Container(
+                          width: widget.isSelected ? 50 : 44,
+                          height: widget.isSelected ? 50 : 44,
+                          decoration: BoxDecoration(
+                            color: pinColor,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: widget.isSelected ? 3.0 : 2.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: widget.isSelected
+                                    ? pinColor.withValues(alpha: 0.45)
+                                    : Colors.black26,
+                                blurRadius: widget.isSelected ? 10 : 6,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.wc_rounded,
+                            color: Colors.white,
+                            size: widget.isSelected ? 26 : 22,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 3),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
+                color: widget.isSelected
+                    ? const Color(0xFFFFF3E0)
+                    : Colors.blue.shade50,
                 borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: widget.isSelected
+                      ? const Color(0xFFFFB74D)
+                      : Colors.blue.shade200,
+                  width: 1,
+                ),
               ),
               child: Text(
                 'Baño',
                 style: GoogleFonts.urbanist(
                   fontSize: 9,
                   fontWeight: FontWeight.w900,
-                  color: Colors.blue.shade700,
+                  color: widget.isSelected
+                      ? const Color(0xFFE65100)
+                      : Colors.blue.shade700,
                 ),
               ),
             ),

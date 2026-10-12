@@ -172,14 +172,26 @@ class BarraInferiorMapa extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: AppColors.verdeAzulado.withValues(alpha: 0.15),
+                color: sel.esBanio
+                    ? Colors.blue.shade50
+                    : AppColors.verdeAzulado.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: sel.imagen != null
-                    ? Image.asset(sel.imagen!, fit: BoxFit.cover)
-                    : Icon(sel.icono, color: AppColors.verdeAzulado, size: 28),
+                child: sel.esBanio
+                    ? Icon(
+                        Icons.wc_rounded,
+                        color: Colors.blue.shade700,
+                        size: 28,
+                      )
+                    : (sel.imagen != null
+                          ? Image.asset(sel.imagen!, fit: BoxFit.cover)
+                          : Icon(
+                              sel.icono,
+                              color: AppColors.verdeAzulado,
+                              size: 28,
+                            )),
               ),
             ),
             const SizedBox(width: 16),
@@ -188,15 +200,19 @@ class BarraInferiorMapa extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    sel.nombre,
+                    sel.esBanio ? 'Servicios Higiénicos' : sel.nombre,
                     style: GoogleFonts.urbanist(
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
-                      color: AppColors.verdePrincipal,
+                      color: sel.esBanio
+                          ? Colors.blue.shade800
+                          : AppColors.verdePrincipal,
                     ),
                   ),
                   Text(
-                    sel.categoria,
+                    sel.esBanio
+                        ? 'Baños disponibles para visitantes'
+                        : sel.categoria,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -222,42 +238,47 @@ class BarraInferiorMapa extends StatelessWidget {
         const SizedBox(height: 20),
         Row(
           children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PantallaDetalleAnimal(animal: sel),
+            if (!sel.esBanio) ...[
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            PantallaDetalleAnimal(animal: sel),
+                      ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.verdePrincipal,
+                    side: const BorderSide(
+                      color: AppColors.verdePrincipal,
+                      width: 2,
                     ),
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.verdePrincipal,
-                  side: const BorderSide(
-                    color: AppColors.verdePrincipal,
-                    width: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: Text(
-                  'Ver Info',
-                  style: GoogleFonts.urbanist(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                  child: Text(
+                    'Ver Info',
+                    style: GoogleFonts.urbanist(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
+              const SizedBox(width: 12),
+            ],
             Expanded(
               child: ElevatedButton(
                 onPressed: onIniciarNavegacion,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.verdeAzulado,
+                  backgroundColor: sel.esBanio
+                      ? Colors.blue.shade600
+                      : AppColors.verdeAzulado,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
@@ -274,7 +295,7 @@ class BarraInferiorMapa extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Explorar',
+                      sel.esBanio ? 'Cómo llegar' : 'Explorar',
                       style: GoogleFonts.urbanist(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

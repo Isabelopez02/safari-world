@@ -1,58 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
-import 'package:zoologico_front/core/services/sound_service.dart';
+
+import 'pantalla_detalle_show_acuatico.dart';
 
 class PantallaPrincipal extends StatelessWidget {
   const PantallaPrincipal({super.key});
+
+  void _navigateToMapExploraciones(BuildContext context) {
+    SoundService.instance.playButtonTap();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            const PantallaMapa(abrirExploracionesAlCargar: true),
+      ),
+    );
+  }
 
   void _navigateToMap(BuildContext context) {
     SoundService.instance.playButtonTap();
     Navigator.push(
       context,
       PageRouteBuilder(
-        opaque: false, // Permite ver la pantalla anterior durante la transición
-        transitionDuration: const Duration(milliseconds: 1200),
-        reverseTransitionDuration: const Duration(milliseconds: 1200),
+        opaque: false,
+        transitionDuration: const Duration(milliseconds: 1000),
+        reverseTransitionDuration: const Duration(milliseconds: 1000),
         pageBuilder: (context, animation, secondaryAnimation) =>
             const PantallaMapa(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return Stack(
             children: [
-              // 1. La nueva pantalla (PantallaMapa) aparece bruscamente a la mitad de la animación
-              // cuando la hoja está en su máximo tamaño cubriendo todo.
               FadeTransition(
                 opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
                   CurvedAnimation(
                     parent: animation,
-                    curve: const Interval(
-                      0.49,
-                      0.51,
-                    ), // Transición rápida a la mitad
+                    curve: const Interval(0.48, 0.52),
                   ),
                 ),
                 child: child,
               ),
-
-              // 2. Animación de la hoja gigante pasando por encima
               AnimatedBuilder(
                 animation: animation,
                 builder: (context, _) {
                   final t = animation.value;
                   final size = MediaQuery.of(context).size;
-
-                  // offset: empieza abajo a la derecha, pasa por el centro, termina arriba a la izquierda
                   final dx = (1 - 2 * t) * size.width;
                   final dy = (1 - 2 * t) * size.height;
-
-                  // factor: 0.0 (inicio) -> 0.5 (mitad) -> 0.0 (fin)
                   final factor = 0.5 - (t - 0.5).abs();
-
-                  // scale: empieza en 1, crece masivamente en el centro para tapar la pantalla, vuelve a 1
-                  final scale = 1.0 + (factor * 40.0);
-
-                  // rotación ligera para darle efecto orgánico
+                  final scale = 1.0 + (factor * 35.0);
                   final rotation = t * 3.14159;
 
                   return IgnorePointer(
@@ -65,8 +63,8 @@ class PantallaPrincipal extends StatelessWidget {
                           child: Center(
                             child: Image.asset(
                               'assets/images/planta_1.png',
-                              width: 150,
-                              height: 150,
+                              width: 140,
+                              height: 140,
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -86,41 +84,30 @@ class PantallaPrincipal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Fondo blanco para el rebote inferior
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Fondo verde oscuro para cubrir el rebote superior
+          // FONDO HERO CON GRADIENTE TIPO APPLE/SAFARI
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            height: MediaQuery.of(context).size.height * 0.5,
-            child: Container(color: const Color(0xFF1B2E24)),
-          ),
-
-          // 1. BACKGROUND JUNGLE IMAGE (Mitad superior)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: MediaQuery.of(context).size.height * 0.45,
+            height: MediaQuery.of(context).size.height * 0.46,
             child: Stack(
               fit: StackFit.expand,
               children: [
-                // Imagen original
                 Image.asset(
                   'assets/images/pantalla_principal/hero_fondo.png',
                   fit: BoxFit.cover,
                 ),
-                // Capa oscura encima
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withValues(alpha: 0.55),
-                        Colors.black.withValues(alpha: 0.35),
+                        Colors.black.withValues(alpha: 0.6),
+                        Colors.black.withValues(alpha: 0.25),
                       ],
                     ),
                   ),
@@ -129,389 +116,477 @@ class PantallaPrincipal extends StatelessWidget {
             ),
           ),
 
-          // 2. CONTENIDO DESPLAZABLE SOBRE EL FONDO
+          // CONTENIDO SCROLLEABLE
           SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: IntrinsicHeight(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // --- HEADER CONTENT ---
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              left: 24.0,
-                              right: 10.0,
-                              top: 20.0,
-                              bottom: 20.0,
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 13,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        'Visita todas nuestras\nzonas con nuestro mapa',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.urbanist(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w800,
-                                          height: 1.2,
-                                        ),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 12),
+
+                  // TOP HERO (Título + Botón Apple + Pingüino Explorador)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 22.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          flex: 13,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                  ),
+                                ),
+                                child: Text(
+                                  '🌲 Parque Natural & Safari',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                'Explora nuestras\nzonas interactivas',
+                                style: GoogleFonts.urbanist(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.15,
+                                  letterSpacing: -0.5,
+                                  shadows: const [
+                                    Shadow(
+                                      color: Colors.black38,
+                                      blurRadius: 10,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              // Botón de estilo iOS / Apple
+                              GestureDetector(
+                                onTap: () => _navigateToMap(context),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                    vertical: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.verdeAzulado,
+                                    borderRadius: BorderRadius.circular(24),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.verdeAzulado
+                                            .withValues(alpha: 0.4),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
                                       ),
-                                      const SizedBox(height: 16),
-                                      ElevatedButton(
-                                        onPressed: () =>
-                                            _navigateToMap(context),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              AppColors.verdeAzulado,
-                                          foregroundColor: Colors.white,
-                                          elevation: 3,
-                                          shadowColor: Colors.black45,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 20,
-                                            vertical: 12,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              30,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Icon(
-                                              Icons.explore_rounded,
-                                              size: 16,
-                                              color: Colors.white,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              'EMPEZAR A NAVEGAR',
-                                              style: GoogleFonts.urbanist(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w800,
-                                                letterSpacing: 0.5,
-                                              ),
-                                            ),
-                                          ],
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.explore_rounded,
+                                        size: 18,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Empezar a navegar',
+                                        style: GoogleFonts.urbanist(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w900,
+                                          color: Colors.white,
+                                          letterSpacing: 0.2,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                Expanded(
-                                  flex: 10,
-                                  child: Image.asset(
-                                    'assets/images/pantalla_principal/investigador.png',
-                                    height: 140,
-                                    fit: BoxFit.contain,
-                                    alignment: Alignment.bottomRight,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            const Icon(
-                                              Icons.pets,
-                                              size: 80,
-                                              color: Colors.white,
-                                            ),
-                                  ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          flex: 10,
+                          child: Image.asset(
+                            'assets/images/pantalla_principal/investigador.png',
+                            height: 145,
+                            fit: BoxFit.contain,
+                            alignment: Alignment.centerRight,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(
+                                  Icons.pets,
+                                  size: 80,
+                                  color: Colors.white,
                                 ),
-                              ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // CUERPO PRINCIPAL (TARJETA BLANCA TIPO APPLE SHEET)
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(32),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 20,
+                          offset: Offset(0, -5),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 16),
+                        // Handle bar tipo iOS
+                        Center(
+                          child: Container(
+                            width: 38,
+                            height: 4.5,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(3),
                             ),
                           ),
+                        ),
 
-                          const SizedBox(height: 10),
+                        const SizedBox(height: 18),
 
-                          // --- CUERPO BLANCO Y TARJETA FLOTANTE ---
-                          Expanded(
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                // Fondo blanco principal con borde redondeado superior
-                                Container(
-                                  margin: const EdgeInsets.only(top: 55),
-                                  width: double.infinity,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
+                        // --- 1. SECCIÓN: ANIMALES POR DESCUBRIR (AVATARES FOTOGRÁFICOS) ---
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '¿A quién deseas visitar hoy?',
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w900,
+                                      color: AppColors.textoOscuro,
+                                      letterSpacing: -0.3,
+                                    ),
                                   ),
-                                  child: Column(
+                                  Text(
+                                    'Toca un animal para ver su ubicación',
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 12,
+                                      color: Colors.grey[500],
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              GestureDetector(
+                                onTap: () =>
+                                    _navigateToMapExploraciones(context),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.verdeAzulado.withValues(
+                                      alpha: 0.1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const SizedBox(height: 65),
                                       Text(
-                                        'Conoce otros de nuestros servicios',
+                                        'Tus exploraciones',
                                         style: GoogleFonts.urbanist(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textoOscuro,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w800,
+                                          color: AppColors.verdeAzulado,
                                         ),
                                       ),
-                                      const SizedBox(height: 55),
-
-                                      // TARJETAS 3D (Foca y Castor)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 24.0,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: _buildServiceCard(
-                                                title: 'Shows acuáticos',
-                                                subtitle: '10am · 1pm · 4pm',
-                                                imagePath: 'assets/images/pantalla_principal/foca.png',
-                                                accentColor:
-                                                    AppColors.verdeAzulado,
-                                                onTap: () {},
-                                              ),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            Expanded(
-                                              child: _buildServiceCard(
-                                                title: 'Contacto de emergencia',
-                                                subtitle: '912321232',
-                                                imagePath: 'assets/images/pantalla_principal/emergencia.png',
-                                                accentColor: const Color(
-                                                  0xFF8B263E,
-                                                ),
-                                                onTap: () {},
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                      const SizedBox(width: 4),
+                                      const Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        size: 10,
+                                        color: AppColors.verdeAzulado,
                                       ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
 
-                                      const SizedBox(height: 40),
+                        const SizedBox(height: 14),
 
-                                      // BANNER DEL MAPA
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 28.0,
+                        // Carrusel horizontal de avatares fotográficos de animales
+                        SizedBox(
+                          height: 92,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            children: [
+                              _buildAnimalAvatar(
+                                context,
+                                'León',
+                                'assets/images/animales_con_fondo/leon-card.jpg',
+                              ),
+                              _buildAnimalAvatar(
+                                context,
+                                'Pingüino',
+                                'assets/images/animales_con_fondo/pinguino-card.jpg',
+                              ),
+                              _buildAnimalAvatar(
+                                context,
+                                'Gorila',
+                                'assets/images/animales_con_fondo/gorila-card.jpg',
+                              ),
+                              _buildAnimalAvatar(
+                                context,
+                                'Jirafa',
+                                'assets/images/animales_con_fondo/jirada-card.jpg',
+                              ),
+                              _buildAnimalAvatar(
+                                context,
+                                'Foca',
+                                'assets/images/animales_con_fondo/foca-card.jpg',
+                              ),
+                              _buildAnimalAvatar(
+                                context,
+                                'Panda',
+                                'assets/images/animales_con_fondo/osoPanda-card.jpg',
+                              ),
+                              _buildAnimalAvatar(
+                                context,
+                                'Cocodrilo',
+                                'assets/images/animales_con_fondo/cocodrilo-card.jpg',
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // --- 2. SECCIÓN: SERVICIOS Y EXPERIENCIAS (CARDS 3D POP-OUT) ---
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Experiencias y servicios',
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.textoOscuro,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.verdePrincipal.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  'Zoo Guide',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.verdePrincipal,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // TARJETAS 3D POP-OUT VERTICALES (UNA DEBAJO DE LA OTRA CON FONDOS TEMÁTICOS)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Column(
+                            children: [
+                              _buildShowAcuaticoCard(context),
+                              const SizedBox(height: 22),
+                              _buildEmergenciaCard(context),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 34),
+
+                        // --- 3. SECCIÓN: BANNER DEL MAPA INTERACTIVO ---
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Mapa satelital del parque',
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w900,
+                                      color: AppColors.textoOscuro,
+                                      letterSpacing: -0.3,
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              GestureDetector(
+                                onTap: () => _navigateToMap(context),
+                                child: Container(
+                                  height: 155,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(24),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.12,
                                         ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  'Explora nuestro mapa ',
-                                                  style: GoogleFonts.urbanist(
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.bold,
-                                                    color:
-                                                        AppColors.textoOscuro,
-                                                  ),
-                                                ),
-                                                const Icon(
-                                                  Icons.arrow_forward,
-                                                  size: 16,
-                                                  color: AppColors.textoOscuro,
+                                        blurRadius: 16,
+                                        offset: const Offset(0, 6),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(24),
+                                    child: Stack(
+                                      fit: StackFit.expand,
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/mapa_zoologico.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                        // Gradiente para legibilidad
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                              colors: [
+                                                Colors.transparent,
+                                                Colors.black.withValues(
+                                                  alpha: 0.75,
                                                 ),
                                               ],
                                             ),
-                                            const SizedBox(height: 12),
-                                            GestureDetector(
-                                              onTap: () =>
-                                                  _navigateToMap(context),
-                                              child: Container(
-                                                height: 120,
-                                                width: double.infinity,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(16),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.black
-                                                          .withAlpha(
-                                                            (255 * 0.12)
-                                                                .toInt(),
-                                                          ),
-                                                      blurRadius: 8,
-                                                      offset: const Offset(
-                                                        0,
-                                                        4,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                  image: const DecorationImage(
-                                                    image: AssetImage(
-                                                      'assets/images/mapa_zoologico.png',
-                                                    ),
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 40),
-
-                                      const Spacer(), // Empuja el footer a la parte inferior
-                                      // FOOTER IMAGE
-                                      Image.asset(
-                                        'assets/images/pantalla_principal/footer.png',
-                                        width: double.infinity,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                // --- TARJETA FLOTANTE (Carrusel de Animales) ---
-                                Positioned(
-                                  top: -5,
-                                  left: 16,
-                                  right: 16,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(12),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withAlpha(
-                                            (255 * 0.15).toInt(),
                                           ),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 5),
                                         ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            const Expanded(
-                                              child: Divider(
-                                                indent: 20,
-                                                endIndent: 12,
-                                                color: Colors.grey,
-                                                thickness: 1,
-                                              ),
-                                            ),
-                                            Text(
-                                              '¿Qué animales te falta visitar?',
-                                              style: GoogleFonts.urbanist(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w700,
-                                                color: AppColors.textoOscuro,
-                                              ),
-                                            ),
-                                            const Expanded(
-                                              child: Divider(
-                                                indent: 12,
-                                                endIndent: 20,
-                                                color: Colors.grey,
-                                                thickness: 1,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 12),
-                                        SizedBox(
-                                          height: 32,
-                                          child: ListView.builder(
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: 15,
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                            ),
-                                            itemBuilder: (context, index) {
-                                              final animals = [
-                                                {
-                                                  'icon': Icons.pets,
-                                                  'color':
-                                                      AppColors.verdePrincipal,
-                                                },
-                                                {
-                                                  'icon':
-                                                      Icons.water_drop_rounded,
-                                                  'color':
-                                                      AppColors.verdeAzulado,
-                                                },
-                                                {
-                                                  'icon': Icons.ac_unit_rounded,
-                                                  'color': Colors.blue,
-                                                },
-                                                {
-                                                  'icon': Icons
-                                                      .flutter_dash_rounded,
-                                                  'color': Colors.teal,
-                                                },
-                                                {
-                                                  'icon': Icons
-                                                      .cruelty_free_rounded,
-                                                  'color': Colors.brown,
-                                                },
-                                              ];
-                                              final item =
-                                                  animals[index %
-                                                      animals.length];
-                                              return GestureDetector(
-                                                onTap: () =>
-                                                    _navigateToMap(context),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 10.0,
-                                                      ),
-                                                  child: Container(
-                                                    width: 32,
-                                                    height: 32,
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          (item['color']
-                                                                  as Color)
-                                                              .withValues(
-                                                                alpha: 0.1,
-                                                              ),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: Icon(
-                                                      item['icon'] as IconData,
-                                                      color:
-                                                          item['color']
-                                                              as Color,
-                                                      size: 18,
+                                        Positioned(
+                                          bottom: 14,
+                                          left: 16,
+                                          right: 16,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    '20 Zonas y Paraderos',
+                                                    style: GoogleFonts.urbanist(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w900,
+                                                      color: Colors.white,
                                                     ),
                                                   ),
+                                                  Text(
+                                                    'Rutas con GPS inteligente y Dijkstra',
+                                                    style: GoogleFonts.urbanist(
+                                                      fontSize: 12,
+                                                      color: Colors.white70,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Container(
+                                                padding: const EdgeInsets.all(
+                                                  10,
                                                 ),
-                                              );
-                                            },
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.near_me_rounded,
+                                                  size: 18,
+                                                  color: AppColors.verdeAzulado,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        // FOOTER BOTÁNICO
+                        Image.asset(
+                          'assets/images/pantalla_principal/footer.png',
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
+                ],
+              ),
             ),
           ),
         ],
@@ -520,19 +595,80 @@ class PantallaPrincipal extends StatelessWidget {
   }
 
   // ============================================================
-  // TARJETAS 3D CON ANIMAL SOBRESALIENDO Y EFECTO SHIMMER
+  // AVATAR CIRCULAR DE ANIMAL (ESTILO HISTORIAS APPLE / INSTAGRAM)
   // ============================================================
-  Widget _buildServiceCard({
-    required String title,
-    required String subtitle,
-    required String imagePath,
-    required Color accentColor,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildAnimalAvatar(
+    BuildContext context,
+    String nombre,
+    String imagePath,
+  ) {
+    return GestureDetector(
+      onTap: () => _navigateToMapExploraciones(context),
+      child: Padding(
+        padding: const EdgeInsets.only(right: 14.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(2.5),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [AppColors.verdeAzulado, AppColors.verdePrincipal],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.verdeAzulado.withValues(alpha: 0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Container(
+                width: 58,
+                height: 58,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.pets, color: AppColors.verdeAzulado),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              nombre,
+              style: GoogleFonts.urbanist(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textoOscuro,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // TARJETA VERTICAL 3D: SHOWS ACUÁTICOS (FONDO TEMÁTICO MARINO)
+  // ============================================================
+  Widget _buildShowAcuaticoCard(BuildContext context) {
     return GestureDetector(
       onTap: () {
         SoundService.instance.playButtonTap();
-        onTap();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const PantallaDetalleShowAcuatico(),
+          ),
+        );
       },
       child: SizedBox(
         height: 185,
@@ -540,68 +676,149 @@ class PantallaPrincipal extends StatelessWidget {
           clipBehavior: Clip.none,
           alignment: Alignment.bottomCenter,
           children: [
-            // TARJETA BASE BLANCA
+            // 1. BASE DE LA TARJETA CON FONDO MARINO ELEGANTE
             Container(
-              height: 135,
+              height: 155,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 14,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF0F3E4D),
+                    Color(0xFF145366),
+                    Color(0xFF1B6B80),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(26),
                 border: Border.all(
-                  color: accentColor.withValues(alpha: 0.22),
+                  color: const Color(0xFF26A69A).withValues(alpha: 0.35),
                   width: 1.5,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0F3E4D).withValues(alpha: 0.28),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(26),
                 child: Stack(
                   children: [
-                    // CONTENIDO TEXTO
+                    // Círculos de luz ambiental acuática
                     Positioned(
-                      bottom: 12,
-                      left: 10,
-                      right: 10,
+                      right: -20,
+                      top: -20,
+                      child: Container(
+                        width: 160,
+                        height: 160,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: 0.06),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: -30,
+                      bottom: -30,
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color(0xFF26A69A)
+                              .withValues(alpha: 0.12),
+                        ),
+                      ),
+                    ),
+
+                    // CONTENIDO TEXTO A LA IZQUIERDA
+                    Positioned(
+                      left: 18,
+                      top: 16,
+                      bottom: 16,
+                      right: 140,
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            title,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.urbanist(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.verdePrincipal,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            subtitle,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.urbanist(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                          const SizedBox(height: 6),
+                          // BADGE EN VIVO
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
+                              horizontal: 9,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: accentColor.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(12),
+                              color: const Color(0xFF26A69A),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.water_drop_rounded,
+                                  size: 11,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'EN VIVO · 3 FUNCIONES',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                    letterSpacing: 0.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // TÍTULO Y SUBTÍTULO
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Shows Acuáticos',
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Focas y lobos marinos\n10:00 AM · 1:00 PM · 4:00 PM',
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white.withValues(alpha: 0.85),
+                                  height: 1.25,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          // BOTÓN VER DETALLES
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -609,16 +826,16 @@ class PantallaPrincipal extends StatelessWidget {
                                 Text(
                                   'Ver detalles',
                                   style: GoogleFonts.urbanist(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                    color: accentColor,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w900,
+                                    color: const Color(0xFF0F3E4D),
                                   ),
                                 ),
-                                const SizedBox(width: 4),
-                                Icon(
+                                const SizedBox(width: 5),
+                                const Icon(
                                   Icons.arrow_forward_rounded,
-                                  size: 11,
-                                  color: accentColor,
+                                  size: 13,
+                                  color: Color(0xFF0F3E4D),
                                 ),
                               ],
                             ),
@@ -627,28 +844,221 @@ class PantallaPrincipal extends StatelessWidget {
                       ),
                     ),
 
-                    // SHIMMER DE LUZ SUAVE EN LA TARJETA
+                    // SHIMMER SUAVE
                     const Positioned.fill(child: _ShimmerSweep()),
                   ],
                 ),
               ),
             ),
 
-            // IMAGEN 3D SOBRESALIENDO DE LA MITAD SUPERIOR
+            // 2. ANIMAL 3D SOBRESALIENDO (FOCA POP-OUT)
             Positioned(
+              right: 8,
               top: 0,
+              bottom: 6,
               child: Image.asset(
-                imagePath,
-                height: 105,
+                'assets/images/pantalla_principal/foca.png',
+                height: 175,
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 90,
-                  width: 90,
-                  decoration: BoxDecoration(
-                    color: accentColor.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.pets, size: 70, color: Colors.white70),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // TARJETA VERTICAL 3D: EMERGENCIA Y AYUDA (FONDO CÁLIDO PROTECTOR)
+  // ============================================================
+  Widget _buildEmergenciaCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        SoundService.instance.playButtonTap();
+      },
+      child: SizedBox(
+        height: 170,
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.bottomCenter,
+          children: [
+            // 1. BASE DE LA TARJETA CON FONDO DE ASISTENCIA MÉDICA
+            Container(
+              height: 145,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF8B1E1E),
+                    Color(0xFFA82525),
+                    Color(0xFFC53030),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(26),
+                border: Border.all(
+                  color: Colors.red.shade300.withValues(alpha: 0.35),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF8B1E1E).withValues(alpha: 0.25),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
                   ),
-                  child: Icon(Icons.pets, size: 40, color: accentColor),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(26),
+                child: Stack(
+                  children: [
+                    // Círculos de luz ambiental
+                    Positioned(
+                      right: -15,
+                      top: -15,
+                      child: Container(
+                        width: 140,
+                        height: 140,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: 0.06),
+                        ),
+                      ),
+                    ),
+
+                    // CONTENIDO TEXTO A LA IZQUIERDA
+                    Positioned(
+                      left: 18,
+                      top: 14,
+                      bottom: 14,
+                      right: 135,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // BADGE ASISTENCIA 24/7
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 9,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFDC2626),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.health_and_safety_rounded,
+                                  size: 11,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'ASISTENCIA 24/7',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                    letterSpacing: 0.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // TÍTULO Y SUBTÍTULO
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Emergencia & Ayuda',
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Llama directo: 912 321 232\nAtención médica y rescate',
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white.withValues(alpha: 0.85),
+                                  height: 1.25,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          // BOTÓN LLAMAR SOS
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.phone_in_talk_rounded,
+                                  size: 12,
+                                  color: Color(0xFF8B1E1E),
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  'Contactar SOS',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w900,
+                                    color: const Color(0xFF8B1E1E),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // SHIMMER SUAVE
+                    const Positioned.fill(child: _ShimmerSweep()),
+                  ],
+                ),
+              ),
+            ),
+
+            // 2. ILUSTRACIÓN 3D SOBRESALIENDO (EMERGENCIA POP-OUT)
+            Positioned(
+              right: 12,
+              top: 2,
+              bottom: 8,
+              child: Image.asset(
+                'assets/images/pantalla_principal/emergencia.png',
+                height: 155,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.health_and_safety,
+                  size: 70,
+                  color: Colors.white70,
                 ),
               ),
             ),
@@ -659,6 +1069,9 @@ class PantallaPrincipal extends StatelessWidget {
   }
 }
 
+// =====================================================================
+// Shimmer sweep widget — reflejo de luz suave sin tapar contenido
+// =====================================================================
 class _ShimmerSweep extends StatefulWidget {
   const _ShimmerSweep();
   @override
@@ -669,6 +1082,7 @@ class _ShimmerSweepState extends State<_ShimmerSweep>
     with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late Animation<double> _anim;
+
   @override
   void initState() {
     super.initState();
@@ -701,7 +1115,7 @@ class _ShimmerSweepState extends State<_ShimmerSweep>
                 end: const Alignment(2.0, 1.0),
                 colors: [
                   Colors.white.withValues(alpha: 0.0),
-                  Colors.white.withValues(alpha: 0.25),
+                  Colors.white.withValues(alpha: 0.2),
                   Colors.white.withValues(alpha: 0.0),
                 ],
                 stops: [

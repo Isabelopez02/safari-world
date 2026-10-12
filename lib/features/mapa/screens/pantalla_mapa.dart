@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,7 +14,8 @@ import '../widgets/ruta_painter.dart';
 import '../widgets/tutorial_overlay.dart';
 
 class PantallaMapa extends StatefulWidget {
-  const PantallaMapa({super.key});
+  final bool abrirExploracionesAlCargar;
+  const PantallaMapa({super.key, this.abrirExploracionesAlCargar = false});
 
   @override
   State<PantallaMapa> createState() => _PantallaMapaState();
@@ -87,7 +88,11 @@ class _PantallaMapaState extends State<PantallaMapa>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _centrarEnUbicacionInicial(false);
-      _checkTutorial();
+      if (widget.abrirExploracionesAlCargar) {
+        _mostrarAnimalesPorVisitar(context);
+      } else {
+        _checkTutorial();
+      }
     });
   }
 
@@ -115,36 +120,76 @@ class _PantallaMapaState extends State<PantallaMapa>
     super.dispose();
   }
 
+  Matrix4 _clampearMatriz(Matrix4 matrix, Size viewportSize) {
+    final scale = matrix.getMaxScaleOnAxis();
+    final translation = matrix.getTranslation();
+
+    final scaledWidth = mapaAncho * scale;
+    final scaledHeight = mapaAlto * scale;
+
+    double tx = translation.x;
+    double ty = translation.y;
+
+    if (scaledWidth >= viewportSize.width) {
+      tx = tx.clamp(viewportSize.width - scaledWidth, 0.0);
+    } else {
+      tx = (viewportSize.width - scaledWidth) / 2;
+    }
+
+    if (scaledHeight >= viewportSize.height) {
+      ty = ty.clamp(viewportSize.height - scaledHeight, 0.0);
+    } else {
+      ty = (viewportSize.height - scaledHeight) / 2;
+    }
+
+    return Matrix4.identity()
+      ..translate(tx, ty)
+      ..scale(scale);
+  }
+
   void _centrarEnUbicacionInicial([bool animate = true]) {
     final size = MediaQuery.of(context).size;
-    final scale = size.height / mapaAlto;
+    final double scale = math.max(
+      size.width / mapaAncho,
+      size.height / mapaAlto,
+    );
+    final dx = (size.width - mapaAncho * scale) / 2;
+    final dy = (size.height - mapaAlto * scale) / 2;
     final targetMatrix = Matrix4.identity()
-      ..scale(scale)
-      ..translate(-(mapaAncho * scale - size.width) / 2 / scale, 0.0);
+      ..translate(dx, dy)
+      ..scale(scale);
 
     _limitarYCentrar(targetMatrix, animate);
   }
 
   void _centrarEnPunto(double x, double y) {
     final size = MediaQuery.of(context).size;
+    final double minMapScale = math.max(
+      size.width / mapaAncho,
+      size.height / mapaAlto,
+    );
     final double currentScale = _transformationController.value
         .getMaxScaleOnAxis();
-    final double zoomScale = currentScale < 1.5 ? 1.5 : currentScale;
+    final double zoomScale = math.max(currentScale, math.max(minMapScale, 1.4));
+
+    final double dx = (size.width / 2) - (x * zoomScale);
+    final double dy = (size.height / 2) - (y * zoomScale);
 
     final targetMatrix = Matrix4.identity()
-      ..translate(size.width / 2, size.height / 2)
-      ..scale(zoomScale)
-      ..translate(-x, -y);
+      ..translate(dx, dy)
+      ..scale(zoomScale);
 
     _limitarYCentrar(targetMatrix, true);
   }
 
   void _limitarYCentrar(Matrix4 target, bool animate) {
+    final size = MediaQuery.of(context).size;
+    final clamped = _clampearMatriz(target, size);
     if (animate) {
       _cameraAnimation =
           Matrix4Tween(
             begin: _transformationController.value,
-            end: target,
+            end: clamped,
           ).animate(
             CurvedAnimation(
               parent: _cameraAnimationController,
@@ -153,7 +198,7 @@ class _PantallaMapaState extends State<PantallaMapa>
           );
       _cameraAnimationController.forward(from: 0);
     } else {
-      _transformationController.value = target;
+      _transformationController.value = clamped;
     }
   }
 
@@ -553,6 +598,12 @@ class _PantallaMapaState extends State<PantallaMapa>
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final double minMapScale = math.max(
+      screenSize.width / mapaAncho,
+      screenSize.height / mapaAlto,
+    );
+
     return Scaffold(
       backgroundColor: Colors.white,
       extendBody: true,
@@ -562,9 +613,9 @@ class _PantallaMapaState extends State<PantallaMapa>
           Positioned.fill(
             child: InteractiveViewer(
               transformationController: _transformationController,
-              minScale: 0.1,
+              minScale: minMapScale,
               maxScale: 5.0,
-              boundaryMargin: const EdgeInsets.all(1000),
+              boundaryMargin: EdgeInsets.zero,
               constrained: false,
               child: SizedBox(
                 width: mapaAncho,
@@ -611,8 +662,8 @@ class _PantallaMapaState extends State<PantallaMapa>
                           top: banio.y - 35,
                           child: MarcadorAnimado(
                             marcador: banio,
-                            isSelected: false,
-                            onTap: () {},
+                            isSelected: _marcadorSeleccionado?.id == banio.id,
+                            onTap: () => _mostrarInfoMarcador(banio),
                           ),
                         );
                       }),

@@ -62,6 +62,10 @@ final GrafoZoolologico grafoMapa = GrafoZoolologico()
   ..agregarNodo('A18', 273, 638) // Vaca
   ..agregarNodo('A19', 377, 650) // Oveja
   ..agregarNodo('A20', 458, 635) // Cerdo
+  // BAÑOS (WC)
+  ..agregarNodo('B01', 420, 580)
+  ..agregarNodo('B02', 900, 520)
+  ..agregarNodo('B03', 1300, 720)
   // 4. CONECTAR ANIMALES AL CAMINO MÁS CERCANO
   ..agregarArista('camino_izq_5', 'A01')
   ..agregarArista('camino_izq_5', 'A02')
@@ -82,4 +86,8 @@ final GrafoZoolologico grafoMapa = GrafoZoolologico()
   ..agregarArista('camino_izq_1', 'A17')
   ..agregarArista('camino_izq_2', 'A18')
   ..agregarArista('camino_izq_2', 'A19')
-  ..agregarArista('camino_izq_2', 'A20');
+  ..agregarArista('camino_izq_2', 'A20')
+  // CONEXIONES DE BAÑOS
+  ..agregarArista('camino_izq_2', 'B01')
+  ..agregarArista('camino_centro_2', 'B02')
+  ..agregarArista('camino_der_1', 'B03');
