@@ -65,7 +65,9 @@ class _PantallaOnboardingState extends State<PantallaOnboarding> {
               child: TextButton(
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                    MaterialPageRoute(
+                      builder: (context) => const PantallaPrincipal(),
+                    ),
                   );
                 },
                 child: const Text(
@@ -77,7 +79,7 @@ class _PantallaOnboardingState extends State<PantallaOnboarding> {
                 ),
               ),
             ),
-            
+
             // Contenido desplazable (Imágenes, Título, Texto)
             Expanded(
               child: PageView.builder(
@@ -113,9 +115,9 @@ class _PantallaOnboardingState extends State<PantallaOnboarding> {
                             ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 40),
-                        
+
                         // Indicadores (Puntitos / Pill)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -124,9 +126,9 @@ class _PantallaOnboardingState extends State<PantallaOnboarding> {
                             (indexPunto) => _buildPunto(indexPunto: indexPunto),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 40),
-                        
+
                         // Título
                         Text(
                           pagina.title,
@@ -138,9 +140,9 @@ class _PantallaOnboardingState extends State<PantallaOnboarding> {
                             height: 1.2,
                           ),
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Descripción
                         Text(
                           pagina.description,
@@ -151,7 +153,7 @@ class _PantallaOnboardingState extends State<PantallaOnboarding> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        
+
                         const SizedBox(height: 40),
                       ],
                     ),
@@ -159,10 +161,13 @@ class _PantallaOnboardingState extends State<PantallaOnboarding> {
                 },
               ),
             ),
-            
+
             // Botón Inferior "Siguiente"
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 30.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 40.0,
+                vertical: 30.0,
+              ),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -180,7 +185,9 @@ class _PantallaOnboardingState extends State<PantallaOnboarding> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        _paginaActual == _paginas.length - 1 ? 'Empezar' : 'Siguiente',
+                        _paginaActual == _paginas.length - 1
+                            ? 'Empezar'
+                            : 'Siguiente',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
 class MarcadorMapa {
@@ -10,6 +12,7 @@ class MarcadorMapa {
   bool visitado;
   final String categoria;
   final String? imagen;
+  final bool esBanio;
 
   MarcadorMapa({
     required this.id,
@@ -20,6 +23,7 @@ class MarcadorMapa {
     this.visitado = false,
     this.categoria = 'Todos',
     this.imagen,
+    this.esBanio = false,
   });
 }
 
@@ -40,136 +44,366 @@ class MarcadorAnimado extends StatefulWidget {
 }
 
 class _MarcadorAnimadoState extends State<MarcadorAnimado>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
+    with TickerProviderStateMixin {
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  late AnimationController _bounceController;
+  late Animation<double> _bounceAnimation;
+
+  late AnimationController _bubbleController;
+  late Animation<double> _bubbleFade;
+  late Animation<Offset> _bubbleSlide;
+
+  bool _showBubble = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    );
-    _animation = Tween<double>(
-      begin: 0.9,
-      end: 1.2,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    );
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.25).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
     if (!widget.marcador.visitado || widget.isSelected) {
-      _controller.repeat(reverse: true);
+      _pulseController.repeat(reverse: true);
     }
+
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 320),
+    );
+    _bounceAnimation = Tween<double>(begin: 1.0, end: 1.25).animate(
+      CurvedAnimation(parent: _bounceController, curve: Curves.elasticOut),
+    );
+
+    _bubbleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+    _bubbleFade = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _bubbleController,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
+      ),
+    );
+    _bubbleSlide = Tween<Offset>(begin: Offset.zero, end: const Offset(0, -1.8))
+        .animate(
+          CurvedAnimation(
+            parent: _bubbleController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
+    _bubbleController.addStatusListener((s) {
+      if (s == AnimationStatus.completed && mounted) {
+        setState(() => _showBubble = false);
+      }
+    });
   }
 
   @override
-  void didUpdateWidget(MarcadorAnimado oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  void didUpdateWidget(MarcadorAnimado old) {
+    super.didUpdateWidget(old);
     if ((!widget.marcador.visitado || widget.isSelected) &&
-        !_controller.isAnimating) {
-      _controller.repeat(reverse: true);
+        !_pulseController.isAnimating) {
+      _pulseController.repeat(reverse: true);
     } else if (widget.marcador.visitado &&
         !widget.isSelected &&
-        _controller.isAnimating) {
-      _controller.stop();
-      _controller.value = 0.0;
+        _pulseController.isAnimating) {
+      _pulseController.stop();
+      _pulseController.value = 0;
     }
+    if (widget.isSelected && !old.isSelected) {
+      _triggerFeedback();
+    }
+  }
+
+  void _triggerFeedback() {
+    _bounceController.forward(from: 0).then((_) => _bounceController.reverse());
+    setState(() => _showBubble = true);
+    _bubbleController.forward(from: 0);
+  }
+
+  void _handleTap() {
+    if (widget.marcador.esBanio) {
+      SoundService.instance.playButtonTap();
+    } else {
+      SoundService.instance.playAnimalTap(widget.marcador.nombre);
+    }
+    _triggerFeedback();
+    widget.onTap();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _pulseController.dispose();
+    _bounceController.dispose();
+    _bubbleController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final Color markerColor = widget.marcador.visitado
-        ? AppColors.verdeClaro
+    if (widget.marcador.esBanio) return _buildBathroomPin();
+    return _buildAnimalParadero();
+  }
+
+  Widget _buildAnimalParadero() {
+    final sound = SoundService.instance.getSoundReaction(
+      widget.marcador.nombre,
+    );
+    final borderColor = widget.marcador.visitado
+        ? const Color(0xFF2E7D32)
         : (widget.isSelected
               ? AppColors.verdeAzulado
               : AppColors.verdePrincipal);
 
+    final double pinSize = widget.isSelected ? 68.0 : 58.0;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: widget.onTap,
+      onTap: _handleTap,
       child: SizedBox(
-        width: 80,
-        height: 80,
-        child: Center(
-          child: AnimatedBuilder(
-            animation: _animation,
-            builder: (context, child) {
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Pulso
-                  if (!widget.marcador.visitado || widget.isSelected)
-                    Transform.scale(
-                      scale: _animation.value,
+        width: 100,
+        height: 110,
+        child: Stack(
+          alignment: Alignment.topCenter,
+          clipBehavior: Clip.none,
+          children: [
+            // ONOMATOPEYA FLOTANTE
+            if (_showBubble)
+              Positioned(
+                top: -28,
+                child: AnimatedBuilder(
+                  animation: _bubbleController,
+                  builder: (_, __) => SlideTransition(
+                    position: _bubbleSlide,
+                    child: FadeTransition(
+                      opacity: _bubbleFade,
                       child: Container(
-                        width: 50,
-                        height: 50,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: markerColor.withValues(alpha: 0.3),
+                          color: AppColors.verdePrincipal,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black26, blurRadius: 6),
+                          ],
+                        ),
+                        child: Text(
+                          sound,
+                          style: GoogleFonts.urbanist(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
-                    ),
-                  // Icono base
-                  Container(
-                    width: widget.isSelected ? 54 : 44,
-                    height: widget.isSelected ? 54 : 44,
-                    decoration: BoxDecoration(
-                      color: widget.marcador.visitado
-                          ? AppColors.fondoGrisClaro
-                          : Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: markerColor,
-                        width: widget.isSelected ? 4 : 3,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: widget.isSelected ? 8 : 4,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      widget.marcador.icono,
-                      color: markerColor,
-                      size: widget.isSelected ? 26 : 22,
                     ),
                   ),
-                  // Check verde si está visitado
-                  if (widget.marcador.visitado)
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
+                ),
+              ),
+
+            // CONTENIDO DEL PARADERO (AVATAR GRANDE + NOMBRE)
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedBuilder(
+                  animation: _bounceAnimation,
+                  builder: (_, __) => Transform.scale(
+                    scale: _bounceAnimation.value,
+                    child: _buildAvatarWithPulse(pinSize, borderColor),
+                  ),
+                ),
+                const SizedBox(height: 3),
+                // Etiqueta con nombre del animal
+                Container(
+                  constraints: const BoxConstraints(maxWidth: 90),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2.5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.95),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 5,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                    border: Border.all(
+                      color: borderColor.withValues(alpha: 0.25),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    widget.marcador.nombre,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.urbanist(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      color: borderColor,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAvatarWithPulse(double size, Color borderColor) {
+    return AnimatedBuilder(
+      animation: _pulseAnimation,
+      builder: (_, __) {
+        return Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+            // Halo de pulso
+            if (!widget.marcador.visitado || widget.isSelected)
+              Transform.scale(
+                scale: _pulseAnimation.value,
+                child: Container(
+                  width: size + 16,
+                  height: size + 16,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: borderColor.withValues(alpha: 0.18),
+                  ),
+                ),
+              ),
+
+            // AVATAR CIRCULAR CON FOTO GRANDE
+            Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                border: Border.all(
+                  color: borderColor,
+                  width: widget.isSelected ? 3.5 : 2.8,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.22),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: widget.marcador.imagen != null
+                    ? Image.asset(
+                        widget.marcador.imagen!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: borderColor.withValues(alpha: 0.15),
+                          child: Icon(
+                            widget.marcador.icono,
+                            size: size * 0.5,
+                            color: borderColor,
+                          ),
                         ),
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.check,
-                            size: 14,
-                            color: Colors.white,
-                          ),
+                      )
+                    : Container(
+                        color: borderColor.withValues(alpha: 0.15),
+                        child: Icon(
+                          widget.marcador.icono,
+                          size: size * 0.5,
+                          color: borderColor,
                         ),
                       ),
-                    ),
+              ),
+            ),
+
+            // BADGE VISITADO (CHECK VERDE)
+            if (widget.marcador.visitado)
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(color: Colors.black26, blurRadius: 4),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: Color(0xFF2E7D32),
+                    size: 16,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildBathroomPin() {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _handleTap,
+      child: SizedBox(
+        width: 60,
+        height: 70,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: Colors.blue.shade600,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2.5),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 6,
+                    offset: Offset(0, 3),
+                  ),
                 ],
-              );
-            },
-          ),
+              ),
+              child: const Icon(
+                Icons.wc_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                'Baño',
+                style: GoogleFonts.urbanist(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.blue.shade700,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

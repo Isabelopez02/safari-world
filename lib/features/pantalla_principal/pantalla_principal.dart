@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
+import 'package:zoologico_front/core/services/sound_service.dart';
 
 class PantallaPrincipal extends StatelessWidget {
   const PantallaPrincipal({super.key});
 
   void _navigateToMap(BuildContext context) {
+    SoundService.instance.playButtonTap();
     Navigator.push(
       context,
       PageRouteBuilder(
@@ -176,9 +178,10 @@ class PantallaPrincipal extends StatelessWidget {
                                           backgroundColor:
                                               AppColors.verdeAzulado,
                                           foregroundColor: Colors.white,
-                                          elevation: 0,
+                                          elevation: 3,
+                                          shadowColor: Colors.black45,
                                           padding: const EdgeInsets.symmetric(
-                                            horizontal: 22,
+                                            horizontal: 20,
                                             vertical: 12,
                                           ),
                                           shape: RoundedRectangleBorder(
@@ -187,12 +190,24 @@ class PantallaPrincipal extends StatelessWidget {
                                             ),
                                           ),
                                         ),
-                                        child: Text(
-                                          'EMPESAR A NAVEGAR',
-                                          style: GoogleFonts.urbanist(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w800,
-                                          ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(
+                                              Icons.explore_rounded,
+                                              size: 16,
+                                              color: Colors.white,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'EMPEZAR A NAVEGAR',
+                                              style: GoogleFonts.urbanist(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w800,
+                                                letterSpacing: 0.5,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
@@ -253,24 +268,23 @@ class PantallaPrincipal extends StatelessWidget {
                                         child: Row(
                                           children: [
                                             Expanded(
-                                              child: _buildPopOutCard(
-                                                title: 'Show acuaticos',
+                                              child: _buildServiceCard(
+                                                title: 'Shows acuáticos',
                                                 subtitle: '10am · 1pm · 4pm',
                                                 imagePath: 'assets/images/pantalla_principal/foca.png',
-                                                topColor: const Color(
-                                                  0xFF335746,
-                                                ),
+                                                accentColor:
+                                                    AppColors.verdeAzulado,
                                                 onTap: () {},
                                               ),
                                             ),
                                             const SizedBox(width: 16),
                                             Expanded(
-                                              child: _buildPopOutCard(
-                                                title: 'Contacto emergencia',
+                                              child: _buildServiceCard(
+                                                title: 'Contacto de emergencia',
                                                 subtitle: '912321232',
                                                 imagePath: 'assets/images/pantalla_principal/emergencia.png',
-                                                topColor: const Color(
-                                                  0xFF552D37,
+                                                accentColor: const Color(
+                                                  0xFF8B263E,
                                                 ),
                                                 onTap: () {},
                                               ),
@@ -395,7 +409,7 @@ class PantallaPrincipal extends StatelessWidget {
                                               ),
                                             ),
                                             Text(
-                                              '¿Que animales te falta visitar?',
+                                              '¿Qué animales te falta visitar?',
                                               style: GoogleFonts.urbanist(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w700,
@@ -422,22 +436,64 @@ class PantallaPrincipal extends StatelessWidget {
                                               horizontal: 12,
                                             ),
                                             itemBuilder: (context, index) {
-                                              final icons = [
-                                                Icons.flutter_dash,
-                                                Icons.pets,
-                                                Icons.cruelty_free,
-                                                Icons.bug_report,
-                                                Icons.catching_pokemon,
+                                              final animals = [
+                                                {
+                                                  'icon': Icons.pets,
+                                                  'color':
+                                                      AppColors.verdePrincipal,
+                                                },
+                                                {
+                                                  'icon':
+                                                      Icons.water_drop_rounded,
+                                                  'color':
+                                                      AppColors.verdeAzulado,
+                                                },
+                                                {
+                                                  'icon': Icons.ac_unit_rounded,
+                                                  'color': Colors.blue,
+                                                },
+                                                {
+                                                  'icon': Icons
+                                                      .flutter_dash_rounded,
+                                                  'color': Colors.teal,
+                                                },
+                                                {
+                                                  'icon': Icons
+                                                      .cruelty_free_rounded,
+                                                  'color': Colors.brown,
+                                                },
                                               ];
-                                              return Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 12.0,
+                                              final item =
+                                                  animals[index %
+                                                      animals.length];
+                                              return GestureDetector(
+                                                onTap: () =>
+                                                    _navigateToMap(context),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 10.0,
+                                                      ),
+                                                  child: Container(
+                                                    width: 32,
+                                                    height: 32,
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          (item['color']
+                                                                  as Color)
+                                                              .withValues(
+                                                                alpha: 0.1,
+                                                              ),
+                                                      shape: BoxShape.circle,
                                                     ),
-                                                child: Icon(
-                                                  icons[index % icons.length],
-                                                  color: Colors.black87,
-                                                  size: 26,
+                                                    child: Icon(
+                                                      item['icon'] as IconData,
+                                                      color:
+                                                          item['color']
+                                                              as Color,
+                                                      size: 18,
+                                                    ),
+                                                  ),
                                                 ),
                                               );
                                             },
@@ -464,143 +520,200 @@ class PantallaPrincipal extends StatelessWidget {
   }
 
   // ============================================================
-  // TARJETAS 3D VERTICALES
+  // TARJETAS 3D CON ANIMAL SOBRESALIENDO Y EFECTO SHIMMER
   // ============================================================
-  Widget _buildPopOutCard({
+  Widget _buildServiceCard({
     required String title,
     required String subtitle,
     required String imagePath,
-    required Color topColor,
+    required Color accentColor,
     required VoidCallback onTap,
   }) {
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: Alignment.bottomCenter,
-      children: [
-        // Base de la tarjeta
-        Container(
-          height: 140, // Un poco más chaparrita para igualar proporciones
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha((255 * 0.08).toInt()),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // Mitad superior de color (Más alta que la blanca)
-              Expanded(
-                flex: 13,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: topColor,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
-                    ),
+    return GestureDetector(
+      onTap: () {
+        SoundService.instance.playButtonTap();
+        onTap();
+      },
+      child: SizedBox(
+        height: 185,
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.bottomCenter,
+          children: [
+            // TARJETA BASE BLANCA
+            Container(
+              height: 135,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
                   ),
+                ],
+                border: Border.all(
+                  color: accentColor.withValues(alpha: 0.22),
+                  width: 1.5,
                 ),
               ),
-              // Mitad inferior blanca con textos
-              Expanded(
-                flex: 10,
-                child: Container(
-                  padding: const EdgeInsets.only(
-                    left: 12,
-                    right: 12,
-                    top: 4,
-                    bottom: 8,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Título con línea inferior
-                      Column(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: Stack(
+                  children: [
+                    // CONTENIDO TEXTO
+                    Positioned(
+                      bottom: 12,
+                      left: 10,
+                      right: 10,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             title,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.urbanist(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.verdePrincipal,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            subtitle,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.urbanist(
                               fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.verdeAzulado,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.grey[700],
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 6),
                           Container(
-                            height: 1,
-                            width: 60,
-                            color: AppColors.verdeAzulado.withAlpha(
-                              (255 * 0.5).toInt(),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: accentColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Ver detalles',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                    color: accentColor,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.arrow_forward_rounded,
+                                  size: 11,
+                                  color: accentColor,
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 6),
-                      // Subtítulo y botón
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              subtitle,
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.urbanist(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w900,
-                                color: AppColors.textoOscuro,
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: onTap,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: AppColors.verdeAzulado,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.arrow_forward,
-                                color: Colors.white,
-                                size: 14,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    ),
+
+                    // SHIMMER DE LUZ SUAVE EN LA TARJETA
+                    const Positioned.fill(child: _ShimmerSweep()),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-
-        // Imagen sobresaliendo
-        Positioned(
-          top: -40, // Sobresale menos pero con una imagen más grande
-          child: Image.asset(
-            imagePath,
-            height: 125, // Imagen adaptada
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => Container(
-              height: 110,
-              width: 80,
-              decoration: BoxDecoration(
-                color: Colors.grey.withAlpha(100),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.pets, size: 40),
             ),
-          ),
+
+            // IMAGEN 3D SOBRESALIENDO DE LA MITAD SUPERIOR
+            Positioned(
+              top: 0,
+              child: Image.asset(
+                imagePath,
+                height: 105,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: 90,
+                  width: 90,
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.pets, size: 40, color: accentColor),
+                ),
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
+    );
+  }
+}
+
+class _ShimmerSweep extends StatefulWidget {
+  const _ShimmerSweep();
+  @override
+  State<_ShimmerSweep> createState() => _ShimmerSweepState();
+}
+
+class _ShimmerSweepState extends State<_ShimmerSweep>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _anim;
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat();
+    _anim = Tween<double>(
+      begin: -1.0,
+      end: 2.0,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.linear));
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: AnimatedBuilder(
+        animation: _anim,
+        builder: (context, child) {
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: const Alignment(-2.0, -1.0),
+                end: const Alignment(2.0, 1.0),
+                colors: [
+                  Colors.white.withValues(alpha: 0.0),
+                  Colors.white.withValues(alpha: 0.25),
+                  Colors.white.withValues(alpha: 0.0),
+                ],
+                stops: [
+                  (_anim.value - 0.2).clamp(0.0, 1.0),
+                  _anim.value.clamp(0.0, 1.0),
+                  (_anim.value + 0.2).clamp(0.0, 1.0),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

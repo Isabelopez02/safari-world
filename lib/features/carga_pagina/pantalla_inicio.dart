@@ -31,10 +31,12 @@ class _PantallaInicioState extends State<PantallaInicio> {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => const PantallaOnboarding(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const PantallaOnboarding(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
             transitionDuration: const Duration(milliseconds: 800),
           ),
         );
@@ -93,7 +95,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
             // ==========================================
             // LAS 3 HOJAS PRINCIPALES QUE SE QUEDAN (Como Imagen 2)
             // ==========================================
-            
+
             // Hoja 1: Esquina superior derecha
             _buildLeaf(
               stays: true,
@@ -162,8 +164,8 @@ class _PantallaInicioState extends State<PantallaInicio> {
       top: top,
       left: left,
       child: AnimatedOpacity(
-        duration: stays 
-            ? const Duration(milliseconds: 1800) 
+        duration: stays
+            ? const Duration(milliseconds: 1800)
             : const Duration(milliseconds: 1000),
         // Si no se queda, la opacidad baja a 0 en la fase 2
         opacity: stays ? 1.0 : (_fase2 ? 0.0 : 1.0),
@@ -174,10 +176,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
           child: SizedBox(
             width: size,
             height: size,
-            child: Image.asset(
-              image,
-              fit: BoxFit.contain,
-            ),
+            child: Image.asset(image, fit: BoxFit.contain),
           ),
         ),
       ),

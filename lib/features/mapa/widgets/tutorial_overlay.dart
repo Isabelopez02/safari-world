@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
 class TutorialOverlay extends StatelessWidget {
@@ -26,101 +27,241 @@ class TutorialOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final bool isTargetInTopHalf =
+        targetRect != Rect.zero &&
+        targetRect.center.dy < (screenSize.height / 2);
+
     return GestureDetector(
-      onTap: () {},
+      onTap: () {}, // Bloquea clics accidentales detrás
       child: Stack(
         children: [
+          // 1. MÁSCARA OSCURA CON RECORTE Y ANILLO LUMINOSO
           CustomPaint(
-            size: MediaQuery.of(context).size,
+            size: screenSize,
             painter: HolePainter(holeRect: targetRect),
           ),
+
+          // 2. FLECHA ORGÁNICA DIRIGIDA AL OBJETIVO
           CustomPaint(
-            size: MediaQuery.of(context).size,
+            size: screenSize,
             painter: ArrowPainter(targetRect: targetRect, step: step),
           ),
-          Positioned(
-            top: MediaQuery.of(context).size.height / 2 - 80,
+
+          // 3. TARJETA MODERNA DE TUTORIAL (SAFARI GUIDE CARD)
+          // Se posiciona inteligentemente arriba o abajo según la posición del objetivo
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+            top: isTargetInTopHalf ? null : (screenSize.height * 0.18),
+            bottom: isTargetInTopHalf ? (screenSize.height * 0.14) : null,
             left: 20,
             right: 20,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  text,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.urbanist(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 22,
+                    vertical: 20,
+                  ),
+                  decoration: BoxDecoration(
                     color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    height: 1.3,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    if (step > 1)
-                      TextButton(
-                        onPressed: onPrev,
-                        child: Text(
-                          'Anterior',
-                          style: GoogleFonts.urbanist(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      )
-                    else
-                      const SizedBox(width: 80),
-
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List.generate(totalSteps, (index) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: step == index + 1
-                                ? AppColors.verdeAzulado
-                                : Colors.white38,
-                          ),
-                        );
-                      }),
-                    ),
-
-                    ElevatedButton(
-                      onPressed: onNext,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.verdeAzulado,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.25),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
                       ),
-                      child: Text(
-                        step == totalSteps ? 'Finalizar' : 'Siguiente',
+                    ],
+                    border: Border.all(
+                      color: AppColors.verdeAzulado.withValues(alpha: 0.15),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // ENCABEZADO CON BADGE SAFARI
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.verdeAzulado.withValues(
+                                alpha: 0.1,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.explore_rounded,
+                                  size: 15,
+                                  color: AppColors.verdeAzulado,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  'GUÍA DE SAFARI · PASO $step DE $totalSteps',
+                                  style: GoogleFonts.urbanist(
+                                    color: AppColors.verdeAzulado,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (step < totalSteps)
+                            TextButton(
+                              onPressed: () {
+                                SoundService.instance.playButtonTap();
+                                onSkip();
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                minimumSize: const Size(50, 30),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: Text(
+                                'Saltar',
+                                style: GoogleFonts.urbanist(
+                                  color: Colors.grey[500],
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 14),
+
+                      // TEXTO EXPLICATIVO
+                      Text(
+                        text,
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.urbanist(
-                          fontWeight: FontWeight.bold,
+                          color: AppColors.textoOscuro,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          height: 1.35,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                if (step < totalSteps)
-                  TextButton(
-                    onPressed: onSkip,
-                    child: Text(
-                      'Saltar tutorial',
-                      style: GoogleFonts.urbanist(
-                        color: Colors.white54,
-                        decoration: TextDecoration.underline,
+
+                      const SizedBox(height: 20),
+
+                      // BARRA DE PROGRESO Y BOTONES
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Botón Anterior
+                          if (step > 1)
+                            OutlinedButton.icon(
+                              onPressed: () {
+                                SoundService.instance.playButtonTap();
+                                onPrev();
+                              },
+                              icon: const Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                size: 13,
+                              ),
+                              label: Text(
+                                'Atrás',
+                                style: GoogleFonts.urbanist(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.verdePrincipal,
+                                side: BorderSide(
+                                  color: Colors.grey.withValues(alpha: 0.3),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 10,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                            )
+                          else
+                            const SizedBox(width: 80),
+
+                          // Indicador de pasos con puntitos
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: List.generate(totalSteps, (index) {
+                              final isActive = (step == index + 1);
+                              return AnimatedContainer(
+                                duration: const Duration(milliseconds: 250),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 3,
+                                ),
+                                width: isActive ? 18 : 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(3),
+                                  color: isActive
+                                      ? AppColors.verdeAzulado
+                                      : Colors.grey.withValues(alpha: 0.3),
+                                ),
+                              );
+                            }),
+                          ),
+
+                          // Botón Siguiente / Empezar
+                          ElevatedButton(
+                            onPressed: () {
+                              SoundService.instance.playButtonTap();
+                              onNext();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.verdeAzulado,
+                              foregroundColor: Colors.white,
+                              elevation: 2,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 18,
+                                vertical: 10,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  step == totalSteps ? '¡Listo!' : 'Siguiente',
+                                  style: GoogleFonts.urbanist(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  step == totalSteps
+                                      ? Icons.check_circle_rounded
+                                      : Icons.arrow_forward_ios_rounded,
+                                  size: 13,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
-              ],
+                ),
+              ),
             ),
           ),
         ],
@@ -138,7 +279,7 @@ class HolePainter extends CustomPainter {
     if (holeRect == Rect.zero) {
       canvas.drawRect(
         Rect.fromLTWH(0, 0, size.width, size.height),
-        Paint()..color = Colors.black.withValues(alpha: 0.75),
+        Paint()..color = Colors.black.withValues(alpha: 0.65),
       );
       return;
     }
@@ -148,14 +289,25 @@ class HolePainter extends CustomPainter {
       Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height)),
       Path()..addRRect(
         RRect.fromRectAndRadius(
-          holeRect.inflate(12),
-          const Radius.circular(30),
+          holeRect.inflate(10),
+          const Radius.circular(24),
         ),
       ),
     );
     canvas.drawPath(
       path,
-      Paint()..color = Colors.black.withValues(alpha: 0.75),
+      Paint()..color = Colors.black.withValues(alpha: 0.65),
+    );
+
+    // Borde brillante suave alrededor del elemento enfocado
+    final borderPaint = Paint()
+      ..color = AppColors.verdeAzulado
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(holeRect.inflate(10), const Radius.circular(24)),
+      borderPaint,
     );
   }
 
@@ -176,64 +328,45 @@ class ArrowPainter extends CustomPainter {
 
     final paint = Paint()
       ..color = Colors.white
-      ..strokeWidth = 3.0
+      ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke;
 
     final path = Path();
-    final center = Offset(size.width / 2, size.height / 2 + 30);
+    final center = Offset(size.width / 2, size.height / 2);
 
     if (step == 1) {
       // Bottom bar
-      path.moveTo(center.dx, center.dy);
+      path.moveTo(center.dx, center.dy + 40);
       path.quadraticBezierTo(
         center.dx,
-        targetRect.top - 40,
+        targetRect.top - 30,
         targetRect.center.dx,
-        targetRect.top - 10,
+        targetRect.top - 6,
       );
-    } else if (step == 2) {
-      // Search
-      path.moveTo(center.dx, center.dy);
+    } else if (step == 2 || step == 3 || step == 5) {
+      // FABs a la derecha
+      path.moveTo(center.dx, targetRect.center.dy);
       path.quadraticBezierTo(
         center.dx + 40,
-        targetRect.top - 40,
-        targetRect.left - 10,
         targetRect.center.dy,
-      );
-    } else if (step == 3) {
-      // Help
-      path.moveTo(center.dx, center.dy);
-      path.quadraticBezierTo(
-        center.dx + 40,
-        center.dy + 40,
-        targetRect.left - 10,
+        targetRect.left - 8,
         targetRect.center.dy,
       );
     } else if (step == 4) {
-      // Como funciona
-      final start = Offset(size.width / 2, size.height / 2 - 100);
-      path.moveTo(start.dx, start.dy);
+      // Top bar
+      path.moveTo(center.dx, center.dy - 60);
       path.quadraticBezierTo(
-        start.dx + 60,
+        startAndEnd(center.dx, targetRect.center.dx),
         targetRect.bottom + 40,
         targetRect.center.dx,
-        targetRect.bottom + 10,
-      );
-    } else if (step == 5) {
-      // FAB (Mi ubicación)
-      path.moveTo(center.dx, center.dy);
-      path.quadraticBezierTo(
-        center.dx - 40,
-        targetRect.top - 40,
-        targetRect.center.dx,
-        targetRect.top - 10,
+        targetRect.bottom + 8,
       );
     }
 
     for (PathMetric measurePath in path.computeMetrics()) {
       double distance = 0.0;
       while (distance < measurePath.length) {
-        final double nextDistance = distance + 8.0;
+        final double nextDistance = distance + 7.0;
         canvas.drawPath(measurePath.extractPath(distance, nextDistance), paint);
         distance = nextDistance + 6.0;
       }
@@ -250,30 +383,17 @@ class ArrowPainter extends CustomPainter {
 
         final arrowPath = Path();
         arrowPath.moveTo(0, 0);
-        arrowPath.lineTo(-14, -8);
-        arrowPath.quadraticBezierTo(-10, 0, -14, 8);
+        arrowPath.lineTo(-12, -6);
+        arrowPath.quadraticBezierTo(-8, 0, -12, 6);
         arrowPath.close();
 
         canvas.drawPath(arrowPath, arrowPaint);
-
-        final splashPaint = Paint()
-          ..color = Colors.white
-          ..strokeWidth = 2.0
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round;
-
-        canvas.drawLine(
-          const Offset(6, -6),
-          const Offset(12, -10),
-          splashPaint,
-        );
-        canvas.drawLine(const Offset(8, 0), const Offset(14, 0), splashPaint);
-        canvas.drawLine(const Offset(6, 6), const Offset(12, 10), splashPaint);
-
         canvas.restore();
       }
     }
   }
+
+  double startAndEnd(double a, double b) => (a + b) / 2;
 
   @override
   bool shouldRepaint(covariant ArrowPainter oldDelegate) =>

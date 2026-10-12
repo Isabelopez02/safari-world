@@ -4,8 +4,5 @@ class Area {
   final String nombre;
   final IconData icono;
 
-  const Area({
-    required this.nombre,
-    required this.icono,
-  });
+  const Area({required this.nombre, required this.icono});
 }
