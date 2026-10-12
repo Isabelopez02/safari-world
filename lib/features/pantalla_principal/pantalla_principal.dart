@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/emergency_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
@@ -876,7 +877,7 @@ class PantallaPrincipal extends StatelessWidget {
   Widget _buildEmergenciaCard(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        SoundService.instance.playButtonTap();
+        EmergencyService.instance.mostrarModalEmergencia(context);
       },
       child: SizedBox(
         height: 170,
@@ -999,40 +1000,47 @@ class PantallaPrincipal extends StatelessWidget {
                           ),
 
                           // BOTÓN LLAMAR SOS
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 7,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 6,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.phone_in_talk_rounded,
-                                  size: 12,
-                                  color: Color(0xFF8B1E1E),
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  'Contactar SOS',
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w900,
-                                    color: const Color(0xFF8B1E1E),
+                          GestureDetector(
+                            onTap: () {
+                              EmergencyService.instance.mostrarModalEmergencia(
+                                context,
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 7,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 2),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.phone_in_talk_rounded,
+                                    size: 12,
+                                    color: Color(0xFF8B1E1E),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'Contactar SOS',
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w900,
+                                      color: const Color(0xFF8B1E1E),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],

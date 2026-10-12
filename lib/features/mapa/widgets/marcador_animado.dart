@@ -1,31 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/models/marcador_mapa.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
-class MarcadorMapa {
-  final String id;
-  final String nombre;
-  final double x;
-  final double y;
-  final IconData icono;
-  bool visitado;
-  final String categoria;
-  final String? imagen;
-  final bool esBanio;
-
-  MarcadorMapa({
-    required this.id,
-    required this.nombre,
-    required this.x,
-    required this.y,
-    this.icono = Icons.pets,
-    this.visitado = false,
-    this.categoria = 'Todos',
-    this.imagen,
-    this.esBanio = false,
-  });
-}
+export 'package:zoologico_front/core/models/marcador_mapa.dart';
 
 class MarcadorAnimado extends StatefulWidget {
   final MarcadorMapa marcador;
@@ -167,8 +146,8 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
       behavior: HitTestBehavior.opaque,
       onTap: _handleTap,
       child: SizedBox(
-        width: 100,
-        height: 110,
+        width: 104,
+        height: 125,
         child: Stack(
           alignment: Alignment.topCenter,
           clipBehavior: Clip.none,
@@ -179,7 +158,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                 top: -28,
                 child: AnimatedBuilder(
                   animation: _bubbleController,
-                  builder: (_, __) => SlideTransition(
+                  builder: (_, _) => SlideTransition(
                     position: _bubbleSlide,
                     child: FadeTransition(
                       opacity: _bubbleFade,
@@ -215,7 +194,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
               children: [
                 AnimatedBuilder(
                   animation: _bounceAnimation,
-                  builder: (_, __) => Transform.scale(
+                  builder: (_, _) => Transform.scale(
                     scale: _bounceAnimation.value,
                     child: _buildAvatarWithPulse(pinSize, borderColor),
                   ),
@@ -266,7 +245,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
   Widget _buildAvatarWithPulse(double size, Color borderColor) {
     return AnimatedBuilder(
       animation: _pulseAnimation,
-      builder: (_, __) {
+      builder: (_, _) {
         return Stack(
           alignment: Alignment.center,
           clipBehavior: Clip.none,
@@ -365,19 +344,19 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
       behavior: HitTestBehavior.opaque,
       onTap: _handleTap,
       child: SizedBox(
-        width: 68,
-        height: 78,
+        width: 76,
+        height: 96,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             AnimatedBuilder(
               animation: _pulseAnimation,
-              builder: (_, __) {
+              builder: (_, _) {
                 return Stack(
                   alignment: Alignment.center,
                   clipBehavior: Clip.none,
                   children: [
-                    // Halo expansivo de selección
+                    // Halo expansivo de selecciÃ³n
                     if (widget.isSelected)
                       Transform.scale(
                         scale: _pulseAnimation.value,
@@ -392,7 +371,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                       ),
                     AnimatedBuilder(
                       animation: _bounceAnimation,
-                      builder: (_, __) => Transform.scale(
+                      builder: (_, _) => Transform.scale(
                         scale: _bounceAnimation.value,
                         child: Container(
                           width: widget.isSelected ? 50 : 44,
@@ -442,7 +421,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                 ),
               ),
               child: Text(
-                'Baño',
+                'BaÃ±o',
                 style: GoogleFonts.urbanist(
                   fontSize: 9,
                   fontWeight: FontWeight.w900,

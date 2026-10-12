@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/animal_service.dart';
+import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
 import 'marcador_animado.dart';
@@ -222,6 +224,57 @@ class BarraInferiorMapa extends StatelessWidget {
                 ],
               ),
             ),
+            if (!sel.esBanio)
+              GestureDetector(
+                onTap: () async {
+                  SoundService.instance.playButtonTap();
+                  await AnimalService.instance.toggleVisitado(sel.id);
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(right: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: sel.visitado
+                        ? const Color(0xFFE8F5E9)
+                        : Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: sel.visitado
+                          ? const Color(0xFF4CAF50)
+                          : Colors.grey.shade300,
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        sel.visitado
+                            ? Icons.check_circle_rounded
+                            : Icons.add_circle_outline_rounded,
+                        size: 14,
+                        color: sel.visitado
+                            ? const Color(0xFF2E7D32)
+                            : Colors.grey.shade700,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        sel.visitado ? 'Visto' : 'Marcar',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          color: sel.visitado
+                              ? const Color(0xFF2E7D32)
+                              : Colors.grey.shade800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(6),
