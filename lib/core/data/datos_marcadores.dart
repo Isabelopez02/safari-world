@@ -7,7 +7,7 @@ final List<MarcadorMapa> marcadoresZoologico = [
   MarcadorMapa(
     id: 'A01',
     nombre: 'Chimpancé',
-    imagen: 'assets/images/animales_con_fondo/gorila-card.jpg',
+    imagen: 'assets/images/animales_con_fondo/chimpace.png',
     x: 346.0,
     y: 287.0,
     icono: Icons.pets,
@@ -18,7 +18,7 @@ final List<MarcadorMapa> marcadoresZoologico = [
   MarcadorMapa(
     id: 'A02',
     nombre: 'Mono',
-    imagen: 'assets/images/animales_con_fondo/gorila-card.jpg',
+    imagen: 'assets/images/animales_con_fondo/mono.png',
     x: 438.0,
     y: 305.0,
     icono: Icons.pets,
@@ -58,7 +58,7 @@ final List<MarcadorMapa> marcadoresZoologico = [
   MarcadorMapa(
     id: 'A06',
     nombre: 'Oso Pardo',
-    imagen: 'assets/images/animales_con_fondo/osoPanda-card.jpg',
+    imagen: 'assets/images/animales_con_fondo/osoPardo.png',
     x: 904.0,
     y: 308.0,
     icono: Icons.pets,

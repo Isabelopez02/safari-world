@@ -97,10 +97,6 @@ class AnimalesCarrusel extends StatelessWidget {
                 'assets/images/animales_con_fondo/pinguino-card.jpg',
               ),
               _buildAnimalAvatar(
-                'Gorila',
-                'assets/images/animales_con_fondo/gorila-card.jpg',
-              ),
-              _buildAnimalAvatar(
                 'Jirafa',
                 'assets/images/animales_con_fondo/jirada-card.jpg',
               ),
