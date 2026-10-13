@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
-import 'package:zoologico_front/features/onboarding/screens/pantalla_onboarding.dart';
+import 'package:zoologico_front/features/pantalla_principal/pantalla_principal.dart';
 
 class PantallaInicio extends StatefulWidget {
   const PantallaInicio({super.key});
@@ -26,18 +26,18 @@ class _PantallaInicioState extends State<PantallaInicio> {
       }
     });
 
-    // Después de 4.5 segundos, navegamos al Onboarding
-    Future.delayed(const Duration(milliseconds: 4500), () {
+    // Después de 3.2 segundos, navegamos directamente a la Pantalla Principal
+    Future.delayed(const Duration(milliseconds: 3200), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                const PantallaOnboarding(),
+                const PantallaPrincipal(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
                   return FadeTransition(opacity: animation, child: child);
                 },
-            transitionDuration: const Duration(milliseconds: 800),
+            transitionDuration: const Duration(milliseconds: 600),
           ),
         );
       }
