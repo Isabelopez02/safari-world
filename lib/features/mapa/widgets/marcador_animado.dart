@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
@@ -171,7 +171,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                           color: AppColors.verdePrincipal,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: const [
-                            BoxShadow(color: Colors.black26, blurRadius: 6),
+                            BoxShadow(color: Colors.black45, blurRadius: 6),
                           ],
                         ),
                         child: Text(
@@ -188,7 +188,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                 ),
               ),
 
-            // CONTENIDO DEL PARADERO (AVATAR GRANDE + NOMBRE)
+            // CONTENIDO DEL PARADERO (AVATAR GRANDE + ETIQUETA ALTO CONTRASTE)
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -200,38 +200,57 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                   ),
                 ),
                 const SizedBox(height: 3),
-                // Etiqueta con nombre del animal
+                // Etiqueta con nombre del animal de ALTO CONTRASTE (fondo oscuro, texto blanco nítido)
                 Container(
-                  constraints: const BoxConstraints(maxWidth: 90),
+                  constraints: const BoxConstraints(maxWidth: 100),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 7,
-                    vertical: 2.5,
+                    vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.95),
-                    borderRadius: BorderRadius.circular(10),
+                    color: const Color(0xFF1E293B), // Azul grafito oscuro de alto contraste
+                    borderRadius: BorderRadius.circular(12),
                     boxShadow: const [
                       BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 5,
+                        color: Colors.black45,
+                        blurRadius: 6,
                         offset: Offset(0, 2),
                       ),
                     ],
                     border: Border.all(
-                      color: borderColor.withValues(alpha: 0.25),
-                      width: 1,
+                      color: widget.isSelected
+                          ? const Color(0xFFFFB74D)
+                          : Colors.white,
+                      width: 1.5,
                     ),
                   ),
-                  child: Text(
-                    widget.marcador.nombre,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.urbanist(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      color: borderColor,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.marcador.visitado ? '✓ ' : '🐾 ',
+                        style: TextStyle(
+                          fontSize: 9,
+                          color: widget.marcador.visitado
+                              ? const Color(0xFF81C784)
+                              : const Color(0xFFFFD54F),
+                        ),
+                      ),
+                      Flexible(
+                        child: Text(
+                          widget.marcador.nombre,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.urbanist(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: 0.2,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -259,12 +278,12 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                   height: size + 16,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: borderColor.withValues(alpha: 0.18),
+                    color: borderColor.withValues(alpha: 0.25),
                   ),
                 ),
               ),
 
-            // AVATAR CIRCULAR CON FOTO GRANDE
+            // AVATAR CIRCULAR CON FOTO Y BORDE DE ALTO CONTRASTE
             Container(
               width: size,
               height: size,
@@ -273,12 +292,12 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                 color: Colors.white,
                 border: Border.all(
                   color: borderColor,
-                  width: widget.isSelected ? 3.5 : 2.8,
+                  width: widget.isSelected ? 3.8 : 3.0,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.22),
-                    blurRadius: 8,
+                    color: Colors.black.withValues(alpha: 0.35),
+                    blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
                 ],
@@ -319,7 +338,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                     color: Colors.white,
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(color: Colors.black26, blurRadius: 4),
+                      BoxShadow(color: Colors.black38, blurRadius: 4),
                     ],
                   ),
                   child: const Icon(
@@ -337,7 +356,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
 
   Widget _buildBathroomPin() {
     final Color pinColor = widget.isSelected
-        ? const Color(0xFFFF9800) // Naranja dorado brillante al seleccionar
+        ? const Color(0xFFFF9800)
         : Colors.blue.shade600;
 
     return GestureDetector(
@@ -356,7 +375,6 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                   alignment: Alignment.center,
                   clipBehavior: Clip.none,
                   children: [
-                    // Halo expansivo de selecciÃ³n
                     if (widget.isSelected)
                       Transform.scale(
                         scale: _pulseAnimation.value,
@@ -387,7 +405,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                               BoxShadow(
                                 color: widget.isSelected
                                     ? pinColor.withValues(alpha: 0.45)
-                                    : Colors.black26,
+                                    : Colors.black38,
                                 blurRadius: widget.isSelected ? 10 : 6,
                                 offset: const Offset(0, 3),
                               ),
@@ -407,27 +425,28 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
             ),
             const SizedBox(height: 3),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: widget.isSelected
-                    ? const Color(0xFFFFF3E0)
-                    : Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(6),
+                color: const Color(0xFF0D47A1), // Azul marino oscuro para alto contraste
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: widget.isSelected
-                      ? const Color(0xFFFFB74D)
-                      : Colors.blue.shade200,
-                  width: 1,
+                  color: Colors.white,
+                  width: 1.5,
                 ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black38,
+                    blurRadius: 5,
+                    offset: Offset(0, 2),
+                  ),
+                ],
               ),
               child: Text(
-                'BaÃ±o',
+                '🚻 Baños',
                 style: GoogleFonts.urbanist(
-                  fontSize: 9,
+                  fontSize: 10,
                   fontWeight: FontWeight.w900,
-                  color: widget.isSelected
-                      ? const Color(0xFFE65100)
-                      : Colors.blue.shade700,
+                  color: Colors.white,
                 ),
               ),
             ),

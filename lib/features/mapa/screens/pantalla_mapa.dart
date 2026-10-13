@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:vector_math/vector_math_64.dart' as vmath;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
@@ -16,7 +17,12 @@ import '../widgets/tutorial_overlay.dart';
 
 class PantallaMapa extends StatefulWidget {
   final bool abrirExploracionesAlCargar;
-  const PantallaMapa({super.key, this.abrirExploracionesAlCargar = false});
+  final String? animalIdInicial;
+  const PantallaMapa({
+    super.key,
+    this.abrirExploracionesAlCargar = false,
+    this.animalIdInicial,
+  });
 
   @override
   State<PantallaMapa> createState() => _PantallaMapaState();
@@ -92,7 +98,12 @@ class _PantallaMapaState extends State<PantallaMapa>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _centrarEnUbicacionInicial(false);
-      if (widget.abrirExploracionesAlCargar) {
+      if (widget.animalIdInicial != null) {
+        final matches = marcadores.where((m) => m.id == widget.animalIdInicial);
+        if (matches.isNotEmpty) {
+          _mostrarInfoMarcador(matches.first);
+        }
+      } else if (widget.abrirExploracionesAlCargar) {
         _mostrarAnimalesPorVisitar(context);
       } else {
         _checkTutorial();
@@ -152,8 +163,8 @@ class _PantallaMapaState extends State<PantallaMapa>
     }
 
     return Matrix4.identity()
-      ..translate(tx, ty)
-      ..scale(scale);
+      ..translateByVector3(vmath.Vector3(tx, ty, 0.0))
+      ..scaleByVector3(vmath.Vector3(scale, scale, 1.0));
   }
 
   void _centrarEnUbicacionInicial([bool animate = true]) {
@@ -165,8 +176,8 @@ class _PantallaMapaState extends State<PantallaMapa>
     final dx = (size.width - mapaAncho * scale) / 2;
     final dy = (size.height - mapaAlto * scale) / 2;
     final targetMatrix = Matrix4.identity()
-      ..translate(dx, dy)
-      ..scale(scale);
+      ..translateByVector3(vmath.Vector3(dx, dy, 0.0))
+      ..scaleByVector3(vmath.Vector3(scale, scale, 1.0));
 
     _limitarYCentrar(targetMatrix, animate);
   }
@@ -185,8 +196,8 @@ class _PantallaMapaState extends State<PantallaMapa>
     final double dy = (size.height / 2) - (y * zoomScale);
 
     final targetMatrix = Matrix4.identity()
-      ..translate(dx, dy)
-      ..scale(zoomScale);
+      ..translateByVector3(vmath.Vector3(dx, dy, 0.0))
+      ..scaleByVector3(vmath.Vector3(zoomScale, zoomScale, 1.0));
 
     _limitarYCentrar(targetMatrix, true);
   }
@@ -908,6 +919,55 @@ class _PantallaMapaState extends State<PantallaMapa>
                           ),
                         ),
                       ),
+                      // BADGE DESTACADO: TÚ ESTÁS AQUÍ
+                      Positioned(
+                        left: grafoMapa.nodos[_nodoActual]!.posicion.dx - 65,
+                        top: grafoMapa.nodos[_nodoActual]!.posicion.dy - 46,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E293B),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 1.8,
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black45,
+                                blurRadius: 8,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF4ADE80),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Tú estás aquí',
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ],
                 ),
@@ -915,7 +975,29 @@ class _PantallaMapaState extends State<PantallaMapa>
             ),
           ),
 
-          // BOTONES SUPERIORES (Regresar y Guía)
+          // SOMBRA AMBIENTAL SUPERIOR PARA CONTRASTE DEL MAPA
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 120,
+            child: IgnorePointer(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.55),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // BARRA SUPERIOR DE ALTO CONTRASTE (Regresar, Baños y Guía)
           Positioned(
             top: 0,
             left: 0,
@@ -923,138 +1005,167 @@ class _PantallaMapaState extends State<PantallaMapa>
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
+                  horizontal: 14.0,
+                  vertical: 10.0,
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ElevatedButton.icon(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        size: 16,
-                      ),
-                      label: Text(
-                        'Regresar',
-                        style: GoogleFonts.urbanist(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppColors.verdePrincipal,
-                        elevation: 4,
-                        shadowColor: Colors.black26,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                    ),
-                    OutlinedButton.icon(
-                      key: _keyComoFunciona,
-                      onPressed: () => setState(() => _tutorialStep = 1),
-                      icon: const Icon(
-                        Icons.lightbulb_outline_rounded,
-                        size: 18,
-                      ),
-                      label: Text(
-                        'Guía',
-                        style: GoogleFonts.urbanist(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Colors.white.withValues(alpha: 0.9),
-                        foregroundColor: AppColors.verdeAzulado,
-                        side: const BorderSide(
-                          color: AppColors.verdeAzulado,
-                          width: 2,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // CHIP DE FILTRO (Baños)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 66, left: 16),
-                child: Row(
-                  children: [
+                    // Botón Regresar de alto contraste
                     GestureDetector(
-                      onTap: _dirigirAlBanioMasCercano,
+                      onTap: () => Navigator.pop(context),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
-                          vertical: 8,
+                          vertical: 9,
                         ),
                         decoration: BoxDecoration(
-                          color: _mostrarBanios
-                              ? Colors.blue.shade600
-                              : Colors.white,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppColors.verdeAzulado,
+                            width: 1.8,
+                          ),
                           boxShadow: const [
                             BoxShadow(
-                              color: Colors.black12,
+                              color: Colors.black38,
                               blurRadius: 8,
                               offset: Offset(0, 3),
                             ),
                           ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 14,
+                              color: AppColors.verdeAzulado,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Regresar',
+                              style: GoogleFonts.urbanist(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.textoOscuro,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    // Chip Filtro Baños
+                    GestureDetector(
+                      onTap: _dirigirAlBanioMasCercano,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 9,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _mostrarBanios
+                              ? Colors.blue.shade700
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: _mostrarBanios
-                                ? Colors.blue.shade600
-                                : Colors.grey.withValues(alpha: 0.3),
-                            width: 1.5,
+                            color: Colors.blue.shade700,
+                            width: 1.8,
                           ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black38,
+                              blurRadius: 8,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.wc_rounded,
-                              size: 16,
+                              size: 15,
                               color: _mostrarBanios
                                   ? Colors.white
-                                  : Colors.blue.shade600,
+                                  : Colors.blue.shade700,
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 5),
                             Text(
                               'Baños',
                               style: GoogleFonts.urbanist(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w900,
                                 color: _mostrarBanios
                                     ? Colors.white
-                                    : Colors.blue.shade600,
+                                    : Colors.blue.shade800,
                               ),
                             ),
                             if (_mostrarBanios) ...[
-                              const SizedBox(width: 6),
-                              Icon(
+                              const SizedBox(width: 4),
+                              const Icon(
                                 Icons.close_rounded,
-                                size: 14,
-                                color: Colors.white.withValues(alpha: 0.8),
+                                size: 13,
+                                color: Colors.white,
                               ),
                             ],
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 8),
+
+                    // Botón Guía Tutorial (Toggle instantáneo)
+                    GestureDetector(
+                      key: _keyComoFunciona,
+                      onTap: () {
+                        SoundService.instance.playButtonTap();
+                        setState(() {
+                          _tutorialStep = (_tutorialStep > 0 ? 0 : 1);
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 9,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _tutorialStep > 0
+                              ? const Color(0xFFF59E0B)
+                              : AppColors.verdeAzulado,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 1.5,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black38,
+                              blurRadius: 8,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.lightbulb_rounded,
+                              size: 16,
+                              color: Color(0xFFFFD54F),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              _tutorialStep > 0 ? 'Cerrar Guía' : 'Guía',
+                              style: GoogleFonts.urbanist(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -1065,41 +1176,49 @@ class _PantallaMapaState extends State<PantallaMapa>
             ),
           ),
 
-          // FABS: Soporte, Búsqueda y Mi Ubicación
+          // BOTONES FLOTANTES CIRCULARES PERFECTOS (SOS, Búsqueda, Mi Ubicación)
+          // Con padding inferior dinámico para que no los tape la barra del celular
           Positioned(
             right: 16,
-            bottom: 140,
+            bottom: 140 + MediaQuery.of(context).padding.bottom,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                FloatingActionButton.small(
+                // Botón Emergencia SOS
+                _buildCircularActionButton(
                   key: _keyHelp,
-                  heroTag: 'help_btn',
-                  backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFFD32F2F),
+                  color: const Color(0xFFD32F2F),
+                  iconColor: Colors.white,
+                  icon: Icons.phone_in_talk_rounded,
+                  size: 46,
+                  iconSize: 20,
                   onPressed: () {
                     EmergencyService.instance.mostrarModalEmergencia(context);
                   },
-                  child: const Icon(Icons.phone_in_talk_rounded),
                 ),
                 const SizedBox(height: 12),
-                FloatingActionButton.small(
+
+                // Botón Búsqueda y Exploraciones
+                _buildCircularActionButton(
                   key: _keySearch,
-                  heroTag: 'search_btn',
-                  backgroundColor: Colors.white,
-                  foregroundColor: AppColors.verdePrincipal,
-                  onPressed: () {},
-                  child: const Icon(Icons.search_rounded),
+                  color: Colors.white,
+                  iconColor: AppColors.verdeAzulado,
+                  icon: Icons.search_rounded,
+                  size: 46,
+                  iconSize: 22,
+                  onPressed: () => _mostrarAnimalesPorVisitar(context),
                 ),
-                const SizedBox(height: 24),
-                FloatingActionButton(
+                const SizedBox(height: 16),
+
+                // Botón Mi Ubicación Radar
+                _buildCircularActionButton(
                   key: _keyFab,
-                  heroTag: 'location_btn',
-                  backgroundColor: AppColors.verdeAzulado,
-                  foregroundColor: Colors.white,
-                  elevation: 4,
+                  color: AppColors.verdeAzulado,
+                  iconColor: Colors.white,
+                  icon: Icons.my_location_rounded,
+                  size: 54,
+                  iconSize: 26,
                   onPressed: _onMyLocationPressed,
-                  child: const Icon(Icons.my_location_rounded, size: 24),
                 ),
               ],
             ),
@@ -1153,6 +1272,43 @@ class _PantallaMapaState extends State<PantallaMapa>
               onSkip: _finishTutorial,
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCircularActionButton({
+    Key? key,
+    required Color color,
+    required Color iconColor,
+    required IconData icon,
+    required double size,
+    required double iconSize,
+    required VoidCallback onPressed,
+  }) {
+    return GestureDetector(
+      key: key,
+      onTap: () {
+        SoundService.instance.playButtonTap();
+        onPressed();
+      },
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 2.5),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Icon(icon, color: iconColor, size: iconSize),
+        ),
       ),
     );
   }

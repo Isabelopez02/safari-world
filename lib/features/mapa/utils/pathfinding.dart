@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 
 class NodoRuta {
   final String id;
@@ -26,7 +26,7 @@ class GrafoZoolologico {
 
   void agregarArista(String id1, String id2) {
     if (!nodos.containsKey(id1) || !nodos.containsKey(id2)) {
-      print('Error: Intentando conectar nodos inexistentes $id1 o $id2');
+      debugPrint('Error: Intentando conectar nodos inexistentes $id1 o $id2');
       return;
     }
 
@@ -44,8 +44,9 @@ class GrafoZoolologico {
 
   // Implementación del Algoritmo de Dijkstra para la ruta más corta
   List<Offset> encontrarRutaMasCorta(String inicioId, String destinoId) {
-    if (!nodos.containsKey(inicioId) || !nodos.containsKey(destinoId))
+    if (!nodos.containsKey(inicioId) || !nodos.containsKey(destinoId)) {
       return [];
+    }
 
     final distancias = <String, double>{};
     final anteriores = <String, String?>{};

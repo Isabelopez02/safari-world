@@ -33,7 +33,8 @@ class TutorialOverlay extends StatelessWidget {
         targetRect.center.dy < (screenSize.height / 2);
 
     return GestureDetector(
-      onTap: () {}, // Bloquea clics accidentales detrás
+      onTap: onSkip, // Tocar en cualquier parte regresa al mapa de inmediato sin forzar a presionar nada
+      behavior: HitTestBehavior.translucent,
       child: Stack(
         children: [
           // 1. MÁSCARA OSCURA CON RECORTE Y ANILLO LUMINOSO

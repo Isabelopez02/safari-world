@@ -4,23 +4,156 @@ import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
 
-class PantallaDetalleShowAcuatico extends StatelessWidget {
+/// Modal y pantalla interactiva del Gran Show Acuático de Focas y Lobos Marinos.
+/// Diseñada con alto enfoque en UI/UX: divertida, interactiva y llena de sorpresas.
+class PantallaDetalleShowAcuatico extends StatefulWidget {
   const PantallaDetalleShowAcuatico({super.key});
+
+  @override
+  State<PantallaDetalleShowAcuatico> createState() =>
+      _PantallaDetalleShowAcuaticoState();
+}
+
+class _PantallaDetalleShowAcuaticoState extends State<PantallaDetalleShowAcuatico>
+    with SingleTickerProviderStateMixin {
+  // Estado interactivo de función seleccionada (0: 10:00 AM, 1: 01:00 PM, 2: 04:00 PM)
+  int _funcionSeleccionada = 1;
+
+  // Mini-juego interactivo: aplausos del público
+  int _contadorAplausos = 148;
+  String _mensajeDiversion = '¡Toca abajo para animar a las focas! 👏';
+
+  // Recordatorio de asiento activado
+  bool _recordatorioActivado = false;
+
+  // Acrobacia expandida seleccionada
+  int? _trucoExpandido = 0;
+
+  late AnimationController _sealBounceController;
+  late Animation<double> _sealBounceAnimation;
+
+  final List<Map<String, dynamic>> _funciones = [
+    {
+      'numero': 'Función 1',
+      'horario': '10:00 AM - 10:35 AM',
+      'asientos': '8 asientos libres',
+      'etiqueta': 'Mañana marina',
+      'icono': Icons.wb_sunny_rounded,
+    },
+    {
+      'numero': 'Función 2',
+      'horario': '01:00 PM - 01:35 PM',
+      'asientos': '14 asientos libres',
+      'etiqueta': '¡Función estrella!',
+      'icono': Icons.star_rounded,
+    },
+    {
+      'numero': 'Función 3',
+      'horario': '04:00 PM - 04:35 PM',
+      'asientos': '22 asientos libres',
+      'etiqueta': 'Atardecer oceánico',
+      'icono': Icons.nights_stay_rounded,
+    },
+  ];
+
+  final List<Map<String, dynamic>> _trucos = [
+    {
+      'icono': '⚽',
+      'titulo': 'Equilibrio con Pelota',
+      'detalle': '¡Sostienen la pelota con la nariz por más de 10 minutos mientras saludan con la aleta!',
+    },
+    {
+      'icono': '🐬',
+      'titulo': 'Salto Sincronizado',
+      'detalle': '¡Se elevan hasta 3 metros fuera del agua pasando a través de aros de burbujas!',
+    },
+    {
+      'icono': '🎵',
+      'titulo': 'Coro de Voces Marinas',
+      'detalle': '¡Cantan con divertidos sonidos y aplauden al compás de la música del zoológico!',
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _sealBounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _sealBounceAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
+      CurvedAnimation(
+        parent: _sealBounceController,
+        curve: Curves.elasticOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _sealBounceController.dispose();
+    super.dispose();
+  }
+
+  void _aplaudirFocas() {
+    SoundService.instance.playButtonTap();
+    _sealBounceController.forward(from: 0).then((_) {
+      _sealBounceController.reverse();
+    });
+
+    final frases = [
+      '¡La foca dio una voltereta en el agua! 🌊🦭',
+      '¡Te lanzó un saludo con sus aletas! 👏✨',
+      '¡Atrapó un pez en pleno vuelo! 🐟🎉',
+      '¡Salto triple con chapuzón refrescante! 💦🐬',
+      '¡La foca cantó: "¡Honk honk!" 🎶🦭',
+    ];
+
+    setState(() {
+      _contadorAplausos++;
+      _mensajeDiversion = frases[_contadorAplausos % frases.length];
+    });
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: const Color(0xFF0077B6),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        duration: const Duration(milliseconds: 1400),
+        content: Row(
+          children: [
+            const Text('👏', style: TextStyle(fontSize: 20)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                _mensajeDiversion,
+                style: GoogleFonts.urbanist(
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenH = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF0F7FA),
       body: Stack(
         children: [
-          // 1. IMAGEN HERO CON FONDO ACUÁTICO
+          // 1. HERO SUPERIOR CON DEGRADADO OCEÁNICO FESTIVO
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            height: screenH * 0.44,
+            height: screenH * 0.40,
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -34,10 +167,22 @@ class PantallaDetalleShowAcuatico extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withValues(alpha: 0.65),
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.3),
+                        const Color(0xFF003049).withValues(alpha: 0.85),
+                        const Color(0xFF0288D1).withValues(alpha: 0.65),
                       ],
+                    ),
+                  ),
+                ),
+                // Burbujas y partículas decorativas
+                Positioned(
+                  top: 50,
+                  right: 25,
+                  child: Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.08),
                     ),
                   ),
                 ),
@@ -45,7 +190,7 @@ class PantallaDetalleShowAcuatico extends StatelessWidget {
             ),
           ),
 
-          // 2. BOTÓN REGRESAR SUPERIOR
+          // 2. BARRA DE NAVEGACIÓN SUPERIOR
           Positioned(
             top: 0,
             left: 0,
@@ -57,6 +202,7 @@ class PantallaDetalleShowAcuatico extends StatelessWidget {
                   vertical: 8,
                 ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     GestureDetector(
                       onTap: () {
@@ -66,27 +212,44 @@ class PantallaDetalleShowAcuatico extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.25),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.4),
-                            width: 1.5,
-                          ),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black26, blurRadius: 6),
+                          ],
                         ),
                         child: const Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          color: Colors.white,
+                          color: Color(0xFF003049),
                           size: 18,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Experiencias Zoo',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.4),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Text('🌊', style: TextStyle(fontSize: 14)),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Show Acuático Zoo',
+                            style: GoogleFonts.urbanist(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -95,209 +258,573 @@ class PantallaDetalleShowAcuatico extends StatelessWidget {
             ),
           ),
 
-          // 3. TÍTULO Y BADGE SOBRE EL HERO
+          // 3. TÍTULO Y PROTAGONISTA INTERACTIVO
           Positioned(
-            top: 95,
-            left: 24,
-            right: 24,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            top: 75,
+            left: 20,
+            right: 20,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.verdeAzulado,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '🌊 SHOW ESTRELLA EN VIVO',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: 0.5,
-                    ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFB703),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black26, blurRadius: 4),
+                          ],
+                        ),
+                        child: Text(
+                          '🎉 ¡DIVERSIÓN GARANTIZADA!',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w900,
+                            color: const Color(0xFF003049),
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Gran Show de Focas\ny Lobos Marinos',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          height: 1.15,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '📍 Ubicado en el Hábitat de Focas y Lobos Marinos.',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 12.5,
+                          color: Colors.white.withValues(alpha: 0.95),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Gran Show de Focas\ny Lobos Marinos',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                    height: 1.2,
-                    shadows: const [
-                      Shadow(color: Colors.black45, blurRadius: 10),
-                    ],
+                // FOCA INTERACTIVA (Al tocarla rebota alegremente)
+                GestureDetector(
+                  onTap: _aplaudirFocas,
+                  child: AnimatedBuilder(
+                    animation: _sealBounceAnimation,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _sealBounceAnimation.value,
+                        child: Container(
+                          width: 105,
+                          height: 105,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            border: Border.all(
+                              color: const Color(0xFF00B4D8),
+                              width: 3.5,
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/pantalla_principal/foca.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
             ),
           ),
 
-          // 4. ANIMAL PROTAGONISTA EN CÍRCULO 3D FLOTANTE
+          // 4. CONTENIDO PRINCIPAL SCROLLEABLE E INTERACTIVO
           Positioned(
-            top: screenH * 0.28,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.verdeAzulado.withValues(alpha: 0.35),
-                    width: 3.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/pantalla_principal/foca.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // 5. CUERPO INFERIOR (TARJETA BLANCA SCROLLEABLE TIPO APPLE)
-          Positioned(
-            top: screenH * 0.40,
+            top: screenH * 0.30,
             bottom: 0,
             left: 0,
             right: 0,
             child: Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(36)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black12,
                     blurRadius: 16,
-                    offset: Offset(0, -6),
+                    offset: Offset(0, -5),
                   ),
                 ],
               ),
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.only(
-                  top: 85,
-                  left: 24,
-                  right: 24,
-                  bottom: 36,
-                ),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // BADGES DE ESTADO
-                    Row(
-                      children: [
-                        _buildPillBadge(
-                          icon: Icons.place_rounded,
-                          label: 'Acuario Central · Zona 09',
-                          color: AppColors.verdeAzulado,
+                    // MINI-JUEGO DE APLAUSOS INTERACTIVOS (UX DE DIVERSIÓN)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFE0F7FA), Color(0xFFE1F5FE)],
                         ),
-                        const SizedBox(width: 8),
-                        _buildPillBadge(
-                          icon: Icons.timer_rounded,
-                          label: '35 min de duración',
-                          color: AppColors.verdePrincipal,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(
+                          color: const Color(0xFF00B4D8).withValues(alpha: 0.35),
+                          width: 1.5,
                         ),
-                      ],
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Text('👏', style: TextStyle(fontSize: 16)),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '¡Anima el Show en Vivo!',
+                                      style: GoogleFonts.urbanist(
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w900,
+                                        color: const Color(0xFF0277BD),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  '$_contadorAplausos aplausos de exploradores hoy',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 12,
+                                    color: Colors.blueGrey[700],
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Botón interactivo de aplauso
+                          ElevatedButton.icon(
+                            onPressed: _aplaudirFocas,
+                            icon: const Icon(Icons.touch_app_rounded, size: 16),
+                            label: Text(
+                              '¡Aplaudir! 🦭',
+                              style: GoogleFonts.urbanist(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 13,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF0288D1),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              elevation: 2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 22),
+
+                    // SELECTOR INTERACTIVO DE HORARIOS / FUNCIONES
+                    Text(
+                      'Escoge tu Función de Hoy 🎟️',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.textoOscuro,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Toca un horario para seleccionarlo y activar tu asiento:',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 12.5,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // LISTA DE TARJETAS INTERACTIVAS DE FUNCIONES
+                    Column(
+                      children: List.generate(_funciones.length, (index) {
+                        final item = _funciones[index];
+                        final bool isSelected = _funcionSeleccionada == index;
+
+                        return GestureDetector(
+                          onTap: () {
+                            SoundService.instance.playButtonTap();
+                            setState(() {
+                              _funcionSeleccionada = index;
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? const Color(0xFFE1F5FE)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(0xFF0288D1)
+                                    : Colors.grey.shade300,
+                                width: isSelected ? 2.2 : 1.2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: isSelected
+                                      ? const Color(0xFF0288D1)
+                                          .withValues(alpha: 0.18)
+                                      : Colors.black.withValues(alpha: 0.04),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? const Color(0xFF0288D1)
+                                        : Colors.grey.shade100,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    item['icono'] as IconData,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.grey.shade600,
+                                    size: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            item['numero'] as String,
+                                            style: GoogleFonts.urbanist(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w900,
+                                              color: isSelected
+                                                  ? const Color(0xFF0277BD)
+                                                  : AppColors.textoOscuro,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 7,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: isSelected
+                                                  ? const Color(0xFF0288D1)
+                                                      .withValues(alpha: 0.15)
+                                                  : Colors.grey.shade200,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              item['etiqueta'] as String,
+                                              style: GoogleFonts.urbanist(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w800,
+                                                color: isSelected
+                                                    ? const Color(0xFF0288D1)
+                                                    : Colors.grey.shade700,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        item['horario'] as String,
+                                        style: GoogleFonts.urbanist(
+                                          fontSize: 14.5,
+                                          fontWeight: FontWeight.w900,
+                                          color: AppColors.textoOscuro,
+                                        ),
+                                      ),
+                                      Text(
+                                        item['asientos'] as String,
+                                        style: GoogleFonts.urbanist(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color: isSelected
+                                              ? const Color(0xFF2E7D32)
+                                              : Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  isSelected
+                                      ? Icons.check_circle_rounded
+                                      : Icons.radio_button_unchecked_rounded,
+                                  color: isSelected
+                                      ? const Color(0xFF0288D1)
+                                      : Colors.grey.shade400,
+                                  size: 22,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // BOTÓN INTERACTIVO DE RECORDATORIO DE ASIENTO
+                    GestureDetector(
+                      onTap: () {
+                        SoundService.instance.playButtonTap();
+                        setState(() {
+                          _recordatorioActivado = !_recordatorioActivado;
+                        });
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: _recordatorioActivado
+                                ? const Color(0xFF2E7D32)
+                                : Colors.grey.shade800,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            content: Row(
+                              children: [
+                                Icon(
+                                  _recordatorioActivado
+                                      ? Icons.notifications_active_rounded
+                                      : Icons.notifications_off_rounded,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    _recordatorioActivado
+                                        ? '¡Recordatorio guardado para la ${_funciones[_funcionSeleccionada]['numero']}! 🔔'
+                                        : 'Recordatorio cancelado',
+                                    style: GoogleFonts.urbanist(
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _recordatorioActivado
+                              ? const Color(0xFFE8F5E9)
+                              : Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: _recordatorioActivado
+                                ? const Color(0xFF4CAF50)
+                                : Colors.grey.shade300,
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _recordatorioActivado
+                                  ? Icons.check_circle_rounded
+                                  : Icons.notifications_outlined,
+                              color: _recordatorioActivado
+                                  ? const Color(0xFF2E7D32)
+                                  : AppColors.textoOscuro,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              _recordatorioActivado
+                                  ? 'Recordatorio Activo para mi Función ✓'
+                                  : 'Notificarme 15 min antes del show 🔔',
+                              style: GoogleFonts.urbanist(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: _recordatorioActivado
+                                    ? const Color(0xFF2E7D32)
+                                    : AppColors.textoOscuro,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
 
                     const SizedBox(height: 24),
 
-                    // DESCRIPCIÓN DEL SHOW
+                    // TRUCOS Y ACROBACIAS INTERACTIVAS (TOCA PARA DESCUBRIR)
                     Text(
-                      'Acerca del Show Acuático',
+                      'Acrobacias y Trucos del Show ✨',
                       style: GoogleFonts.urbanist(
-                        fontSize: 18,
+                        fontSize: 17,
                         fontWeight: FontWeight.w900,
                         color: AppColors.textoOscuro,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Text(
-                      'Disfruta de acrobacias marinas impresionantes, saltos sincronizados y actividades educativas guiadas por nuestros cuidadores certificados. Conoce de cerca la inteligencia de las focas y cómo contribuimos a la preservación del ecosistema oceánico.',
+                      'Toca cualquier truco para ver la sorpresa:',
                       style: GoogleFonts.urbanist(
-                        fontSize: 13,
-                        color: Colors.grey[700],
-                        height: 1.5,
+                        fontSize: 12.5,
+                        color: Colors.grey[600],
                         fontWeight: FontWeight.w600,
                       ),
                     ),
 
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 12),
 
-                    // --- RUTA CIRCULAR DE HORARIOS (INICIO Y FIN) ---
-                    Text(
-                      'Cronograma de Funciones',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textoOscuro,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Ruta de horarios con inicio y finalización:',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                        fontWeight: FontWeight.w600,
-                      ),
+                    // LISTA INTERACTIVA DE TRUCOS
+                    Column(
+                      children: List.generate(_trucos.length, (index) {
+                        final truco = _trucos[index];
+                        final isAbierto = _trucoExpandido == index;
+
+                        return GestureDetector(
+                          onTap: () {
+                            SoundService.instance.playButtonTap();
+                            setState(() {
+                              _trucoExpandido = isAbierto ? null : index;
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: isAbierto
+                                  ? const Color(0xFFFFF8E1)
+                                  : const Color(0xFFF9FBFB),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isAbierto
+                                    ? const Color(0xFFFFB74D)
+                                    : Colors.grey.shade200,
+                                width: 1.2,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      truco['icono'] as String,
+                                      style: const TextStyle(fontSize: 18),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        truco['titulo'] as String,
+                                        style: GoogleFonts.urbanist(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w900,
+                                          color: isAbierto
+                                              ? const Color(0xFFE65100)
+                                              : AppColors.textoOscuro,
+                                        ),
+                                      ),
+                                    ),
+                                    Icon(
+                                      isAbierto
+                                          ? Icons.keyboard_arrow_up_rounded
+                                          : Icons.keyboard_arrow_down_rounded,
+                                      color: isAbierto
+                                          ? const Color(0xFFE65100)
+                                          : Colors.grey,
+                                    ),
+                                  ],
+                                ),
+                                if (isAbierto) ...[
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    truco['detalle'] as String,
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 12.5,
+                                      color: Colors.brown.shade800,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
 
-                    // TIMELINE DE 3 FUNCIONES CON NODOS CIRCULARES
-                    _buildTimelineFunction(
-                      numero: 'Función 1',
-                      horaInicio: '10:00 AM',
-                      horaFin: '10:35 AM',
-                      estado: 'Finalizado',
-                      isPast: true,
-                    ),
-                    const SizedBox(height: 14),
-                    _buildTimelineFunction(
-                      numero: 'Función 2',
-                      horaInicio: '01:00 PM',
-                      horaFin: '01:35 PM',
-                      estado: 'Próxima función',
-                      isHighlight: true,
-                    ),
-                    const SizedBox(height: 14),
-                    _buildTimelineFunction(
-                      numero: 'Función 3',
-                      horaInicio: '04:00 PM',
-                      horaFin: '04:35 PM',
-                      estado: 'Por comenzar',
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    // BOTÓN VER UBICACIÓN EN EL MAPA
+                    // BOTÓN NAVEGAR AL ACUARIO (UBICADO EN LAS FOCAS)
                     GestureDetector(
                       onTap: () {
                         SoundService.instance.playButtonTap();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const PantallaMapa(),
+                            builder: (context) => const PantallaMapa(
+                              animalIdInicial: 'A09',
+                            ),
                           ),
                         );
                       },
@@ -307,16 +834,15 @@ class PantallaDetalleShowAcuatico extends StatelessWidget {
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [
-                              AppColors.verdeAzulado,
-                              AppColors.verdePrincipal,
+                              Color(0xFF0288D1),
+                              Color(0xFF00B4D8),
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(28),
+                          borderRadius: BorderRadius.circular(22),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.verdeAzulado.withValues(
-                                alpha: 0.35,
-                              ),
+                              color: const Color(0xFF0288D1)
+                                  .withValues(alpha: 0.35),
                               blurRadius: 14,
                               offset: const Offset(0, 5),
                             ),
@@ -332,223 +858,22 @@ class PantallaDetalleShowAcuatico extends StatelessWidget {
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              'Cómo llegar al Acuario',
+                              'Ir a las Focas (Show Marino) 🧭',
                               style: GoogleFonts.urbanist(
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white,
+                                letterSpacing: 0.2,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
+                    SizedBox(height: 16 + MediaQuery.of(context).padding.bottom),
                   ],
                 ),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Widget para el nodo de la ruta circular de inicio a fin
-  Widget _buildTimelineFunction({
-    required String numero,
-    required String horaInicio,
-    required String horaFin,
-    required String estado,
-    bool isHighlight = false,
-    bool isPast = false,
-  }) {
-    final Color mainColor = isHighlight
-        ? AppColors.verdeAzulado
-        : (isPast ? Colors.grey : AppColors.verdePrincipal);
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isHighlight
-            ? AppColors.verdeAzulado.withValues(alpha: 0.06)
-            : const Color(0xFFF8FAF9),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isHighlight
-              ? AppColors.verdeAzulado.withValues(alpha: 0.35)
-              : Colors.grey.withValues(alpha: 0.2),
-          width: isHighlight ? 1.5 : 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          // NODO CIRCULAR DE INICIO
-          Column(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: mainColor.withValues(alpha: 0.12),
-                  border: Border.all(color: mainColor, width: 2),
-                ),
-                child: Icon(
-                  isPast
-                      ? Icons.check_circle_rounded
-                      : Icons.play_arrow_rounded,
-                  color: mainColor,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Inicio',
-                style: GoogleFonts.urbanist(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.grey[500],
-                ),
-              ),
-              Text(
-                horaInicio,
-                style: GoogleFonts.urbanist(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textoOscuro,
-                ),
-              ),
-            ],
-          ),
-
-          // LÍNEA DE RUTA CONECTORA CON FLECHA
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Column(
-                children: [
-                  Text(
-                    numero,
-                    style: GoogleFonts.urbanist(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      color: mainColor,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        height: 3,
-                        decoration: BoxDecoration(
-                          color: mainColor.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: mainColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          estado,
-                          style: GoogleFonts.urbanist(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '35 mins',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 10,
-                      color: Colors.grey[500],
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // NODO CIRCULAR DE FINALIZACIÓN
-          Column(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isPast
-                      ? Colors.grey.withValues(alpha: 0.15)
-                      : AppColors.verdePrincipal.withValues(alpha: 0.12),
-                  border: Border.all(
-                    color: isPast ? Colors.grey : AppColors.verdePrincipal,
-                    width: 2,
-                  ),
-                ),
-                child: Icon(
-                  Icons.flag_rounded,
-                  color: isPast ? Colors.grey : AppColors.verdePrincipal,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Fin',
-                style: GoogleFonts.urbanist(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.grey[500],
-                ),
-              ),
-              Text(
-                horaFin,
-                style: GoogleFonts.urbanist(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textoOscuro,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPillBadge({
-    required IconData icon,
-    required String label,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: color),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: GoogleFonts.urbanist(
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              color: color,
             ),
           ),
         ],

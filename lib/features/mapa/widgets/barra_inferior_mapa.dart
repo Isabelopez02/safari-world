@@ -8,9 +8,9 @@ import 'marcador_animado.dart';
 import '../screens/pantalla_detalle_animal.dart';
 
 /// Barra inferior interactiva del mapa del zoológico.
-/// Maneja los 3 estados:
+/// Maneja los 3 estados con entrada animada y llamadas a la acción claras:
 /// 1. Exploración general (resumen de animales descubiertos)
-/// 2. Vista previa al seleccionar un paradero (con botón Ver Info y Explorar)
+/// 2. Vista previa al seleccionar un paradero (con banner notorio y botones claros)
 /// 3. Navegación activa hacia el destino (con tiempo, distancia y cancelar)
 class BarraInferiorMapa extends StatelessWidget {
   final GlobalKey keyAnimales;
@@ -43,23 +43,46 @@ class BarraInferiorMapa extends StatelessWidget {
       curve: Curves.easeInOut,
       child: Container(
         key: keyAnimales,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: EdgeInsets.fromLTRB(
+          22,
+          14,
+          22,
+          14 + MediaQuery.of(context).padding.bottom,
+        ),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-              offset: Offset(0, -4),
+              color: Colors.black26,
+              blurRadius: 14,
+              offset: Offset(0, -5),
             ),
           ],
         ),
-        child: marcadorSeleccionado == null
-            ? _buildBarraExploracion(context)
-            : (!isNavigating
-                  ? _buildBarraVistaPrevia(context)
-                  : _buildBarraNavegando(context)),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          switchInCurve: Curves.easeOutBack,
+          transitionBuilder: (child, animation) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.12),
+                end: Offset.zero,
+              ).animate(animation),
+              child: FadeTransition(opacity: animation, child: child),
+            );
+          },
+          child: KeyedSubtree(
+            key: ValueKey(
+              '${marcadorSeleccionado?.id ?? -1}_${isNavigating ? "nav" : "view"}',
+            ),
+            child: marcadorSeleccionado == null
+                ? _buildBarraExploracion(context)
+                : (!isNavigating
+                      ? _buildBarraVistaPrevia(context)
+                      : _buildBarraNavegando(context)),
+          ),
+        ),
       ),
     );
   }
@@ -81,12 +104,12 @@ class BarraInferiorMapa extends StatelessWidget {
                 child: const Icon(
                   Icons.keyboard_arrow_up_rounded,
                   color: AppColors.verdeAzulado,
-                  size: 28,
+                  size: 26,
                 ),
               );
             },
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -101,21 +124,21 @@ class BarraInferiorMapa extends StatelessWidget {
                       color: AppColors.verdePrincipal,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
-                      vertical: 4,
+                      vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.verdeAzulado.withValues(alpha: 0.2),
+                      color: AppColors.verdeAzulado.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       '$visitados/${marcadores.length} descubiertos',
                       style: GoogleFonts.urbanist(
                         fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w800,
                         color: AppColors.verdeAzulado,
                       ),
                     ),
@@ -155,7 +178,7 @@ class BarraInferiorMapa extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
         ],
       ),
     );
@@ -166,18 +189,70 @@ class BarraInferiorMapa extends StatelessWidget {
 
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // 1. BANNER NOTORIO DE ATENCIÓN: INDICA CLARAMENTE QUE SE SELECCIONÓ EL ANIMAL
+        Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          decoration: BoxDecoration(
+            color: sel.esBanio
+                ? Colors.blue.shade50
+                : AppColors.verdeAzulado.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: sel.esBanio
+                  ? Colors.blue.shade300
+                  : AppColors.verdeAzulado.withValues(alpha: 0.35),
+              width: 1.2,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                sel.esBanio ? Icons.wc_rounded : Icons.pets_rounded,
+                color: sel.esBanio
+                    ? Colors.blue.shade700
+                    : AppColors.verdeAzulado,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  sel.esBanio
+                      ? '📍 ¡Baños seleccionados! Elige una opción abajo 👇'
+                      : '📍 ¡Seleccionaste a ${sel.nombre}! Elige una opción abajo 👇',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w900,
+                    color: sel.esBanio
+                        ? Colors.blue.shade800
+                        : AppColors.verdeAzulado,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // 2. FILA DE INFORMACIÓN DEL ANIMAL / SERVICIO
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: 54,
+              height: 54,
               decoration: BoxDecoration(
                 color: sel.esBanio
                     ? Colors.blue.shade50
                     : AppColors.verdeAzulado.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: sel.esBanio
+                      ? Colors.blue.shade200
+                      : AppColors.verdeAzulado.withValues(alpha: 0.3),
+                  width: 1.5,
+                ),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
@@ -196,7 +271,7 @@ class BarraInferiorMapa extends StatelessWidget {
                             )),
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,21 +279,21 @@ class BarraInferiorMapa extends StatelessWidget {
                   Text(
                     sel.esBanio ? 'Servicios Higiénicos' : sel.nombre,
                     style: GoogleFonts.urbanist(
-                      fontSize: 20,
+                      fontSize: 19,
                       fontWeight: FontWeight.w900,
                       color: sel.esBanio
                           ? Colors.blue.shade800
-                          : AppColors.verdePrincipal,
+                          : AppColors.textoOscuro,
                     ),
                   ),
                   Text(
                     sel.esBanio
-                        ? 'Baños disponibles para visitantes'
-                        : sel.categoria,
+                        ? 'Baños públicos disponibles'
+                        : '${sel.categoria} · Zona #${sel.id}',
                     style: GoogleFonts.urbanist(
-                      fontSize: 14,
+                      fontSize: 13,
                       color: Colors.grey[600],
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
@@ -279,22 +354,26 @@ class BarraInferiorMapa extends StatelessWidget {
               icon: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.1),
+                  color: Colors.grey.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.close, color: Colors.black54, size: 20),
+                child: const Icon(Icons.close, color: Colors.black54, size: 18),
               ),
               onPressed: onCerrarSeleccion,
             ),
           ],
         ),
-        const SizedBox(height: 20),
+
+        const SizedBox(height: 16),
+
+        // 3. BOTONES DE ACCIÓN: VER FICHA vs IR CON GPS
         Row(
           children: [
             if (!sel.esBanio) ...[
               Expanded(
-                child: OutlinedButton(
+                child: OutlinedButton.icon(
                   onPressed: () {
+                    SoundService.instance.playButtonTap();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -303,6 +382,18 @@ class BarraInferiorMapa extends StatelessWidget {
                       ),
                     );
                   },
+                  icon: const Icon(
+                    Icons.menu_book_rounded,
+                    size: 18,
+                    color: AppColors.verdePrincipal,
+                  ),
+                  label: Text(
+                    'Ver Ficha',
+                    style: GoogleFonts.urbanist(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14.5,
+                    ),
+                  ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.verdePrincipal,
                     side: const BorderSide(
@@ -310,52 +401,42 @@ class BarraInferiorMapa extends StatelessWidget {
                       width: 2,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(22),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  child: Text(
-                    'Ver Info',
-                    style: GoogleFonts.urbanist(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
             ],
             Expanded(
-              child: ElevatedButton(
-                onPressed: onIniciarNavegacion,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  SoundService.instance.playButtonTap();
+                  onIniciarNavegacion();
+                },
+                icon: const Icon(
+                  Icons.navigation_rounded,
+                  color: Colors.white,
+                  size: 18,
+                ),
+                label: Text(
+                  sel.esBanio ? 'Ir a los Baños' : 'Ir con GPS',
+                  style: GoogleFonts.urbanist(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 14.5,
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: sel.esBanio
                       ? Colors.blue.shade600
                       : AppColors.verdeAzulado,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(22),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  elevation: 0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.directions_walk,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      sel.esBanio ? 'Cómo llegar' : 'Explorar',
-                      style: GoogleFonts.urbanist(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  elevation: 2,
                 ),
               ),
             ),
@@ -380,70 +461,70 @@ class BarraInferiorMapa extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                Icons.navigation,
+                Icons.directions_walk_rounded,
                 color: AppColors.verdePrincipal,
-                size: 28,
+                size: 26,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'En camino a ${sel.nombre}',
+                    'Navegando hacia ${sel.nombre}',
                     style: GoogleFonts.urbanist(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w600,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textoOscuro,
                     ),
                   ),
-                  const SizedBox(height: 2),
                   Text(
-                    '150 metros • 2 min',
+                    'Sigue la línea punteada verde en el mapa',
                     style: GoogleFonts.urbanist(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.verdePrincipal,
+                      fontSize: 12.5,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            Expanded(
-              child: ElevatedButton(
-                onPressed: onCancelarNavegacion,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFEE6E6),
-                  foregroundColor: const Color(0xFFD93B3B),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  elevation: 0,
+            IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  shape: BoxShape.circle,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.close_rounded, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Cancelar ruta',
-                      style: GoogleFonts.urbanist(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
+                child: const Icon(Icons.close_rounded, color: Colors.red, size: 20),
               ),
+              onPressed: onCancelarNavegacion,
             ),
           ],
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: onCancelarNavegacion,
+            icon: const Icon(Icons.stop_rounded, size: 18),
+            label: Text(
+              'Finalizar Navegación',
+              style: GoogleFonts.urbanist(
+                fontWeight: FontWeight.w800,
+                fontSize: 14,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade600,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 11),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+            ),
+          ),
         ),
       ],
     );
