@@ -6,6 +6,9 @@ import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/services/audioguia_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+import 'package:zoologico_front/core/widgets/imagen_animal.dart';
+
+import '../widgets/informacion_ampliada_animal.dart';
 
 /// Tema visual específico de cada hábitat para una experiencia inmersiva
 class HabitatThemeData {
@@ -35,7 +38,7 @@ class HabitatThemeData {
 HabitatThemeData getHabitatTheme(String habitat) {
   final h = habitat.toLowerCase();
   if (h.contains('sabana')) {
-    return const HabitatThemeData(
+    return HabitatThemeData(
       background: Color(0xFFFDFBF7),
       cardBackground: Color(0xFFFFFBEB),
       gradientStart: Color(0xFFFEF3C7),
@@ -46,8 +49,10 @@ HabitatThemeData getHabitatTheme(String habitat) {
       emoji: '🦁',
       nombreHabitat: 'Sabana Africana',
     );
-  } else if (h.contains('selva')) {
-    return const HabitatThemeData(
+  } else if (h.contains('selva') ||
+      h.contains('felinario') ||
+      h.contains('aves')) {
+    return HabitatThemeData(
       background: Color(0xFFF7FBF8),
       cardBackground: Color(0xFFF0FDF4),
       gradientStart: Color(0xFFDCFCE7),
@@ -56,10 +61,13 @@ HabitatThemeData getHabitatTheme(String habitat) {
       badgeBg: Color(0xFFBBF7D0),
       badgeText: Color(0xFF166534),
       emoji: '🌴',
-      nombreHabitat: 'Selva Tropical',
+      nombreHabitat: habitat,
     );
-  } else if (h.contains('acua') || h.contains('mar') || h.contains('foca') || h.contains('pinguino') || h.contains('delfin')) {
-    return const HabitatThemeData(
+  } else if (h.contains('acua') ||
+      h.contains('mar') ||
+      h.contains('costa') ||
+      h.contains('anfibio')) {
+    return HabitatThemeData(
       background: Color(0xFFF6FAFC),
       cardBackground: Color(0xFFF0F9FF),
       gradientStart: Color(0xFFE0F2FE),
@@ -68,10 +76,10 @@ HabitatThemeData getHabitatTheme(String habitat) {
       badgeBg: Color(0xFFBAE6FD),
       badgeText: Color(0xFF075985),
       emoji: '🐬',
-      nombreHabitat: 'Mundo Acuático',
+      nombreHabitat: habitat,
     );
   } else if (h.contains('granja')) {
-    return const HabitatThemeData(
+    return HabitatThemeData(
       background: Color(0xFFFCFDF6),
       cardBackground: Color(0xFFFEFCE8),
       gradientStart: Color(0xFFF7FEE7),
@@ -82,9 +90,9 @@ HabitatThemeData getHabitatTheme(String habitat) {
       emoji: '🚜',
       nombreHabitat: 'La Granja',
     );
-  } else {
+  } else if (h.contains('sierra') || h.contains('montaña')) {
     // Bosque & Montaña / Por defecto
-    return const HabitatThemeData(
+    return HabitatThemeData(
       background: Color(0xFFF8FAFC),
       cardBackground: Color(0xFFF1F5F9),
       gradientStart: Color(0xFFE2E8F0),
@@ -93,7 +101,19 @@ HabitatThemeData getHabitatTheme(String habitat) {
       badgeBg: Color(0xFFCBD5E1),
       badgeText: Color(0xFF1E293B),
       emoji: '🏔️',
-      nombreHabitat: 'Bosque & Montaña',
+      nombreHabitat: habitat,
+    );
+  } else {
+    return HabitatThemeData(
+      background: Color(0xFFF8FAFC),
+      cardBackground: Color(0xFFF1F5F9),
+      gradientStart: Color(0xFFE2E8F0),
+      gradientEnd: Color(0xFFF1F5F9),
+      accent: Color(0xFF475569),
+      badgeBg: Color(0xFFCBD5E1),
+      badgeText: Color(0xFF1E293B),
+      emoji: '🌿',
+      nombreHabitat: 'Parque de las Leyendas · Huachipa',
     );
   }
 }
@@ -135,7 +155,10 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
       CurvedAnimation(parent: _stampController, curve: Curves.elasticOut),
     );
     _stampOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _stampController, curve: const Interval(0.0, 0.4, curve: Curves.easeIn)),
+      CurvedAnimation(
+        parent: _stampController,
+        curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
+      ),
     );
 
     AudioGuiaService.instance.addListener(_onAudioGuiaChanged);
@@ -171,7 +194,9 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
   Future<void> _marcarVisitado(bool esVisitadoActual) async {
     SoundService.instance.playButtonTap();
     final messenger = ScaffoldMessenger.of(context);
-    final nuevoEstado = await AnimalService.instance.toggleVisitado(widget.animal.id);
+    final nuevoEstado = await AnimalService.instance.toggleVisitado(
+      widget.animal.id,
+    );
     if (!mounted) return;
 
     if (nuevoEstado) {
@@ -195,13 +220,17 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
-        backgroundColor: nuevoEstado ? const Color(0xFF2E7D32) : Colors.grey.shade800,
+        backgroundColor: nuevoEstado
+            ? const Color(0xFF2E7D32)
+            : Colors.grey.shade800,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         content: Row(
           children: [
             Icon(
-              nuevoEstado ? Icons.check_circle_rounded : Icons.info_outline_rounded,
+              nuevoEstado
+                  ? Icons.check_circle_rounded
+                  : Icons.info_outline_rounded,
               color: Colors.white,
               size: 18,
             ),
@@ -260,7 +289,10 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
               children: [
                 // BARRA SUPERIOR MINIMALISTA
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -289,18 +321,21 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                           ),
                         ),
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(
                             '${theme.emoji} Ficha de Explorador',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
                             style: GoogleFonts.urbanist(
                               fontSize: 15,
                               fontWeight: FontWeight.w900,
                               color: AppColors.textoOscuro,
                             ),
                           ),
-                        ],
+                        ),
                       ),
                       // BOTÓN AUDIOGUÍA MINIMALISTA
                       GestureDetector(
@@ -400,34 +435,18 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: theme.accent.withValues(alpha: 0.25),
+                                            color: theme.accent.withValues(
+                                              alpha: 0.25,
+                                            ),
                                             blurRadius: 8,
                                             offset: const Offset(0, 3),
                                           ),
                                         ],
                                       ),
                                       child: ClipOval(
-                                        child: widget.animal.imagen != null
-                                            ? Image.asset(
-                                                widget.animal.imagen!,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error, stackTrace) => Container(
-                                                  color: theme.accent,
-                                                  child: Icon(
-                                                    widget.animal.icono,
-                                                    size: 46,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              )
-                                            : Container(
-                                                color: theme.accent,
-                                                child: Icon(
-                                                  widget.animal.icono,
-                                                  size: 46,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
+                                        child: ImagenAnimal(
+                                          animal: widget.animal,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -435,20 +454,24 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                   // Datos principales a la derecha
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        Wrap(
+                                          spacing: 6,
+                                          runSpacing: 5,
                                           children: [
                                             // Badge hábitat temático
                                             Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 3,
-                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 3,
+                                                  ),
                                               decoration: BoxDecoration(
                                                 color: theme.badgeBg,
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
                                               child: Text(
                                                 '${theme.emoji} ${theme.nombreHabitat}',
@@ -461,13 +484,15 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                             ),
                                             // Chip zona
                                             Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 7,
-                                                vertical: 3,
-                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 7,
+                                                    vertical: 3,
+                                                  ),
                                               decoration: BoxDecoration(
                                                 color: Colors.grey.shade100,
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
                                               child: Text(
                                                 '#${widget.animal.id}',
@@ -530,7 +555,8 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFC62828).withValues(alpha: 0.10),
+                                      color: const Color(0xFFC62828)
+                                          .withValues(alpha: 0.10),
                                       borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
                                         color: const Color(0xFFC62828),
@@ -552,7 +578,8 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(6),
                                         border: Border.all(
-                                          color: const Color(0xFFC62828).withValues(alpha: 0.6),
+                                          color: const Color(0xFFC62828)
+                                              .withValues(alpha: 0.6),
                                           width: 1.0,
                                         ),
                                       ),
@@ -624,18 +651,23 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                       builder: (context, child) {
                                         return Row(
                                           children: List.generate(4, (i) {
-                                            final h = 5.0 +
+                                            final h =
+                                                5.0 +
                                                 (11.0 *
-                                                    ((_audioWaveController.value +
+                                                    ((_audioWaveController
+                                                                .value +
                                                             (i * 0.25)) %
                                                         1.0));
                                             return Container(
-                                              margin: const EdgeInsets.only(left: 3),
+                                              margin: const EdgeInsets.only(
+                                                left: 3,
+                                              ),
                                               width: 3,
                                               height: h,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFFE65100),
-                                                borderRadius: BorderRadius.circular(2),
+                                                borderRadius:
+                                                    BorderRadius.circular(2),
                                               ),
                                             );
                                           }),
@@ -678,7 +710,8 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                             ),
                             _chipInfo(
                               icon: Icons.shield_rounded,
-                              label: datos.estadoConservacion,
+                              label:
+                                  'Conservación: ${datos.estadoConservacion}',
                               color: const Color(0xFFE65100),
                             ),
                           ],
@@ -695,7 +728,9 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: Colors.grey.shade200),
+                                  border: Border.all(
+                                    color: Colors.grey.shade200,
+                                  ),
                                   boxShadow: const [
                                     BoxShadow(
                                       color: Colors.black12,
@@ -715,19 +750,21 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                           color: theme.accent,
                                         ),
                                         const SizedBox(width: 5),
-                                        Text(
-                                          'Horarios',
-                                          style: GoogleFonts.urbanist(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w900,
-                                            color: AppColors.textoOscuro,
+                                        Expanded(
+                                          child: Text(
+                                            'Horario del parque',
+                                            style: GoogleFonts.urbanist(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w900,
+                                              color: AppColors.textoOscuro,
+                                            ),
                                           ),
                                         ),
                                       ],
                                     ),
                                     const SizedBox(height: 6),
                                     Text(
-                                      '${datos.horaApertura} - ${datos.horaCierre}',
+                                      '${datos.horaApertura} – ${datos.horaCierre}',
                                       style: GoogleFonts.urbanist(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w800,
@@ -745,7 +782,9 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: Colors.grey.shade200),
+                                  border: Border.all(
+                                    color: Colors.grey.shade200,
+                                  ),
                                   boxShadow: const [
                                     BoxShadow(
                                       color: Colors.black12,
@@ -765,20 +804,22 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                           color: theme.accent,
                                         ),
                                         const SizedBox(width: 5),
-                                        Text(
-                                          'Dieta diaria',
-                                          style: GoogleFonts.urbanist(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w900,
-                                            color: AppColors.textoOscuro,
+                                        Expanded(
+                                          child: Text(
+                                            'Alimentación natural',
+                                            style: GoogleFonts.urbanist(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w900,
+                                              color: AppColors.textoOscuro,
+                                            ),
                                           ),
                                         ),
                                       ],
                                     ),
                                     const SizedBox(height: 6),
                                     Text(
-                                      datos.alimentos.take(2).join(', '),
-                                      maxLines: 1,
+                                      datos.alimentos.join(' · '),
+                                      maxLines: 4,
                                       overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.urbanist(
                                         fontSize: 12,
@@ -822,12 +863,14 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                     color: theme.accent,
                                   ),
                                   const SizedBox(width: 6),
-                                  Text(
-                                    'Comportamiento en hábitat',
-                                    style: GoogleFonts.urbanist(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w900,
-                                      color: AppColors.textoOscuro,
+                                  Expanded(
+                                    child: Text(
+                                      'Comportamiento natural',
+                                      style: GoogleFonts.urbanist(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.textoOscuro,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -839,6 +882,51 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                   fontSize: 12.5,
                                   color: Colors.grey[700],
                                   height: 1.4,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Distribución natural',
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.textoOscuro,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                datos.distribucion,
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 12.5,
+                                  height: 1.4,
+                                  color: Colors.grey[700],
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                datos.fuente,
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 10.5,
+                                  height: 1.35,
+                                  color: Colors.grey[600],
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -893,6 +981,12 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                           ),
                         ),
 
+                        const SizedBox(height: 14),
+                        InformacionAmpliadaAnimal(
+                          animal: widget.animal,
+                          datos: datos,
+                          accent: theme.accent,
+                        ),
                         const SizedBox(height: 20),
                       ],
                     ),
@@ -901,13 +995,18 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
 
                 // BOTÓN DE ACCIÓN INFERIOR: MARCAR EN MI PASAPORTE DE VISITAS
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 12,
+                  ),
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () => _marcarVisitado(esVisitado),
                       icon: Icon(
-                        esVisitado ? Icons.check_circle_rounded : Icons.bookmark_add_rounded,
+                        esVisitado
+                            ? Icons.check_circle_rounded
+                            : Icons.bookmark_add_rounded,
                         size: 18,
                       ),
                       label: Text(
@@ -920,7 +1019,9 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: esVisitado ? const Color(0xFF2E7D32) : theme.accent,
+                        backgroundColor: esVisitado
+                            ? const Color(0xFF2E7D32)
+                            : theme.accent,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 13),
                         shape: RoundedRectangleBorder(
@@ -950,18 +1051,27 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                           child: Transform.scale(
                             scale: _stampScaleAnimation.value,
                             child: Opacity(
-                              opacity: _stampOpacityAnimation.value.clamp(0.0, 1.0),
+                              opacity: _stampOpacityAnimation.value.clamp(
+                                0.0,
+                                1.0,
+                              ),
                               child: child,
                             ),
                           ),
                         );
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 18,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(22),
-                          border: Border.all(color: const Color(0xFFC62828), width: 4.5),
+                          border: Border.all(
+                            color: const Color(0xFFC62828),
+                            width: 4.5,
+                          ),
                           boxShadow: const [
                             BoxShadow(
                               color: Colors.black38,
@@ -971,11 +1081,15 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                           ],
                         ),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: const Color(0xFFC62828).withValues(alpha: 0.7),
+                              color: const Color(0xFFC62828)
+                                  .withValues(alpha: 0.7),
                               width: 2.0,
                             ),
                           ),
@@ -985,7 +1099,11 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.star_rounded, size: 26, color: Color(0xFFC62828)),
+                                  const Icon(
+                                    Icons.star_rounded,
+                                    size: 26,
+                                    color: Color(0xFFC62828),
+                                  ),
                                   const SizedBox(width: 8),
                                   Text(
                                     '¡EXPLORADO!',
@@ -997,7 +1115,11 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  const Icon(Icons.star_rounded, size: 26, color: Color(0xFFC62828)),
+                                  const Icon(
+                                    Icons.star_rounded,
+                                    size: 26,
+                                    color: Color(0xFFC62828),
+                                  ),
                                 ],
                               ),
                               const SizedBox(width: 6),
@@ -1016,7 +1138,8 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                                 style: GoogleFonts.urbanist(
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w800,
-                                  color: const Color(0xFFC62828).withValues(alpha: 0.85),
+                                  color: const Color(0xFFC62828)
+                                      .withValues(alpha: 0.85),
                                 ),
                               ),
                             ],
@@ -1050,12 +1173,14 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
         children: [
           Icon(icon, size: 13, color: color),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: GoogleFonts.urbanist(
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              color: color,
+          Flexible(
+            child: Text(
+              label,
+              style: GoogleFonts.urbanist(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: color,
+              ),
             ),
           ),
         ],

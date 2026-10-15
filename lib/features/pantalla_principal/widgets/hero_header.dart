@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
+import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
 /// Encabezado Safari Aventura: sin saturación de badges, con tipografía gruesa
@@ -8,10 +9,7 @@ import 'package:zoologico_front/core/theme/app_colors.dart';
 class HeroHeader extends StatelessWidget {
   final VoidCallback onNavegarTap;
 
-  const HeroHeader({
-    super.key,
-    required this.onNavegarTap,
-  });
+  const HeroHeader({super.key, required this.onNavegarTap});
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +94,7 @@ class HeroHeader extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        'Descubre hábitats, escucha animales y navega con GPS.',
+                        'Descubre hábitats, escucha animales y explora el mapa.',
                         style: GoogleFonts.urbanist(
                           fontSize: 13,
                           color: Colors.white,
@@ -156,16 +154,10 @@ class HeroHeader extends StatelessWidget {
             },
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [
-                    AppColors.verdeAzulado,
-                    AppColors.verdePrincipal,
-                  ],
+                  colors: [AppColors.verdeAzulado, AppColors.verdePrincipal],
                 ),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
@@ -174,9 +166,7 @@ class HeroHeader extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.verdeAzulado.withValues(
-                      alpha: 0.45,
-                    ),
+                    color: AppColors.verdeAzulado.withValues(alpha: 0.45),
                     blurRadius: 14,
                     offset: const Offset(0, 5),
                   ),
@@ -221,13 +211,13 @@ class HeroHeader extends StatelessWidget {
             children: [
               _buildFeatureIconPill(
                 icon: Icons.pets_rounded,
-                label: '20 Animales',
+                label: '${AnimalService.instance.totalAnimales} fichas',
                 color: const Color(0xFFFFD54F),
               ),
               const SizedBox(width: 8),
               _buildFeatureIconPill(
                 icon: Icons.near_me_rounded,
-                label: 'Rutas GPS',
+                label: 'Rutas guiadas',
                 color: const Color(0xFF81D4FA),
               ),
               const SizedBox(width: 8),
@@ -254,9 +244,7 @@ class HeroHeader extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.22),
-          ),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

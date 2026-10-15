@@ -85,42 +85,46 @@ class AnimalService extends ChangeNotifier {
     }
   }
 
-  /// Total de animales que el usuario ha visitado.
-  int get totalVisitados => _visitadosIds.length;
+  /// Total de marcadores actuales que el usuario ha visitado.
+  int get totalVisitados =>
+      marcadoresZoologico.where((m) => _visitadosIds.contains(m.id)).length;
 
   /// Total de animales registrados en el parque.
   int get totalAnimales => marcadoresZoologico.length;
 
   /// Porcentaje de progreso de visitas entre 0.0 y 1.0.
   double get porcentajeVisitados =>
-      totalAnimales == 0 ? 0.0 : (_visitadosIds.length / totalAnimales);
+      totalAnimales == 0 ? 0.0 : (totalVisitados / totalAnimales);
 
-  /// Retorna la información educativa detallada de un animal por su nombre.
-  /// Si no existe, retorna una ficha predeterminada segura.
-  DatosAnimal obtenerDatos(String nombre) {
-    return baseDatosAnimales[nombre] ??
-        const DatosAnimal(
-          dieta: 'Omnívoro',
-          alimentos: [
-            '🌿 Vegetales frescos',
-            '🍖 Proteínas nutritivas',
-            '🍎 Frutas',
-          ],
-          horaApertura: '9:00 AM',
-          horaCierre: '5:00 PM',
-          habitat: 'Zoológico',
-          comportamiento: 'Animal amigable y activo que disfruta de la compañía de los visitantes.',
-          nombreCientifico: 'Animalia sp.',
-          curiosidad: '¡Cada animal del zoológico es único, especial y vital para el equilibrio ecológico del planeta!',
-          estadoConservacion: 'Protegido',
-          narracionAudioguia: 'Te encuentras en una de las zonas más fascinantes del parque natural. Nuestros biólogos y veterinarios cuidan de cada ejemplar diariamente con dietas balanceadas y enriquecimiento ambiental.',
-        );
-  }
+  /// Retorna la ficha documentada. Un nombre sin ficha no se rellena con datos
+  /// inventados; la pantalla puede mostrarlo como pendiente de validación.
+  DatosAnimal obtenerDatos(String nombre) =>
+      baseDatosAnimales[nombre] ??
+      const DatosAnimal(
+        dieta: 'Información pendiente de validar',
+        alimentos: ['No publicados'],
+        horaApertura: '9:00 a. m.',
+        horaCierre: '5:00 p. m.',
+        habitat: 'Por confirmar',
+        comportamiento:
+            'Esta ficha está pendiente de validación con el equipo del parque.',
+        nombreCientifico: 'Por confirmar',
+        curiosidad: 'Consulta la señalética del recinto para obtener información específica.',
+        estadoConservacion: 'Por verificar',
+        narracionAudioguia: 'La información detallada de este animal está pendiente de validación.',
+        distribucion: 'Por confirmar',
+        fuente: 'Ficha pendiente de validación con el Parque de las Leyendas.',
+      );
 
   /// Retorna todos los marcadores de animales del parque.
   List<MarcadorMapa> obtenerTodosLosAnimales() {
     return marcadoresZoologico;
   }
+
+  /// El catálogo puede contener registros cuya ubicación actual no se conoce.
+  List<MarcadorMapa> obtenerAnimalesEnMapa() => marcadoresZoologico
+      .where((animal) => animal.tieneUbicacionMapa)
+      .toList(growable: false);
 
   /// Filtra los animales por hábitat ('Todos', 'Sabana Africana', 'Selva Tropical', etc.)
   List<MarcadorMapa> obtenerPorHabitat(String habitat) {
@@ -132,16 +136,21 @@ class AnimalService extends ChangeNotifier {
         .toList();
   }
 
-  /// Retorna la lista de hábitats disponibles en el zoológico.
+  /// Retorna las zonas que aparecen en el catálogo de Huachipa.
   List<String> obtenerHabitats() {
-    return const [
-      'Todos',
-      'Sabana Africana',
-      'Selva Tropical',
-      'Mundo Acuático',
-      'La Granja',
-      'Bosque & Montaña',
+    const orden = [
+      'Costa',
+      'Sierra',
+      'Selva',
+      'Selva-Internacional',
+      'Felinario',
+      'Zona Marina',
+      'Bosque de Aves',
+      'Serpentario',
+      'Mundo Anfibio',
     ];
+    final presentes = marcadoresZoologico.map((m) => m.habitat).toSet();
+    return orden.where(presentes.contains).toList(growable: false);
   }
 
   /// Retorna todos los paraderos de baños disponibles.
@@ -151,15 +160,29 @@ class AnimalService extends ChangeNotifier {
 
   /// Busca animales por nombre o hábitat.
   List<MarcadorMapa> buscarAnimales(String query) {
-    final q = query.trim().toLowerCase();
+    final q = _normalizar(query);
     if (q.isEmpty) return obtenerTodosLosAnimales();
     return marcadoresZoologico
         .where(
           (a) =>
-              a.nombre.toLowerCase().contains(q) ||
-              a.habitat.toLowerCase().contains(q) ||
-              a.categoria.toLowerCase().contains(q),
+              _normalizar(a.nombre).contains(q) ||
+              _normalizar(a.habitat).contains(q) ||
+              _normalizar(obtenerDatos(a.nombre).nombreCientifico).contains(q),
         )
         .toList();
+  }
+
+  String _normalizar(String texto) {
+    var valor = texto.trim().toLowerCase();
+    const cambios = {
+      'á': 'a',
+      'é': 'e',
+      'í': 'i',
+      'ó': 'o',
+      'ú': 'u',
+      'ü': 'u',
+    };
+    cambios.forEach((desde, hasta) => valor = valor.replaceAll(desde, hasta));
+    return valor;
   }
 }

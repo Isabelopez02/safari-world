@@ -13,6 +13,10 @@ class MarcadorMapa {
   final String? imagen;
   final bool esBanio;
 
+  /// Solo dibujar una ubicación si existe una referencia de zona en el plano.
+  /// Los registros del inventario sin coordenadas conservan su ficha accesible.
+  final bool tieneUbicacionMapa;
+
   MarcadorMapa({
     required this.id,
     required this.nombre,
@@ -24,5 +28,6 @@ class MarcadorMapa {
     this.habitat = 'Todos',
     this.imagen,
     this.esBanio = false,
+    this.tieneUbicacionMapa = true,
   });
 }

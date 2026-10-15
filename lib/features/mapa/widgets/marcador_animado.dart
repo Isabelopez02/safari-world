@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+import 'package:zoologico_front/core/widgets/imagen_animal.dart';
 
 export 'package:zoologico_front/core/models/marcador_mapa.dart';
 
@@ -208,7 +209,9 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B), // Azul grafito oscuro de alto contraste
+                    color: const Color(
+                      0xFF1E293B,
+                    ), // Azul grafito oscuro de alto contraste
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: const [
                       BoxShadow(
@@ -302,29 +305,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                   ),
                 ],
               ),
-              child: ClipOval(
-                child: widget.marcador.imagen != null
-                    ? Image.asset(
-                        widget.marcador.imagen!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: borderColor.withValues(alpha: 0.15),
-                          child: Icon(
-                            widget.marcador.icono,
-                            size: size * 0.5,
-                            color: borderColor,
-                          ),
-                        ),
-                      )
-                    : Container(
-                        color: borderColor.withValues(alpha: 0.15),
-                        child: Icon(
-                          widget.marcador.icono,
-                          size: size * 0.5,
-                          color: borderColor,
-                        ),
-                      ),
-              ),
+              child: ClipOval(child: ImagenAnimal(animal: widget.marcador)),
             ),
 
             // BADGE VISITADO (CHECK VERDE)
@@ -427,12 +408,11 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: const Color(0xFF0D47A1), // Azul marino oscuro para alto contraste
+                color: const Color(
+                  0xFF0D47A1,
+                ), // Azul marino oscuro para alto contraste
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.5,
-                ),
+                border: Border.all(color: Colors.white, width: 1.5),
                 boxShadow: const [
                   BoxShadow(
                     color: Colors.black38,

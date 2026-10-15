@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/models/marcador_mapa.dart';
+import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+import 'package:zoologico_front/core/widgets/imagen_animal.dart';
 
 /// Sección carrusel de avatares de animales por descubrir
 class AnimalesCarrusel extends StatelessWidget {
   final VoidCallback onExploracionesTap;
+  final ValueChanged<MarcadorMapa> onSeleccionarAnimal;
 
   const AnimalesCarrusel({
     super.key,
     required this.onExploracionesTap,
+    required this.onSeleccionarAnimal,
   });
 
   @override
   Widget build(BuildContext context) {
+    final animales = AnimalService.instance.obtenerTodosLosAnimales();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -21,28 +27,31 @@ class AnimalesCarrusel extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '¿A quién deseas visitar hoy?',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textoOscuro,
-                      letterSpacing: -0.3,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Animales del parque',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.textoOscuro,
+                        letterSpacing: -0.3,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Toca un animal para ver su ubicación',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                      fontWeight: FontWeight.w600,
+                    Text(
+                      'Desliza y descubre las ${animales.length} fichas',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               GestureDetector(
                 onTap: onExploracionesTap,
                 child: Container(
@@ -51,16 +60,14 @@ class AnimalesCarrusel extends StatelessWidget {
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.verdeAzulado.withValues(
-                      alpha: 0.1,
-                    ),
+                    color: AppColors.verdeAzulado.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Tus exploraciones',
+                        'Ver todos (${animales.length})',
                         style: GoogleFonts.urbanist(
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
@@ -82,93 +89,69 @@ class AnimalesCarrusel extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         SizedBox(
-          height: 92,
-          child: ListView(
+          height: 112,
+          child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            children: [
-              _buildAnimalAvatar(
-                'León',
-                'assets/images/animales_con_fondo/leon-card.jpg',
-              ),
-              _buildAnimalAvatar(
-                'Pingüino',
-                'assets/images/animales_con_fondo/pinguino-card.jpg',
-              ),
-              _buildAnimalAvatar(
-                'Jirafa',
-                'assets/images/animales_con_fondo/jirada-card.jpg',
-              ),
-              _buildAnimalAvatar(
-                'Foca',
-                'assets/images/animales_con_fondo/foca-card.jpg',
-              ),
-              _buildAnimalAvatar(
-                'Panda',
-                'assets/images/animales_con_fondo/osoPanda-card.jpg',
-              ),
-              _buildAnimalAvatar(
-                'Cocodrilo',
-                'assets/images/animales_con_fondo/cocodrilo-card.jpg',
-              ),
-            ],
+            itemCount: animales.length,
+            itemBuilder: (context, index) =>
+                _buildAnimalAvatar(animales[index]),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildAnimalAvatar(String nombre, String imagePath) {
+  Widget _buildAnimalAvatar(MarcadorMapa animal) {
     return GestureDetector(
-      onTap: onExploracionesTap,
+      onTap: () => onSeleccionarAnimal(animal),
       child: Padding(
         padding: const EdgeInsets.only(right: 14.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(2.5),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [AppColors.verdeAzulado, AppColors.verdePrincipal],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.verdeAzulado.withValues(alpha: 0.25),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Container(
-                width: 58,
-                height: 58,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+        child: SizedBox(
+          width: 82,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(2.5),
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    imagePath,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.pets, color: AppColors.verdeAzulado),
+                  gradient: const LinearGradient(
+                    colors: [AppColors.verdeAzulado, AppColors.verdePrincipal],
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.verdeAzulado.withValues(alpha: 0.25),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Container(
+                  width: 58,
+                  height: 58,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(child: ImagenAnimal(animal: animal)),
                 ),
               ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              nombre,
-              style: GoogleFonts.urbanist(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                color: AppColors.textoOscuro,
+              const SizedBox(height: 6),
+              Text(
+                animal.nombre,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.urbanist(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textoOscuro,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

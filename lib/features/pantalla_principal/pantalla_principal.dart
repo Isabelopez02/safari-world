@@ -4,6 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
+import 'package:zoologico_front/core/models/marcador_mapa.dart';
+import 'package:zoologico_front/features/mapa/screens/pantalla_detalle_animal.dart';
+import 'package:zoologico_front/features/mapa/widgets/modal_animales_por_visitar.dart';
 
 import 'widgets/animales_carrusel.dart';
 import 'widgets/banner_mapa.dart';
@@ -21,13 +24,19 @@ class PantallaPrincipal extends StatefulWidget {
 class _PantallaPrincipalState extends State<PantallaPrincipal> {
   DateTime? _lastBackPressTime;
 
-  void _navigateToMapExploraciones(BuildContext context) {
+  void _mostrarCatalogo(BuildContext context) {
     SoundService.instance.playButtonTap();
+    ModalAnimalesPorVisitar.mostrar(
+      context,
+      onSeleccionarAnimal: _abrirFichaAnimal,
+    );
+  }
+
+  void _abrirFichaAnimal(MarcadorMapa animal) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            const PantallaMapa(abrirExploracionesAlCargar: true),
+        builder: (context) => PantallaDetalleAnimal(animal: animal),
       ),
     );
   }
@@ -176,9 +185,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                     const SizedBox(height: 12),
 
                     // ENCABEZADO SAFARI AVENTURA
-                    HeroHeader(
-                      onNavegarTap: () => _navigateToMap(context),
-                    ),
+                    HeroHeader(onNavegarTap: () => _navigateToMap(context)),
 
                     const SizedBox(height: 20),
 
@@ -204,16 +211,17 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 
                           // --- 1. SECCIÓN: ANIMALES POR DESCUBRIR (AVATARES FOTOGRÁFICOS) ---
                           AnimalesCarrusel(
-                            onExploracionesTap: () =>
-                                _navigateToMapExploraciones(context),
+                            onExploracionesTap: () => _mostrarCatalogo(context),
+                            onSeleccionarAnimal: _abrirFichaAnimal,
                           ),
 
                           const SizedBox(height: 32),
 
                           // --- 2. SECCIÓN: SERVICIOS Y EXPERIENCIAS (CARDS 3D POP-OUT) ---
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 24.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24.0,
+                            ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -278,9 +286,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                           const SizedBox(height: 34),
 
                           // --- 3. SECCIÓN: BANNER DEL MAPA INTERACTIVO ---
-                          BannerMapa(
-                            onTap: () => _navigateToMap(context),
-                          ),
+                          BannerMapa(onTap: () => _navigateToMap(context)),
 
                           const SizedBox(height: 30),
 

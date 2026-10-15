@@ -10,6 +10,7 @@ import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
 import '../utils/datos_rutas.dart';
+import 'pantalla_detalle_animal.dart';
 import '../widgets/barra_inferior_mapa.dart';
 import '../widgets/barra_superior_mapa.dart';
 import '../widgets/marcador_animado.dart';
@@ -41,6 +42,7 @@ class _PantallaMapaState extends State<PantallaMapa>
   late Animation<double> _radarPulseAnimation;
 
   Animation<Matrix4>? _cameraAnimation;
+  Size? _ultimoTamanoVista;
 
   final GlobalKey _keyAnimales = GlobalKey();
   final GlobalKey _keySearch = GlobalKey();
@@ -51,8 +53,17 @@ class _PantallaMapaState extends State<PantallaMapa>
   int _tutorialStep = 0;
   final int _totalTutorialSteps = 5;
 
-  final double mapaAncho = 1920;
-  final double mapaAlto = 1080;
+  // Ampliar el plano y sus coordenadas, manteniendo el tamaño de las tarjetas.
+  // Así aumenta la separación sin desplazar recintos respecto al plano.
+  static const double _ampliacionPlano = 2.4;
+  static const double mapaAncho = 1920 * _ampliacionPlano;
+  static const double mapaAlto = 1080 * _ampliacionPlano;
+  static const double _zoomMaximo = 5;
+
+  Offset _puntoEnPlano(Offset punto) => punto * _ampliacionPlano;
+
+  Offset get _posicionEntrada =>
+      _puntoEnPlano(grafoMapa.nodos[_nodoActual]!.posicion);
 
   List<Offset> _rutaActual = [];
   MarcadorMapa? _marcadorSeleccionado;
@@ -62,7 +73,7 @@ class _PantallaMapaState extends State<PantallaMapa>
 
   // Marcadores cargados desde AnimalService
   final List<MarcadorMapa> marcadores = AnimalService.instance
-      .obtenerTodosLosAnimales();
+      .obtenerAnimalesEnMapa();
   final List<MarcadorMapa> banios = AnimalService.instance.obtenerBanios();
 
   @override
@@ -101,7 +112,9 @@ class _PantallaMapaState extends State<PantallaMapa>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _centrarEnUbicacionInicial(false);
       if (widget.animalIdInicial != null) {
-        final matches = marcadores.where((m) => m.id == widget.animalIdInicial);
+        final matches = AnimalService.instance.obtenerTodosLosAnimales().where(
+          (m) => m.id == widget.animalIdInicial,
+        );
         if (matches.isNotEmpty) {
           _mostrarInfoMarcador(matches.first);
         }
@@ -176,8 +189,8 @@ class _PantallaMapaState extends State<PantallaMapa>
   void _centrarEnUbicacionInicial([bool animate = true]) {
     final size = MediaQuery.of(context).size;
     final double scale = math.max(
-      size.width / mapaAncho,
-      size.height / mapaAlto,
+      0.8,
+      math.max(size.width / mapaAncho, size.height / mapaAlto),
     );
     final dx = (size.width - mapaAncho * scale) / 2;
     final dy = (size.height - mapaAlto * scale) / 2;
@@ -188,6 +201,40 @@ class _PantallaMapaState extends State<PantallaMapa>
     _limitarYCentrar(targetMatrix, animate);
   }
 
+  void _mantenerEncuadreAlRedimensionar(Size nuevoTamano) {
+    final anterior = _ultimoTamanoVista;
+    _ultimoTamanoVista = nuevoTamano;
+    if (anterior == null || anterior == nuevoTamano) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || MediaQuery.of(context).size != nuevoTamano) return;
+      _cameraAnimationController.stop();
+      final puntoEnMapa = _transformationController.toScene(
+        Offset(anterior.width / 2, anterior.height / 2),
+      );
+      final minMapScale = math.max(
+        nuevoTamano.width / mapaAncho,
+        nuevoTamano.height / mapaAlto,
+      );
+      final scale = _transformationController.value.getMaxScaleOnAxis().clamp(
+        minMapScale,
+        _zoomMaximo,
+      );
+      _limitarYCentrar(
+        Matrix4.identity()
+          ..translateByVector3(
+            vmath.Vector3(
+              nuevoTamano.width / 2 - puntoEnMapa.dx * scale,
+              nuevoTamano.height / 2 - puntoEnMapa.dy * scale,
+              0,
+            ),
+          )
+          ..scaleByVector3(vmath.Vector3(scale, scale, 1)),
+        false,
+      );
+    });
+  }
+
   void _centrarEnPunto(double x, double y) {
     final size = MediaQuery.of(context).size;
     final double minMapScale = math.max(
@@ -196,16 +243,42 @@ class _PantallaMapaState extends State<PantallaMapa>
     );
     final double currentScale = _transformationController.value
         .getMaxScaleOnAxis();
-    final double zoomScale = math.max(currentScale, math.max(minMapScale, 1.4));
+    final double zoomScale = math.max(currentScale, math.max(minMapScale, 1.0));
+    final punto = _puntoEnPlano(Offset(x, y));
 
-    final double dx = (size.width / 2) - (x * zoomScale);
-    final double dy = (size.height / 2) - (y * zoomScale);
+    final double dx = (size.width / 2) - (punto.dx * zoomScale);
+    final double dy = ((size.height - 220) / 2) - (punto.dy * zoomScale);
 
     final targetMatrix = Matrix4.identity()
       ..translateByVector3(vmath.Vector3(dx, dy, 0.0))
       ..scaleByVector3(vmath.Vector3(zoomScale, zoomScale, 1.0));
 
     _limitarYCentrar(targetMatrix, true);
+  }
+
+  void _cambiarZoom(double factor) {
+    _cameraAnimationController.stop();
+    final size = MediaQuery.of(context).size;
+    final centro = Offset(size.width / 2, (size.height - 220) / 2);
+    final punto = _transformationController.toScene(centro);
+    final minimo = math.max(size.width / mapaAncho, size.height / mapaAlto);
+    final escala =
+        (_transformationController.value.getMaxScaleOnAxis() * factor).clamp(
+          minimo,
+          _zoomMaximo,
+        );
+    _limitarYCentrar(
+      Matrix4.identity()
+        ..translateByVector3(
+          vmath.Vector3(
+            centro.dx - punto.dx * escala,
+            centro.dy - punto.dy * escala,
+            0,
+          ),
+        )
+        ..scaleByVector3(vmath.Vector3(escala, escala, 1)),
+      true,
+    );
   }
 
   void _limitarYCentrar(Matrix4 target, bool animate) {
@@ -228,7 +301,7 @@ class _PantallaMapaState extends State<PantallaMapa>
     }
   }
 
-  void _onMyLocationPressed() {
+  void _centrarEnLaEntrada() {
     SoundService.instance.playRadarPulse();
     final nodo = grafoMapa.nodos[_nodoActual];
     if (nodo != null) {
@@ -237,11 +310,19 @@ class _PantallaMapaState extends State<PantallaMapa>
   }
 
   void _mostrarInfoMarcador(MarcadorMapa marcador) {
+    if (!marcador.tieneUbicacionMapa) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => PantallaDetalleAnimal(animal: marcador),
+        ),
+      );
+      return;
+    }
     final nuevaRuta = grafoMapa.encontrarRutaMasCorta(_nodoActual, marcador.id);
     setState(() {
       _marcadorSeleccionado = marcador;
-      // Si el usuario toca un baño, iniciar de inmediato la navegación activa hacia él
-      _isNavigating = marcador.esBanio;
+      // Seleccionar un destino muestra una vista previa; la navegación inicia al confirmar.
+      _isNavigating = false;
       _rutaActual = nuevaRuta;
     });
     _centrarEnPunto(marcador.x, marcador.y);
@@ -368,7 +449,7 @@ class _PantallaMapaState extends State<PantallaMapa>
       case 4:
         return 'Vuelve a mirar este\ntutorial en cualquier momento';
       case 5:
-        return 'Usa este botón para volver a tu\nubicación actual rápidamente.';
+        return 'Usa este botón para centrar el mapa\nen la entrada del zoológico.';
       default:
         return '';
     }
@@ -384,6 +465,14 @@ class _PantallaMapaState extends State<PantallaMapa>
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    _mantenerEncuadreAlRedimensionar(screenSize);
+    final compacto = screenSize.width < 380;
+    final pantallaBaja = screenSize.height < 520;
+    final tamanoZoom = compacto ? 42.0 : 48.0;
+    final tamanoAccion = (math.min(
+      screenSize.shortestSide * 0.13,
+      54.0,
+    )).clamp(42.0, 54.0).toDouble();
     final double minMapScale = math.max(
       screenSize.width / mapaAncho,
       screenSize.height / mapaAlto,
@@ -399,7 +488,8 @@ class _PantallaMapaState extends State<PantallaMapa>
             child: InteractiveViewer(
               transformationController: _transformationController,
               minScale: minMapScale,
-              maxScale: 5.0,
+              maxScale: _zoomMaximo,
+              onInteractionStart: (_) => _cameraAnimationController.stop(),
               boundaryMargin: EdgeInsets.zero,
               constrained: false,
               child: SizedBox(
@@ -411,6 +501,7 @@ class _PantallaMapaState extends State<PantallaMapa>
                       child: Image.asset(
                         'assets/images/mapa_zoologico.png',
                         fit: BoxFit.fill,
+                        filterQuality: FilterQuality.high,
                       ),
                     ),
                     Positioned.fill(
@@ -419,7 +510,9 @@ class _PantallaMapaState extends State<PantallaMapa>
                         builder: (context, child) {
                           return CustomPaint(
                             painter: RutaPainter(
-                              _rutaActual,
+                              _rutaActual
+                                  .map(_puntoEnPlano)
+                                  .toList(growable: false),
                               _isNavigating,
                               progress: _routeProgressController.value,
                             ),
@@ -430,8 +523,8 @@ class _PantallaMapaState extends State<PantallaMapa>
                     // PARADEROS DE ANIMALES
                     ...marcadores.map((marcador) {
                       return Positioned(
-                        left: marcador.x - 52,
-                        top: marcador.y - 40,
+                        left: marcador.x * _ampliacionPlano - 52,
+                        top: marcador.y * _ampliacionPlano - 40,
                         child: MarcadorAnimado(
                           marcador: marcador,
                           isSelected: _marcadorSeleccionado?.id == marcador.id,
@@ -443,8 +536,8 @@ class _PantallaMapaState extends State<PantallaMapa>
                     if (_mostrarBanios)
                       ...banios.map((banio) {
                         return Positioned(
-                          left: banio.x - 38,
-                          top: banio.y - 32,
+                          left: banio.x * _ampliacionPlano - 38,
+                          top: banio.y * _ampliacionPlano - 32,
                           child: MarcadorAnimado(
                             marcador: banio,
                             isSelected: _marcadorSeleccionado?.id == banio.id,
@@ -455,8 +548,8 @@ class _PantallaMapaState extends State<PantallaMapa>
                     // ONDA DE RADAR EXPANSIVA EN LA UBICACIÓN DEL USUARIO
                     if (grafoMapa.nodos.containsKey(_nodoActual)) ...[
                       Positioned(
-                        left: grafoMapa.nodos[_nodoActual]!.posicion.dx - 60,
-                        top: grafoMapa.nodos[_nodoActual]!.posicion.dy - 60,
+                        left: _posicionEntrada.dx - 60,
+                        top: _posicionEntrada.dy - 60,
                         child: AnimatedBuilder(
                           animation: _radarPulseAnimation,
                           builder: (context, child) {
@@ -486,8 +579,8 @@ class _PantallaMapaState extends State<PantallaMapa>
                         ),
                       ),
                       Positioned(
-                        left: grafoMapa.nodos[_nodoActual]!.posicion.dx - 12,
-                        top: grafoMapa.nodos[_nodoActual]!.posicion.dy - 12,
+                        left: _posicionEntrada.dx - 12,
+                        top: _posicionEntrada.dy - 12,
                         child: Container(
                           width: 24,
                           height: 24,
@@ -505,10 +598,10 @@ class _PantallaMapaState extends State<PantallaMapa>
                           ),
                         ),
                       ),
-                      // BADGE DESTACADO: TÚ ESTÁS AQUÍ
+                      // BADGE DEL PUNTO INICIAL: ENTRADA
                       Positioned(
-                        left: grafoMapa.nodos[_nodoActual]!.posicion.dx - 65,
-                        top: grafoMapa.nodos[_nodoActual]!.posicion.dy - 46,
+                        left: _posicionEntrada.dx - 65,
+                        top: _posicionEntrada.dy - 46,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
@@ -517,10 +610,7 @@ class _PantallaMapaState extends State<PantallaMapa>
                           decoration: BoxDecoration(
                             color: const Color(0xFF1E293B),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 1.8,
-                            ),
+                            border: Border.all(color: Colors.white, width: 1.8),
                             boxShadow: const [
                               BoxShadow(
                                 color: Colors.black45,
@@ -542,7 +632,7 @@ class _PantallaMapaState extends State<PantallaMapa>
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                'Tú estás aquí',
+                                'Entrada · inicio de ruta',
                                 style: GoogleFonts.urbanist(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w900,
@@ -599,55 +689,140 @@ class _PantallaMapaState extends State<PantallaMapa>
                 });
               },
               keyComoFunciona: _keyComoFunciona,
+              compacto: compacto,
             ),
           ),
 
-          // BOTONES FLOTANTES CIRCULARES PERFECTOS (SOS, Búsqueda, Mi Ubicación)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 74,
+            left: 14,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black26, blurRadius: 8),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    tooltip: 'Acercar mapa',
+                    color: AppColors.verdeAzulado,
+                    constraints: BoxConstraints.tightFor(
+                      width: tamanoZoom,
+                      height: tamanoZoom,
+                    ),
+                    padding: EdgeInsets.zero,
+                    onPressed: () => _cambiarZoom(1.3),
+                    icon: Icon(Icons.add_rounded, size: compacto ? 21 : 24),
+                  ),
+                  const SizedBox(width: 28, child: Divider(height: 1)),
+                  IconButton(
+                    tooltip: 'Alejar mapa',
+                    color: AppColors.verdeAzulado,
+                    constraints: BoxConstraints.tightFor(
+                      width: tamanoZoom,
+                      height: tamanoZoom,
+                    ),
+                    padding: EdgeInsets.zero,
+                    onPressed: () => _cambiarZoom(1 / 1.3),
+                    icon: Icon(Icons.remove_rounded, size: compacto ? 21 : 24),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // BOTONES FLOTANTES (SOS, Búsqueda y centrar en la entrada)
           // Con padding inferior dinámico para que no los tape la barra del celular
           Positioned(
-            right: 16,
-            bottom: 140 + MediaQuery.of(context).padding.bottom,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Botón Emergencia SOS
-                _buildCircularActionButton(
-                  key: _keyHelp,
-                  color: const Color(0xFFD32F2F),
-                  iconColor: Colors.white,
-                  icon: Icons.phone_in_talk_rounded,
-                  size: 46,
-                  iconSize: 20,
-                  onPressed: () {
-                    EmergencyService.instance.mostrarModalEmergencia(context);
-                  },
-                ),
-                const SizedBox(height: 12),
+            right: compacto ? 10 : 16,
+            top: pantallaBaja ? MediaQuery.of(context).padding.top + 64 : null,
+            bottom: pantallaBaja
+                ? null
+                : (_marcadorSeleccionado == null ? 214 : 244) +
+                      MediaQuery.of(context).padding.bottom,
+            child: pantallaBaja
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildCircularActionButton(
+                        key: _keyHelp,
+                        color: const Color(0xFFD32F2F),
+                        iconColor: Colors.white,
+                        icon: Icons.phone_in_talk_rounded,
+                        size: tamanoAccion,
+                        iconSize: tamanoAccion * 0.44,
+                        onPressed: () => EmergencyService.instance
+                            .mostrarModalEmergencia(context),
+                      ),
+                      const SizedBox(width: 8),
+                      _buildCircularActionButton(
+                        key: _keySearch,
+                        color: Colors.white,
+                        iconColor: AppColors.verdeAzulado,
+                        icon: Icons.search_rounded,
+                        size: tamanoAccion,
+                        iconSize: tamanoAccion * 0.48,
+                        onPressed: () => _mostrarAnimalesPorVisitar(context),
+                      ),
+                      const SizedBox(width: 8),
+                      _buildCircularActionButton(
+                        key: _keyFab,
+                        color: AppColors.verdeAzulado,
+                        iconColor: Colors.white,
+                        icon: Icons.home_rounded,
+                        size: tamanoAccion,
+                        iconSize: tamanoAccion * 0.48,
+                        onPressed: _centrarEnLaEntrada,
+                      ),
+                    ],
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Botón Emergencia SOS
+                      _buildCircularActionButton(
+                        key: _keyHelp,
+                        color: const Color(0xFFD32F2F),
+                        iconColor: Colors.white,
+                        icon: Icons.phone_in_talk_rounded,
+                        size: tamanoAccion,
+                        iconSize: tamanoAccion * 0.44,
+                        onPressed: () {
+                          EmergencyService.instance.mostrarModalEmergencia(
+                            context,
+                          );
+                        },
+                      ),
+                      SizedBox(height: compacto ? 8 : 12),
 
-                // Botón Búsqueda y Exploraciones
-                _buildCircularActionButton(
-                  key: _keySearch,
-                  color: Colors.white,
-                  iconColor: AppColors.verdeAzulado,
-                  icon: Icons.search_rounded,
-                  size: 46,
-                  iconSize: 22,
-                  onPressed: () => _mostrarAnimalesPorVisitar(context),
-                ),
-                const SizedBox(height: 16),
+                      // Botón Búsqueda y Exploraciones
+                      _buildCircularActionButton(
+                        key: _keySearch,
+                        color: Colors.white,
+                        iconColor: AppColors.verdeAzulado,
+                        icon: Icons.search_rounded,
+                        size: tamanoAccion,
+                        iconSize: tamanoAccion * 0.48,
+                        onPressed: () => _mostrarAnimalesPorVisitar(context),
+                      ),
+                      SizedBox(height: compacto ? 10 : 16),
 
-                // Botón Mi Ubicación Radar
-                _buildCircularActionButton(
-                  key: _keyFab,
-                  color: AppColors.verdeAzulado,
-                  iconColor: Colors.white,
-                  icon: Icons.my_location_rounded,
-                  size: 54,
-                  iconSize: 26,
-                  onPressed: _onMyLocationPressed,
-                ),
-              ],
-            ),
+                      // Centrar en el punto inicial disponible hasta integrar GPS real.
+                      _buildCircularActionButton(
+                        key: _keyFab,
+                        color: AppColors.verdeAzulado,
+                        iconColor: Colors.white,
+                        icon: Icons.home_rounded,
+                        size: tamanoAccion,
+                        iconSize: tamanoAccion * 0.48,
+                        onPressed: _centrarEnLaEntrada,
+                      ),
+                    ],
+                  ),
           ),
 
           // COMPONENTE BARRA INFERIOR REUTILIZABLE
@@ -655,28 +830,36 @@ class _PantallaMapaState extends State<PantallaMapa>
             bottom: 0,
             left: 0,
             right: 0,
-            child: BarraInferiorMapa(
-              keyAnimales: _keyAnimales,
-              marcadorSeleccionado: _marcadorSeleccionado,
-              isNavigating: _isNavigating,
-              marcadores: marcadores,
-              bottomBarPulseController: _bottomBarPulseController,
-              onTapExploraciones: () => _mostrarAnimalesPorVisitar(context),
-              onCerrarSeleccion: () => setState(() {
-                _marcadorSeleccionado = null;
-                _rutaActual = [];
-              }),
-              onIniciarNavegacion: () {
-                setState(() => _isNavigating = true);
-                _routeProgressController.forward(from: 0);
-              },
-              onCancelarNavegacion: () {
-                setState(() {
-                  _isNavigating = false;
-                  _marcadorSeleccionado = null;
-                  _rutaActual = [];
-                });
-              },
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 980),
+                child: BarraInferiorMapa(
+                  keyAnimales: _keyAnimales,
+                  marcadorSeleccionado: _marcadorSeleccionado,
+                  isNavigating: _isNavigating,
+                  marcadores: marcadores,
+                  bottomBarPulseController: _bottomBarPulseController,
+                  onTapExploraciones: () => _mostrarAnimalesPorVisitar(context),
+                  onSeleccionarAnimal: _mostrarInfoMarcador,
+                  onCerrarSeleccion: () => setState(() {
+                    _marcadorSeleccionado = null;
+                    _rutaActual = [];
+                  }),
+                  onIniciarNavegacion: () {
+                    setState(() => _isNavigating = true);
+                    _routeProgressController.forward(from: 0);
+                  },
+                  onCancelarNavegacion: () {
+                    setState(() {
+                      _isNavigating = false;
+                      _marcadorSeleccionado = null;
+                      _rutaActual = [];
+                    });
+                  },
+                  compacta: pantallaBaja,
+                ),
+              ),
             ),
           ),
 

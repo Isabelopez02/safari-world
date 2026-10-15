@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+import 'package:zoologico_front/core/services/animal_service.dart';
 
-/// Banner interactivo del mapa satelital del parque
+/// Banner del plano de referencia del parque.
 class BannerMapa extends StatelessWidget {
   final VoidCallback onTap;
 
-  const BannerMapa({
-    super.key,
-    required this.onTap,
-  });
+  const BannerMapa({super.key, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +20,7 @@ class BannerMapa extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Mapa satelital del parque',
+                'Mapa del parque',
                 style: GoogleFonts.urbanist(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
@@ -47,9 +45,7 @@ class BannerMapa extends StatelessWidget {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: 0.12,
-                    ),
+                    color: Colors.black.withValues(alpha: 0.12),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),
@@ -72,9 +68,7 @@ class BannerMapa extends StatelessWidget {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withValues(
-                              alpha: 0.75,
-                            ),
+                            Colors.black.withValues(alpha: 0.75),
                           ],
                         ),
                       ),
@@ -91,7 +85,7 @@ class BannerMapa extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                '20 Zonas y Paraderos',
+                                '${AnimalService.instance.obtenerAnimalesEnMapa().length} referencias de fauna',
                                 style: GoogleFonts.urbanist(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w900,
@@ -99,7 +93,7 @@ class BannerMapa extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                'Rutas con GPS inteligente y Dijkstra',
+                                'Rutas guiadas por los senderos',
                                 style: GoogleFonts.urbanist(
                                   fontSize: 12,
                                   color: Colors.white70,

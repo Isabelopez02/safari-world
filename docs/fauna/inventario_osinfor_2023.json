@@ -1,0 +1,809 @@
+{
+  "establecimiento": "Parque Zoológico Huachipa",
+  "fuente": "https://zoobservatorio.osinfor.gob.pe/Home/ListFauna",
+  "fecha_supervision": "2023-05-22",
+  "fecha_publicacion": "2023-06-09",
+  "nota": "Registro histórico de supervisión. No acredita presencia ni exhibición actual.",
+  "cantidad_registros": 133,
+  "individuos_registrados": 1047,
+  "registros": [
+    {
+      "numero": 1,
+      "nombre": "Guacamayo rojo y verde",
+      "cientifico": "Ara chloropterus",
+      "individuos": 7
+    },
+    {
+      "numero": 2,
+      "nombre": "Canguro",
+      "cientifico": "Macropus rufus",
+      "individuos": 1
+    },
+    {
+      "numero": 3,
+      "nombre": "Charapa",
+      "cientifico": "Podocnemis expansa",
+      "individuos": 1
+    },
+    {
+      "numero": 4,
+      "nombre": "Chozna",
+      "cientifico": "Potos flavus",
+      "individuos": 4
+    },
+    {
+      "numero": 5,
+      "nombre": "Antílope",
+      "cientifico": "Kobus ellipsiprymnus",
+      "individuos": 1
+    },
+    {
+      "numero": 6,
+      "nombre": "Oso bandera",
+      "cientifico": "Myrmecophaga tridactyla",
+      "individuos": 2
+    },
+    {
+      "numero": 7,
+      "nombre": "Tigre",
+      "cientifico": "Panthera tigris",
+      "individuos": 2
+    },
+    {
+      "numero": 8,
+      "nombre": "Loro de cabeza negra",
+      "cientifico": "Pionites melanocephalus",
+      "individuos": 3
+    },
+    {
+      "numero": 9,
+      "nombre": "Mono huapo negro",
+      "cientifico": "Pithecia monachus",
+      "individuos": 2
+    },
+    {
+      "numero": 10,
+      "nombre": "Perico ala amarilla",
+      "cientifico": "Brotogeris versicolurus",
+      "individuos": 30
+    },
+    {
+      "numero": 11,
+      "nombre": "Camaleón velado",
+      "cientifico": "Chamaeleo calyptratus",
+      "individuos": 2
+    },
+    {
+      "numero": 12,
+      "nombre": "Lagartija vientre de fuego",
+      "cientifico": "Lepidothyris fernandi",
+      "individuos": 1
+    },
+    {
+      "numero": 13,
+      "nombre": "Zorro andino",
+      "cientifico": "Lycalopex culpaeus",
+      "individuos": 2
+    },
+    {
+      "numero": 14,
+      "nombre": "Mono choro",
+      "cientifico": "Lagothrix lagotricha",
+      "individuos": 1
+    },
+    {
+      "numero": 15,
+      "nombre": "Caracara cordillerano",
+      "cientifico": "Phalcoboenus megalopterus",
+      "individuos": 5
+    },
+    {
+      "numero": 16,
+      "nombre": "Ganso africano",
+      "cientifico": "Anser cygnoides",
+      "individuos": 1
+    },
+    {
+      "numero": 17,
+      "nombre": "Serpiente real de California",
+      "cientifico": "Lampropeltis californiae",
+      "individuos": 1
+    },
+    {
+      "numero": 18,
+      "nombre": "Jirafa",
+      "cientifico": "Giraffa camelopardalis",
+      "individuos": 1
+    },
+    {
+      "numero": 19,
+      "nombre": "Guacamayo militar",
+      "cientifico": "Ara militaris",
+      "individuos": 2
+    },
+    {
+      "numero": 20,
+      "nombre": "Maquisapa cenizo",
+      "cientifico": "Ateles belzebuth",
+      "individuos": 2
+    },
+    {
+      "numero": 21,
+      "nombre": "Mono tocón",
+      "cientifico": "Callicebus oenanthe",
+      "individuos": 3
+    },
+    {
+      "numero": 22,
+      "nombre": "Mono aullador rojo",
+      "cientifico": "Alouatta seniculus",
+      "individuos": 3
+    },
+    {
+      "numero": 23,
+      "nombre": "Pacarana",
+      "cientifico": "Dinomys branickii",
+      "individuos": 1
+    },
+    {
+      "numero": 24,
+      "nombre": "Jabirú",
+      "cientifico": "Jabiru mycteria",
+      "individuos": 2
+    },
+    {
+      "numero": 25,
+      "nombre": "Tigrillo",
+      "cientifico": "Leopardus pardalis",
+      "individuos": 1
+    },
+    {
+      "numero": 26,
+      "nombre": "Boa constrictor híbrida",
+      "cientifico": "Boa constrictor ortonii x Boa constrictor constrictor",
+      "individuos": 4
+    },
+    {
+      "numero": 27,
+      "nombre": "Motelo de patas rojas",
+      "cientifico": "Chelonoidis carbonarius",
+      "individuos": 2
+    },
+    {
+      "numero": 28,
+      "nombre": "Cobra",
+      "cientifico": "Naja kaouthia",
+      "individuos": 1
+    },
+    {
+      "numero": 29,
+      "nombre": "Nutria grande de río",
+      "cientifico": "Pteronura brasiliensis",
+      "individuos": 9
+    },
+    {
+      "numero": 30,
+      "nombre": "Pitón reticulada",
+      "cientifico": "Python reticulatus",
+      "individuos": 2
+    },
+    {
+      "numero": 31,
+      "nombre": "Rana gigante del Titicaca",
+      "cientifico": "Telmatobius culeus",
+      "individuos": 82
+    },
+    {
+      "numero": 32,
+      "nombre": "Paujil común",
+      "cientifico": "Mitu tuberosum",
+      "individuos": 5
+    },
+    {
+      "numero": 33,
+      "nombre": "Buho Castaño",
+      "cientifico": "Ciccaba virgata",
+      "individuos": 1
+    },
+    {
+      "numero": 34,
+      "nombre": "Águila mora",
+      "cientifico": "Geranoaetus melanoleucus",
+      "individuos": 4
+    },
+    {
+      "numero": 35,
+      "nombre": "Guacamayo escarlata",
+      "cientifico": "Ara macao",
+      "individuos": 7
+    },
+    {
+      "numero": 36,
+      "nombre": "Margay",
+      "cientifico": "Leopardus wiedii",
+      "individuos": 3
+    },
+    {
+      "numero": 37,
+      "nombre": "Nutria marina",
+      "cientifico": "Lontra felina",
+      "individuos": 1
+    },
+    {
+      "numero": 38,
+      "nombre": "Musmuqui",
+      "cientifico": "Aotus nigriceps",
+      "individuos": 1
+    },
+    {
+      "numero": 39,
+      "nombre": "Guacamayo de vientre rojo",
+      "cientifico": "Orthopsittaca manilata",
+      "individuos": 2
+    },
+    {
+      "numero": 40,
+      "nombre": "Hurón",
+      "cientifico": "Galictis vittata",
+      "individuos": 5
+    },
+    {
+      "numero": 41,
+      "nombre": "Serpiente del maíz",
+      "cientifico": "Pantherophis guttatus",
+      "individuos": 2
+    },
+    {
+      "numero": 42,
+      "nombre": "Loro de cabeza azul",
+      "cientifico": "Pionus menstruus",
+      "individuos": 2
+    },
+    {
+      "numero": 43,
+      "nombre": "Venado Cola Blanca",
+      "cientifico": "Odocoileus virginianus",
+      "individuos": 14
+    },
+    {
+      "numero": 44,
+      "nombre": "Otorongo",
+      "cientifico": "Panthera onca",
+      "individuos": 2
+    },
+    {
+      "numero": 45,
+      "nombre": "Gavilán Acanelado",
+      "cientifico": "Parabuteo unicinctus",
+      "individuos": 2
+    },
+    {
+      "numero": 46,
+      "nombre": "Oso de Anteojos",
+      "cientifico": "Tremarctos ornatus",
+      "individuos": 7
+    },
+    {
+      "numero": 47,
+      "nombre": "Vicuña",
+      "cientifico": "Vicugna vicugna",
+      "individuos": 3
+    },
+    {
+      "numero": 48,
+      "nombre": "Pato gargantillo",
+      "cientifico": "Anas bahamensis",
+      "individuos": 58
+    },
+    {
+      "numero": 49,
+      "nombre": "Loro mejilla amarilla",
+      "cientifico": "Amazona amazonica",
+      "individuos": 6
+    },
+    {
+      "numero": 50,
+      "nombre": "Cotorra de frente roja",
+      "cientifico": "Psittacara wagleri",
+      "individuos": 1
+    },
+    {
+      "numero": 51,
+      "nombre": "Fraile",
+      "cientifico": "Saimiri sciureus",
+      "individuos": 1
+    },
+    {
+      "numero": 52,
+      "nombre": "Sachavaca",
+      "cientifico": "Tapirus terrestris",
+      "individuos": 4
+    },
+    {
+      "numero": 53,
+      "nombre": "Iguana cabeza roja",
+      "cientifico": "Dracaena guianensis",
+      "individuos": 1
+    },
+    {
+      "numero": 54,
+      "nombre": "Boa arcoíris",
+      "cientifico": "Epicrates cenchria",
+      "individuos": 1
+    },
+    {
+      "numero": 55,
+      "nombre": "Tucán de Cuvier",
+      "cientifico": "Ramphastos tucanus",
+      "individuos": 2
+    },
+    {
+      "numero": 56,
+      "nombre": "Perezoso de tres dedos",
+      "cientifico": "Bradypus variegatus",
+      "individuos": 2
+    },
+    {
+      "numero": 57,
+      "nombre": "ibis escarlata",
+      "cientifico": "Eudocimus ruber",
+      "individuos": 2
+    },
+    {
+      "numero": 58,
+      "nombre": "Anaconda",
+      "cientifico": "Eunectes murinus",
+      "individuos": 3
+    },
+    {
+      "numero": 59,
+      "nombre": "Taruca",
+      "cientifico": "Hippocamelus antisensis",
+      "individuos": 1
+    },
+    {
+      "numero": 60,
+      "nombre": "Iguana",
+      "cientifico": "Iguana iguana",
+      "individuos": 2
+    },
+    {
+      "numero": 61,
+      "nombre": "Puma",
+      "cientifico": "Puma concolor",
+      "individuos": 4
+    },
+    {
+      "numero": 62,
+      "nombre": "Pingüino de Humboldt",
+      "cientifico": "Spheniscus humboldti",
+      "individuos": 69
+    },
+    {
+      "numero": 63,
+      "nombre": "Ibis sagrado",
+      "cientifico": "Threskiornis aethiopicus",
+      "individuos": 12
+    },
+    {
+      "numero": 64,
+      "nombre": "Guacamayo frente castaña",
+      "cientifico": "Ara severus",
+      "individuos": 3
+    },
+    {
+      "numero": 65,
+      "nombre": "Gavilán bicolor",
+      "cientifico": "Accipiter bicolor",
+      "individuos": 1
+    },
+    {
+      "numero": 66,
+      "nombre": "Lagarto Lengua Azul",
+      "cientifico": "Tiliqua scincoides",
+      "individuos": 1
+    },
+    {
+      "numero": 67,
+      "nombre": "Coati",
+      "cientifico": "Nasua nasua",
+      "individuos": 4
+    },
+    {
+      "numero": 68,
+      "nombre": "Huapo colorado",
+      "cientifico": "Cacajao calvus",
+      "individuos": 3
+    },
+    {
+      "numero": 69,
+      "nombre": "Armadillo peludo andino",
+      "cientifico": "Chaetophractus nationi",
+      "individuos": 6
+    },
+    {
+      "numero": 70,
+      "nombre": "Paloma peruana",
+      "cientifico": "Patagioenas oenops",
+      "individuos": 6
+    },
+    {
+      "numero": 71,
+      "nombre": "Pichico barba blanca",
+      "cientifico": "Saguinus mystax",
+      "individuos": 1
+    },
+    {
+      "numero": 72,
+      "nombre": "Garza espátula",
+      "cientifico": "Platalea alba",
+      "individuos": 13
+    },
+    {
+      "numero": 73,
+      "nombre": "Arasari de oreja castaña",
+      "cientifico": "Pteroglossus castanotis",
+      "individuos": 2
+    },
+    {
+      "numero": 74,
+      "nombre": "Lobo de mar chusco",
+      "cientifico": "Otaria flavescens",
+      "individuos": 4
+    },
+    {
+      "numero": 75,
+      "nombre": "Guacamayo de cabeza azul",
+      "cientifico": "Primolius couloni",
+      "individuos": 4
+    },
+    {
+      "numero": 76,
+      "nombre": "Polla de agua",
+      "cientifico": "Gallinula chloropus",
+      "individuos": 50
+    },
+    {
+      "numero": 77,
+      "nombre": "Cocodrilo de tumbes",
+      "cientifico": "Crocodylus acutus",
+      "individuos": 5
+    },
+    {
+      "numero": 78,
+      "nombre": "Loro harinoso",
+      "cientifico": "Amazona farinosa",
+      "individuos": 4
+    },
+    {
+      "numero": 79,
+      "nombre": "Cotorra mitrada",
+      "cientifico": "Psittacara mitratus",
+      "individuos": 1
+    },
+    {
+      "numero": 80,
+      "nombre": "Maquisapa negro",
+      "cientifico": "Ateles chamek",
+      "individuos": 4
+    },
+    {
+      "numero": 81,
+      "nombre": "Búho",
+      "cientifico": "Bubo magellanicus",
+      "individuos": 3
+    },
+    {
+      "numero": 82,
+      "nombre": "Zorro costeño",
+      "cientifico": "Lycalopex sechurae",
+      "individuos": 1
+    },
+    {
+      "numero": 83,
+      "nombre": "Piton",
+      "cientifico": "Python curtus",
+      "individuos": 1
+    },
+    {
+      "numero": 84,
+      "nombre": "Armadillo de cola desnuda",
+      "cientifico": "Cabassous unicinctus",
+      "individuos": 1
+    },
+    {
+      "numero": 85,
+      "nombre": "Tortuga motelo",
+      "cientifico": "Chelonoidis denticulatus",
+      "individuos": 15
+    },
+    {
+      "numero": 86,
+      "nombre": "Perezoso de dos dedos de Hoffmann",
+      "cientifico": "Choloepus hoffmanni",
+      "individuos": 7
+    },
+    {
+      "numero": 87,
+      "nombre": "Urraca verde",
+      "cientifico": "Cyanocorax yncas",
+      "individuos": 1
+    },
+    {
+      "numero": 88,
+      "nombre": "Geko leopardo",
+      "cientifico": "Eublepharis macularius",
+      "individuos": 1
+    },
+    {
+      "numero": 89,
+      "nombre": "Tortuga cabeza de serpiente",
+      "cientifico": "Phrynops gibbus",
+      "individuos": 1
+    },
+    {
+      "numero": 90,
+      "nombre": "Loro de vientre blanco",
+      "cientifico": "Pionites leucogaster",
+      "individuos": 1
+    },
+    {
+      "numero": 91,
+      "nombre": "Oso hormiguero amazónico",
+      "cientifico": "Tamandua tetradactyla",
+      "individuos": 4
+    },
+    {
+      "numero": 92,
+      "nombre": "Emú",
+      "cientifico": "Dromaius novaehollandiae",
+      "individuos": 3
+    },
+    {
+      "numero": 93,
+      "nombre": "hiena manchada",
+      "cientifico": "Crocuta crocuta",
+      "individuos": 2
+    },
+    {
+      "numero": 94,
+      "nombre": "Flamenco chileno",
+      "cientifico": "Phoenicopterus chilensis",
+      "individuos": 30
+    },
+    {
+      "numero": 95,
+      "nombre": "Huaco",
+      "cientifico": "Nycticorax nycticorax",
+      "individuos": 1
+    },
+    {
+      "numero": 96,
+      "nombre": "León",
+      "cientifico": "Panthera leo",
+      "individuos": 3
+    },
+    {
+      "numero": 97,
+      "nombre": "Pucacunga",
+      "cientifico": "Penelope jacquacu",
+      "individuos": 2
+    },
+    {
+      "numero": 98,
+      "nombre": "Condor andino",
+      "cientifico": "Vultur gryphus",
+      "individuos": 4
+    },
+    {
+      "numero": 99,
+      "nombre": "Búho listado",
+      "cientifico": "Asio clamator",
+      "individuos": 1
+    },
+    {
+      "numero": 100,
+      "nombre": "Machín negro",
+      "cientifico": "Sapajus apella",
+      "individuos": 7
+    },
+    {
+      "numero": 101,
+      "nombre": "Loro corona amarilla",
+      "cientifico": "Amazona ochrocephala",
+      "individuos": 2
+    },
+    {
+      "numero": 102,
+      "nombre": "Pato barcino",
+      "cientifico": "Anas flavirostris",
+      "individuos": 1
+    },
+    {
+      "numero": 103,
+      "nombre": "Aguilucho variable",
+      "cientifico": "Geranoaetus polyosoma",
+      "individuos": 2
+    },
+    {
+      "numero": 104,
+      "nombre": "Lagarto enano",
+      "cientifico": "Paleosuchus trigonatus",
+      "individuos": 1
+    },
+    {
+      "numero": 105,
+      "nombre": "Taricaya",
+      "cientifico": "Podocnemis unifilis",
+      "individuos": 29
+    },
+    {
+      "numero": 106,
+      "nombre": "Tocón",
+      "cientifico": "Plecturocebus sp.",
+      "individuos": 2
+    },
+    {
+      "numero": 107,
+      "nombre": "Nutria pequeña de río",
+      "cientifico": "Lontra longicaudis",
+      "individuos": 2
+    },
+    {
+      "numero": 108,
+      "nombre": "Arasari encrespado",
+      "cientifico": "Pteroglossus beauharnaesii",
+      "individuos": 1
+    },
+    {
+      "numero": 109,
+      "nombre": "Búho de anteojos",
+      "cientifico": "Pulsatrix perspicillata",
+      "individuos": 2
+    },
+    {
+      "numero": 110,
+      "nombre": "Pitón de la india",
+      "cientifico": "Python molurus",
+      "individuos": 1
+    },
+    {
+      "numero": 111,
+      "nombre": "Pichico común",
+      "cientifico": "Saguinus fuscicollis",
+      "individuos": 3
+    },
+    {
+      "numero": 112,
+      "nombre": "Guacamayo azul y amarillo",
+      "cientifico": "Ara ararauna",
+      "individuos": 8
+    },
+    {
+      "numero": 113,
+      "nombre": "Cebra de Grant",
+      "cientifico": "Equus quagga",
+      "individuos": 2
+    },
+    {
+      "numero": 114,
+      "nombre": "Venado colorado",
+      "cientifico": "Mazama americana",
+      "individuos": 1
+    },
+    {
+      "numero": 115,
+      "nombre": "Charapa de fango",
+      "cientifico": "Phrynops nasutus",
+      "individuos": 2
+    },
+    {
+      "numero": 116,
+      "nombre": "Paloma de nuca blanca",
+      "cientifico": "Patagioenas fasciata",
+      "individuos": 13
+    },
+    {
+      "numero": 117,
+      "nombre": "Asna charapa",
+      "cientifico": "Kinosternon scorpioides",
+      "individuos": 2
+    },
+    {
+      "numero": 118,
+      "nombre": "Oncilla",
+      "cientifico": "Leopardus tigrinus",
+      "individuos": 1
+    },
+    {
+      "numero": 119,
+      "nombre": "Musmuqui",
+      "cientifico": "Aotus miconax",
+      "individuos": 5
+    },
+    {
+      "numero": 120,
+      "nombre": "Cotorra cabeza negra",
+      "cientifico": "Aratinga weddellii",
+      "individuos": 4
+    },
+    {
+      "numero": 121,
+      "nombre": "Cotorra de ojo blanco",
+      "cientifico": "Psittacara leucophthalmus",
+      "individuos": 1
+    },
+    {
+      "numero": 122,
+      "nombre": "Boa macanche",
+      "cientifico": "Boa constrictor ortonii",
+      "individuos": 1
+    },
+    {
+      "numero": 123,
+      "nombre": "Puercoespín arborícola",
+      "cientifico": "Coendou prehensilis",
+      "individuos": 1
+    },
+    {
+      "numero": 124,
+      "nombre": "Rana de Junín",
+      "cientifico": "Telmatobius macrostomus",
+      "individuos": 310
+    },
+    {
+      "numero": 125,
+      "nombre": "Lagarto negro",
+      "cientifico": "Melanosuchus niger",
+      "individuos": 3
+    },
+    {
+      "numero": 126,
+      "nombre": "Manacaraco",
+      "cientifico": "Ortalis guttata",
+      "individuos": 17
+    },
+    {
+      "numero": 127,
+      "nombre": "Culebra de costa",
+      "cientifico": "Oxyrhopus fitzingeri",
+      "individuos": 1
+    },
+    {
+      "numero": 128,
+      "nombre": "Caracara",
+      "cientifico": "Caracara cheriway",
+      "individuos": 1
+    },
+    {
+      "numero": 129,
+      "nombre": "Pichico de Goeldi",
+      "cientifico": "Callimico goeldii",
+      "individuos": 4
+    },
+    {
+      "numero": 130,
+      "nombre": "Caimán blanco",
+      "cientifico": "Caiman crocodilus",
+      "individuos": 9
+    },
+    {
+      "numero": 131,
+      "nombre": "Dragón barbado",
+      "cientifico": "Pogona vitticeps",
+      "individuos": 1
+    },
+    {
+      "numero": 132,
+      "nombre": "Tucan de mandibula negra",
+      "cientifico": "Ramphastos ambiguus",
+      "individuos": 1
+    },
+    {
+      "numero": 133,
+      "nombre": "Tucan toco",
+      "cientifico": "Ramphastos toco",
+      "individuos": 1
+    }
+  ]
+}

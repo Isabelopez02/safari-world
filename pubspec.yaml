@@ -82,6 +82,8 @@ flutter:
    - assets/images/pantalla_principal/investigador.png
    - assets/images/pantalla_principal/footer.png
    - assets/images/animales_con_fondo/
+   - assets/images/fauna/
+   - assets/fonts/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

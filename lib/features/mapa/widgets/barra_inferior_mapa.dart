@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+import 'package:zoologico_front/core/widgets/imagen_animal.dart';
 
 import 'marcador_animado.dart';
 import '../screens/pantalla_detalle_animal.dart';
@@ -11,7 +12,7 @@ import '../screens/pantalla_detalle_animal.dart';
 /// Maneja los 3 estados con entrada animada y llamadas a la acción claras:
 /// 1. Exploración general (resumen de animales descubiertos)
 /// 2. Vista previa al seleccionar un paradero (con banner notorio y botones claros)
-/// 3. Navegación activa hacia el destino (con tiempo, distancia y cancelar)
+/// 3. Navegación activa hacia el destino con opción para cancelar.
 class BarraInferiorMapa extends StatelessWidget {
   final GlobalKey keyAnimales;
   final MarcadorMapa? marcadorSeleccionado;
@@ -19,9 +20,11 @@ class BarraInferiorMapa extends StatelessWidget {
   final List<MarcadorMapa> marcadores;
   final AnimationController bottomBarPulseController;
   final VoidCallback onTapExploraciones;
+  final ValueChanged<MarcadorMapa> onSeleccionarAnimal;
   final VoidCallback onCerrarSeleccion;
   final VoidCallback onIniciarNavegacion;
   final VoidCallback onCancelarNavegacion;
+  final bool compacta;
 
   const BarraInferiorMapa({
     super.key,
@@ -31,9 +34,11 @@ class BarraInferiorMapa extends StatelessWidget {
     required this.marcadores,
     required this.bottomBarPulseController,
     required this.onTapExploraciones,
+    required this.onSeleccionarAnimal,
     required this.onCerrarSeleccion,
     required this.onIniciarNavegacion,
     required this.onCancelarNavegacion,
+    this.compacta = false,
   });
 
   @override
@@ -44,10 +49,10 @@ class BarraInferiorMapa extends StatelessWidget {
       child: Container(
         key: keyAnimales,
         padding: EdgeInsets.fromLTRB(
-          22,
-          14,
-          22,
-          14 + MediaQuery.of(context).padding.bottom,
+          compacta ? 14 : 22,
+          compacta ? 10 : 14,
+          compacta ? 14 : 22,
+          (compacta ? 10 : 14) + MediaQuery.of(context).padding.bottom,
         ),
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -88,99 +93,104 @@ class BarraInferiorMapa extends StatelessWidget {
   }
 
   Widget _buildBarraExploracion(BuildContext context) {
-    final int visitados = marcadores.where((m) => m.visitado).length;
-
-    return GestureDetector(
-      onTap: onTapExploraciones,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedBuilder(
-            animation: bottomBarPulseController,
-            builder: (context, child) {
-              return Transform.translate(
-                offset: Offset(0, -2 * bottomBarPulseController.value),
-                child: const Icon(
-                  Icons.keyboard_arrow_up_rounded,
-                  color: AppColors.verdeAzulado,
-                  size: 26,
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 2),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Tus Exploraciones',
+    final servicio = AnimalService.instance;
+    final animales = servicio.obtenerTodosLosAnimales();
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        InkWell(
+          onTap: onTapExploraciones,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Todos los animales (${animales.length})',
                     style: GoogleFonts.urbanist(
-                      fontSize: 18,
+                      fontSize: compacta ? 15 : 17,
                       fontWeight: FontWeight.w900,
                       color: AppColors.verdePrincipal,
                     ),
                   ),
-                  const SizedBox(height: 3),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 3,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.verdeAzulado.withValues(alpha: 0.18),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '$visitados/${marcadores.length} descubiertos',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.verdeAzulado,
-                      ),
-                    ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Ver todos',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.verdeAzulado,
                   ),
-                ],
-              ),
-              Row(
-                children: List.generate(
-                  marcadores.length > 3 ? 3 : marcadores.length,
-                  (index) {
-                    final m = marcadores[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 4.0),
-                      child: Container(
-                        width: 36,
-                        height: 36,
+                ),
+                const Icon(
+                  Icons.keyboard_arrow_up_rounded,
+                  color: AppColors.verdeAzulado,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (!compacta)
+          Text(
+            'Desliza para explorar · ${servicio.totalVisitados} fichas exploradas',
+            style: GoogleFonts.urbanist(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.verdeAzulado,
+            ),
+          ),
+        SizedBox(height: compacta ? 4 : 10),
+        SizedBox(
+          height: compacta ? 76 : 96,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: animales.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
+            itemBuilder: (context, index) {
+              final animal = animales[index];
+              return SizedBox(
+                width: compacta ? 66 : 76,
+                child: InkWell(
+                  onTap: () => onSeleccionarAnimal(animal),
+                  borderRadius: BorderRadius.circular(14),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: compacta ? 40 : 50,
+                        height: compacta ? 40 : 50,
+                        padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
-                          color: m.visitado
-                              ? AppColors.verdeClaro
-                              : Colors.white,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: m.visitado
-                                ? Colors.transparent
-                                : Colors.grey.withValues(alpha: 0.3),
+                            color: AppColors.verdeAzulado,
+                            width: 1.5,
                           ),
                         ),
-                        child: Icon(
-                          m.icono,
-                          color: m.visitado ? Colors.white : Colors.grey,
-                          size: 18,
+                        child: ClipOval(child: ImagenAnimal(animal: animal)),
+                      ),
+                      SizedBox(height: compacta ? 3 : 5),
+                      Text(
+                        animal.nombre,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.urbanist(
+                          fontSize: compacta ? 10 : 11,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textoOscuro,
                         ),
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              );
+            },
           ),
-          const SizedBox(height: 6),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -262,13 +272,7 @@ class BarraInferiorMapa extends StatelessWidget {
                         color: Colors.blue.shade700,
                         size: 28,
                       )
-                    : (sel.imagen != null
-                          ? Image.asset(sel.imagen!, fit: BoxFit.cover)
-                          : Icon(
-                              sel.icono,
-                              color: AppColors.verdeAzulado,
-                              size: 28,
-                            )),
+                    : ImagenAnimal(animal: sel),
               ),
             ),
             const SizedBox(width: 14),
@@ -289,7 +293,7 @@ class BarraInferiorMapa extends StatelessWidget {
                   Text(
                     sel.esBanio
                         ? 'Baños públicos disponibles'
-                        : '${sel.categoria} · Zona #${sel.id}',
+                        : '${sel.habitat} · Ubicación de referencia',
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
                       color: Colors.grey[600],
@@ -366,7 +370,7 @@ class BarraInferiorMapa extends StatelessWidget {
 
         const SizedBox(height: 16),
 
-        // 3. BOTONES DE ACCIÓN: VER FICHA vs IR CON GPS
+        // 3. BOTONES DE ACCIÓN: VER FICHA vs TRAZAR RUTA
         Row(
           children: [
             if (!sel.esBanio) ...[
@@ -421,7 +425,7 @@ class BarraInferiorMapa extends StatelessWidget {
                   size: 18,
                 ),
                 label: Text(
-                  sel.esBanio ? 'Ir a los Baños' : 'Ir con GPS',
+                  sel.esBanio ? 'Ir a los Baños' : 'Trazar ruta',
                   style: GoogleFonts.urbanist(
                     color: Colors.white,
                     fontWeight: FontWeight.w900,
@@ -480,7 +484,7 @@ class BarraInferiorMapa extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Sigue la línea punteada verde en el mapa',
+                    'Ruta peatonal desde la entrada',
                     style: GoogleFonts.urbanist(
                       fontSize: 12.5,
                       color: Colors.grey[600],
@@ -497,7 +501,11 @@ class BarraInferiorMapa extends StatelessWidget {
                   color: Colors.red.shade50,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.close_rounded, color: Colors.red, size: 20),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: Colors.red,
+                  size: 20,
+                ),
               ),
               onPressed: onCancelarNavegacion,
             ),

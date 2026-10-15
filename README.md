@@ -20,7 +20,7 @@
 
 ## 📖 ¿De qué trata este proyecto?
 
-**ZooExplorer** es una aplicación móvil multiplataforma desarrollada en **Flutter** concebida para transformar por completo la visita tradicional a un parque zoológico. Integra un mapa topológico interactivo en alta resolución, navegación paso a paso con cálculo de rutas mínimas (pathfinding), fichas biológicas interactivas personalizadas por hábitat, audioguías con voz natural y un sistema de gamificación basado en un pasaporte de explorador.
+**ZooExplorer** es un prototipo multiplataforma desarrollado en **Flutter** para explorar un mapa ilustrado, consultar fichas de animales, escuchar audioguías y registrar visitas. El mapa permite acercar y desplazar la vista, y muestra rutas estimadas desde la entrada mediante un grafo de senderos. La ubicación GPS en tiempo real y la validación del plano de la sede Huachipa siguen pendientes.
 
 El objetivo es ofrecer una experiencia **intuitiva, animalista y minimalista**, eliminando la fatiga visual de los mapas tradicionales en papel y facilitando el aprendizaje sobre la biodiversidad y conservación de la fauna silvestre.
 
@@ -41,7 +41,7 @@ Este proyecto nació en el ámbito universitario al identificar una problemátic
 
 ## 🎯 Propósito Central
 
-* **Guiar al visitante en tiempo real:** Facilitar la orientación fluida desde el punto de entrada hacia cualquier recinto animal, servicio higiénico o punto de atención médica.
+* **Guiar al visitante:** Como objetivo del sistema, facilitar la orientación desde su ubicación hacia recintos y servicios del parque.
 * **Fomentar la educación y conservación animal:** Brindar datos científicos, dietas, comportamientos y curiosidades validadas sobre cada especie.
 * **Inclusión y accesibilidad:** Permitir que cualquier usuario pueda escuchar la audioguía narrada en español en alta voz con un solo toque.
 * **Gamificación sana:** Estimular a las familias y niños a recorrer todos los hábitats mediante un pasaporte de explorador con sello digital animado.
@@ -52,9 +52,10 @@ Este proyecto nació en el ámbito universitario al identificar una problemátic
 
 ### 🗺️ 1. Mapa Interactivo y Navegación Inteligente
 * Mapa en alta definición con zoom y paneo continuo mediante `InteractiveViewer`.
-* **Cálculo de rutas en tiempo real:** Algoritmo de pathfinding basado en un grafo de senderos que traza la ruta más corta hacia el animal seleccionado con animaciones de trazo dinámico (`CustomPainter`).
-* **Filtro de Baños y Servicios:** Localización y direccionamiento inmediato al baño más cercano.
-* **Punto de ubicación actual:** Indicador visual tipo radar que marca en todo momento la posición del explorador.
+* **Vista de rutas estimadas:** Algoritmo de pathfinding sobre un grafo provisional que dibuja la ruta desde la entrada con animación (`CustomPainter`).
+* **Acceso rápido a baños:** Muestra tres marcadores de baños y permite trazar una ruta referencial desde la entrada.
+* **Punto de partida visible:** Indicador en la entrada; todavía no representa la ubicación GPS del visitante.
+* **Cobertura de Huachipa pendiente:** El prototipo conserva 20 marcadores de animales y tres baños. La guía oficial de visita de Huachipa también menciona flamencos, caimanes, lobos marinos, camélidos andinos, águila andina, mundo anfibio, felinos, hienas, tortugas, serpentario, pavos reales y tapires, entre otros. Se deben completar el inventario y las ubicaciones antes de presentar el mapa como guía completa; no se asignan coordenadas a esas referencias sin validarlas en un plano legible.
 
 ### 🦁 2. Fichas de Campo Personalizadas por Hábitat
 Cada ficha de animal adapta automáticamente sus tonalidades, gradientes y acentos de acuerdo con su hábitat natural:
@@ -184,3 +185,18 @@ zoologico_front/
 ## 📄 Licencia y Créditos
 
 Este proyecto ha sido desarrollado con fines académicos y de divulgación para el aprendizaje de desarrollo móvil avanzado en Flutter, arquitectura limpia y diseño de experiencia de usuario (UX) enfocado en la conservación animal.
+
+## Catálogo de fauna y fotografías
+
+La aplicación incluye **141 fichas con fotografía local**, identificación, información educativa, recomendaciones para visitantes, fecha del registro y fuentes. El catálogo combina 133 registros de la supervisión de OSINFOR del 22/05/2023 con ocho registros de publicaciones posteriores. No equivale a un censo actual: la Municipalidad de Lima reportó 152 especies el 10/10/2025. Los registros incluyen especies, subespecies, un género sin especie determinada y un híbrido.
+
+La metodología, el inventario original, las atribuciones y las instrucciones de actualización están en [docs/fauna/README.md](docs/fauna/README.md). Las fotografías son referencias de cada taxón, no imágenes identificadas de los ejemplares del parque. Los nuevos registros sin recinto documentado abren su ficha y no añaden puntos inventados al mapa.
+
+Para verificar las fotografías, el catálogo, las rutas disponibles y el diseño de las fichas en móvil y escritorio:
+
+```bash
+flutter test test/fauna_catalogo_test.dart
+flutter analyze
+```
+
+La tipografía Urbanist se incluye con su licencia OFL en `assets/fonts/`, de modo que las fichas conservan sus estilos sin descargar fuentes en cada visita.

@@ -22,14 +22,14 @@ class ShowAcuaticoCard extends StatelessWidget {
         );
       },
       child: SizedBox(
-        height: 185,
+        height: 215,
         child: Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.bottomCenter,
           children: [
             // 1. BASE DE LA TARJETA CON FONDO MARINO ELEGANTE
             Container(
-              height: 155,
+              height: 185,
               width: double.infinity,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
@@ -114,13 +114,15 @@ class ShowAcuaticoCard extends StatelessWidget {
                                   color: Colors.white,
                                 ),
                                 const SizedBox(width: 4),
-                                Text(
-                                  'EN VIVO · 3 FUNCIONES',
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.white,
-                                    letterSpacing: 0.4,
+                                Flexible(
+                                  child: Text(
+                                    'EXHIBICIÓN · 2 HORARIOS',
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                      letterSpacing: 0.4,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -143,7 +145,7 @@ class ShowAcuaticoCard extends StatelessWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Focas y lobos marinos\n10:00 AM · 1:00 PM · 4:00 PM',
+                                'Lobos marinos · Huachipa\nSáb., dom. y feriados\n12:00 m. y 3:00 p. m.',
                                 style: GoogleFonts.urbanist(
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w600,

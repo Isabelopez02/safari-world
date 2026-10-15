@@ -5,7 +5,7 @@ import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
 
-/// Detalle del Show Acuático de Focas y Lobos Marinos.
+/// Detalle de la exhibición educativa de lobos marinos de Huachipa.
 /// Diseño minimalista, elegante y humano inspirado en guías de aventura natural,
 /// con paleta safari, tipografía Urbanist, horarios limpios y audioguía con voz real.
 class PantallaDetalleShowAcuatico extends StatefulWidget {
@@ -18,32 +18,23 @@ class PantallaDetalleShowAcuatico extends StatefulWidget {
 
 class _PantallaDetalleShowAcuaticoState
     extends State<PantallaDetalleShowAcuatico> {
-  int _horarioSeleccionado = 1; // 0: 10:00 AM, 1: 01:00 PM, 2: 04:00 PM
+  int _horarioSeleccionado = 0;
   bool _recordatorioGuardado = false;
 
   static const String _narracionShow =
-      'Bienvenidos al gran show de focas y lobos marinos del acuario central. '
-      'Nuestras focas son acróbatas acuáticas excepcionales que se sumergen a gran velocidad y '
-      'se comunican mediante sonidos únicos. Disfruta de sus saltos sincronizados y equilibrios en vivo '
-      'junto a nuestros biólogos marinos en el anfiteatro de las focas.';
+      'Conoce a Nayra, Sol y Luna en la exhibición educativa de lobos marinos de Huachipa. '
+      'El parque comparte sus historias de rescate y rehabilitación y explica la importancia de proteger '
+      'los ecosistemas marinos. La actividad se realiza en el anfiteatro y tiene aforo limitado.';
 
   final List<Map<String, dynamic>> _horarios = [
     {
-      'hora': '10:00 AM',
-      'tipo': 'Apertura',
-      'cupo': '14 libres',
+      'hora': '12:00 m.',
+      'tipo': 'Sábados, domingos y feriados',
       'icono': Icons.wb_sunny_outlined,
     },
     {
-      'hora': '01:00 PM',
-      'tipo': 'Función Estrella',
-      'cupo': '8 libres',
-      'icono': Icons.star_outline_rounded,
-    },
-    {
-      'hora': '04:00 PM',
-      'tipo': 'Atardecer',
-      'cupo': '22 libres',
+      'hora': '3:00 p. m.',
+      'tipo': 'Sábados, domingos y feriados',
       'icono': Icons.wb_twilight_rounded,
     },
   ];
@@ -144,7 +135,7 @@ class _PantallaDetalleShowAcuaticoState
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Show de Focas & Lobos',
+                                    'Exhibición de lobos marinos',
                                     style: GoogleFonts.urbanist(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w900,
@@ -163,7 +154,7 @@ class _PantallaDetalleShowAcuaticoState
                                       const SizedBox(width: 4),
                                       Flexible(
                                         child: Text(
-                                          'Acuario Central · Hábitat de Focas',
+                                          'Anfiteatro · Sede Huachipa',
                                           style: GoogleFonts.urbanist(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w700,
@@ -217,7 +208,7 @@ class _PantallaDetalleShowAcuaticoState
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Acompaña a nuestras focas y lobos marinos en un emocionante espectáculo acuático con saltos, piruetas y juegos de equilibrio junto al equipo de biólogos marinos.',
+                          'Conoce a Nayra, Sol y Luna, y aprende sobre su rescate, rehabilitación y conservación.',
                           style: GoogleFonts.urbanist(
                             fontSize: 13.5,
                             color: Colors.grey.shade700,
@@ -301,11 +292,7 @@ class _PantallaDetalleShowAcuaticoState
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFE0F2FE),
-            Color(0xFFBAE6FD),
-            Color(0xFFF0F9FF),
-          ],
+          colors: [Color(0xFFE0F2FE), Color(0xFFBAE6FD), Color(0xFFF0F9FF)],
         ),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
       ),
@@ -344,7 +331,10 @@ class _PantallaDetalleShowAcuaticoState
               children: [
                 // Barra superior de navegación en el header
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -360,7 +350,11 @@ class _PantallaDetalleShowAcuaticoState
                             color: Colors.white.withValues(alpha: 0.95),
                             shape: BoxShape.circle,
                             boxShadow: const [
-                              BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
                             ],
                           ),
                           child: const Icon(
@@ -371,12 +365,19 @@ class _PantallaDetalleShowAcuaticoState
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.95),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: const [
-                            BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
                           ],
                         ),
                         child: Row(
@@ -385,7 +386,7 @@ class _PantallaDetalleShowAcuaticoState
                             const Text('🐬', style: TextStyle(fontSize: 13)),
                             const SizedBox(width: 5),
                             Text(
-                              'Acuario Central',
+                              'Anfiteatro de Huachipa',
                               style: GoogleFonts.urbanist(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w900,
@@ -409,8 +410,11 @@ class _PantallaDetalleShowAcuaticoState
                       'assets/images/pantalla_principal/foca.png',
                       height: 195,
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.pets, size: 70, color: Color(0xFF0284C7)),
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.pets,
+                        size: 70,
+                        color: Color(0xFF0284C7),
+                      ),
                     ),
                   ),
                 ),
@@ -436,7 +440,7 @@ class _PantallaDetalleShowAcuaticoState
       },
       {
         'label': 'ESPECIES',
-        'valor': 'Focas & Lobos',
+        'valor': 'Lobos marinos',
         'icono': Icons.pets_rounded,
         'bg': const Color(0xFFE0F2FE),
         'color': const Color(0xFF0284C7),
@@ -625,11 +629,7 @@ class _PantallaDetalleShowAcuaticoState
           width: isPlaying ? 1.5 : 1,
         ),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 2)),
         ],
       ),
       child: Row(
@@ -664,11 +664,13 @@ class _PantallaDetalleShowAcuaticoState
                 ),
                 Text(
                   isPlaying
-                    ? 'Narrando en voz alta por el altavoz 🎧'
-                    : 'Escucha la historia con voz de biólogos',
+                      ? 'Narrando en voz alta por el altavoz 🎧'
+                      : 'Escucha la historia con voz de biólogos',
                   style: GoogleFonts.urbanist(
                     fontSize: 11.5,
-                    color: isPlaying ? AppColors.verdePrincipal : Colors.grey.shade600,
+                    color: isPlaying
+                        ? AppColors.verdePrincipal
+                        : Colors.grey.shade600,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -680,7 +682,9 @@ class _PantallaDetalleShowAcuaticoState
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: isPlaying ? const Color(0xFFD32F2F) : AppColors.verdePrincipal,
+                color: isPlaying
+                    ? const Color(0xFFD32F2F)
+                    : AppColors.verdePrincipal,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -720,9 +724,7 @@ class _PantallaDetalleShowAcuaticoState
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200, width: 1),
-        ),
+        border: Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -743,7 +745,8 @@ class _PantallaDetalleShowAcuaticoState
                   context,
                   MaterialPageRoute(
                     builder: (context) => const PantallaMapa(
-                      animalIdInicial: 'A09', // Dirige directamente al hábitat de las Focas
+                      animalIdInicial:
+                          'A09', // Dirige al marcador de lobos marinos
                     ),
                   ),
                 );
@@ -771,7 +774,7 @@ class _PantallaDetalleShowAcuaticoState
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Ir a las Focas en el Mapa',
+                      'Ir a los lobos marinos en el mapa',
                       style: GoogleFonts.urbanist(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w900,

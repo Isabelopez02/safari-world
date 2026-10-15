@@ -11,6 +11,7 @@ class BarraSuperiorMapa extends StatelessWidget {
   final int tutorialStep;
   final VoidCallback onToggleGuia;
   final GlobalKey keyComoFunciona;
+  final bool compacto;
 
   const BarraSuperiorMapa({
     super.key,
@@ -20,56 +21,72 @@ class BarraSuperiorMapa extends StatelessWidget {
     required this.tutorialStep,
     required this.onToggleGuia,
     required this.keyComoFunciona,
+    this.compacto = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    void toggleGuia() {
+      SoundService.instance.playButtonTap();
+      onToggleGuia();
+    }
+
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+        padding: EdgeInsets.symmetric(
+          horizontal: compacto ? 8 : 14,
+          vertical: compacto ? 6 : 10,
+        ),
         child: Row(
           children: [
             // Botón Regresar de alto contraste
-            GestureDetector(
+            Semantics(
+              label: 'Regresar',
+              button: true,
               onTap: onRegresar,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 9,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.verdeAzulado,
-                    width: 1.8,
+              child: GestureDetector(
+                onTap: onRegresar,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: compacto ? 10 : 14,
+                    vertical: compacto ? 8 : 9,
                   ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black38,
-                      blurRadius: 8,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      size: 14,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
                       color: AppColors.verdeAzulado,
+                      width: 1.8,
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Regresar',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textoOscuro,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        size: 14,
+                        color: AppColors.verdeAzulado,
+                      ),
+                      if (!compacto) ...[
+                        const SizedBox(width: 6),
+                        Text(
+                          'Regresar',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.textoOscuro,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -77,113 +94,116 @@ class BarraSuperiorMapa extends StatelessWidget {
             const Spacer(),
 
             // Chip Filtro Baños
-            GestureDetector(
+            Semantics(
+              label: mostrarBanios ? 'Ocultar baños' : 'Mostrar baños',
+              button: true,
               onTap: onToggleBanios,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 9,
-                ),
-                decoration: BoxDecoration(
-                  color: mostrarBanios
-                      ? Colors.blue.shade700
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.blue.shade700,
-                    width: 1.8,
+              child: GestureDetector(
+                onTap: onToggleBanios,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: compacto ? 9 : 12,
+                    vertical: compacto ? 8 : 9,
                   ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black38,
-                      blurRadius: 8,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.wc_rounded,
-                      size: 15,
-                      color: mostrarBanios
-                          ? Colors.white
-                          : Colors.blue.shade700,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Baños',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w900,
-                        color: mostrarBanios
-                            ? Colors.white
-                            : Colors.blue.shade800,
-                      ),
-                    ),
-                    if (mostrarBanios) ...[
-                      const SizedBox(width: 4),
-                      const Icon(
-                        Icons.close_rounded,
-                        size: 13,
-                        color: Colors.white,
+                  decoration: BoxDecoration(
+                    color: mostrarBanios ? Colors.blue.shade700 : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.blue.shade700, width: 1.8),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
                       ),
                     ],
-                  ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.wc_rounded,
+                        size: 15,
+                        color: mostrarBanios
+                            ? Colors.white
+                            : Colors.blue.shade700,
+                      ),
+                      if (!compacto) ...[
+                        const SizedBox(width: 5),
+                        Text(
+                          'Baños',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w900,
+                            color: mostrarBanios
+                                ? Colors.white
+                                : Colors.blue.shade800,
+                          ),
+                        ),
+                      ],
+                      if (mostrarBanios) ...[
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.close_rounded,
+                          size: 13,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
             ),
 
-            const SizedBox(width: 8),
+            SizedBox(width: compacto ? 5 : 8),
 
             // Botón Guía Tutorial (Toggle instantáneo)
-            GestureDetector(
+            Semantics(
               key: keyComoFunciona,
-              onTap: () {
-                SoundService.instance.playButtonTap();
-                onToggleGuia();
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 9,
-                ),
-                decoration: BoxDecoration(
-                  color: tutorialStep > 0
-                      ? const Color(0xFFF59E0B)
-                      : AppColors.verdeAzulado,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1.5,
+              label: tutorialStep > 0 ? 'Cerrar guía' : 'Abrir guía',
+              button: true,
+              onTap: toggleGuia,
+              child: GestureDetector(
+                onTap: toggleGuia,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: compacto ? 9 : 14,
+                    vertical: compacto ? 8 : 9,
                   ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black38,
-                      blurRadius: 8,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.lightbulb_rounded,
-                      size: 16,
-                      color: Color(0xFFFFD54F),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      tutorialStep > 0 ? 'Cerrar Guía' : 'Guía',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                  decoration: BoxDecoration(
+                    color: tutorialStep > 0
+                        ? const Color(0xFFF59E0B)
+                        : AppColors.verdeAzulado,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white, width: 1.5),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.lightbulb_rounded,
+                        size: 16,
+                        color: Color(0xFFFFD54F),
+                      ),
+                      if (!compacto) ...[
+                        const SizedBox(width: 5),
+                        Text(
+                          tutorialStep > 0 ? 'Cerrar Guía' : 'Guía',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
             ),

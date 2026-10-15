@@ -28,6 +28,7 @@ class TutorialOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final compacto = screenSize.width < 380;
     final bool isTargetInTopHalf =
         targetRect != Rect.zero &&
         targetRect.center.dy < (screenSize.height / 2);
@@ -56,15 +57,15 @@ class TutorialOverlay extends StatelessWidget {
             curve: Curves.easeOutCubic,
             top: isTargetInTopHalf ? null : (screenSize.height * 0.18),
             bottom: isTargetInTopHalf ? (screenSize.height * 0.14) : null,
-            left: 20,
-            right: 20,
+            left: compacto ? 12 : 20,
+            right: compacto ? 12 : 20,
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 420),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 22,
-                    vertical: 20,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: compacto ? 14 : 22,
+                    vertical: compacto ? 14 : 20,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -108,10 +109,12 @@ class TutorialOverlay extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  'GUÍA DE SAFARI · PASO $step DE $totalSteps',
+                                  compacto
+                                      ? 'GUÍA · $step/$totalSteps'
+                                      : 'GUÍA DE SAFARI · PASO $step DE $totalSteps',
                                   style: GoogleFonts.urbanist(
                                     color: AppColors.verdeAzulado,
-                                    fontSize: 11,
+                                    fontSize: compacto ? 9.5 : 11,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 0.5,
                                   ),
@@ -142,7 +145,7 @@ class TutorialOverlay extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 14),
+                      SizedBox(height: compacto ? 10 : 14),
 
                       // TEXTO EXPLICATIVO
                       Text(
@@ -150,13 +153,13 @@ class TutorialOverlay extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: GoogleFonts.urbanist(
                           color: AppColors.textoOscuro,
-                          fontSize: 16,
+                          fontSize: compacto ? 14 : 16,
                           fontWeight: FontWeight.w700,
                           height: 1.35,
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: compacto ? 12 : 20),
 
                       // BARRA DE PROGRESO Y BOTONES
                       Row(
@@ -177,7 +180,7 @@ class TutorialOverlay extends StatelessWidget {
                                 'Atrás',
                                 style: GoogleFonts.urbanist(
                                   fontWeight: FontWeight.w700,
-                                  fontSize: 13,
+                                  fontSize: compacto ? 11 : 13,
                                 ),
                               ),
                               style: OutlinedButton.styleFrom(
@@ -185,8 +188,8 @@ class TutorialOverlay extends StatelessWidget {
                                 side: BorderSide(
                                   color: Colors.grey.withValues(alpha: 0.3),
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: compacto ? 8 : 14,
                                   vertical: 10,
                                 ),
                                 shape: RoundedRectangleBorder(
@@ -194,7 +197,7 @@ class TutorialOverlay extends StatelessWidget {
                                 ),
                               ),
                             )
-                          else
+                          else if (!compacto)
                             const SizedBox(width: 80),
 
                           // Indicador de pasos con puntitos
@@ -229,8 +232,8 @@ class TutorialOverlay extends StatelessWidget {
                               backgroundColor: AppColors.verdeAzulado,
                               foregroundColor: Colors.white,
                               elevation: 2,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 18,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: compacto ? 10 : 18,
                                 vertical: 10,
                               ),
                               shape: RoundedRectangleBorder(
@@ -244,7 +247,7 @@ class TutorialOverlay extends StatelessWidget {
                                   step == totalSteps ? '¡Listo!' : 'Siguiente',
                                   style: GoogleFonts.urbanist(
                                     fontWeight: FontWeight.w800,
-                                    fontSize: 13,
+                                    fontSize: compacto ? 11 : 13,
                                   ),
                                 ),
                                 const SizedBox(width: 4),
