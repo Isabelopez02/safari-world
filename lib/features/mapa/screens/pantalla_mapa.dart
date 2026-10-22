@@ -10,6 +10,7 @@ import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
 import '../utils/datos_rutas.dart';
+import '../utils/servicio_rutas_svg.dart';
 import '../widgets/barra_inferior_mapa.dart';
 import '../widgets/barra_superior_mapa.dart';
 import '../widgets/marcador_animado.dart';
@@ -55,6 +56,7 @@ class _PantallaMapaState extends State<PantallaMapa>
   final double mapaAlto = 1080;
 
   List<Offset> _rutaActual = [];
+  Path? _rutaSvgActual;
   MarcadorMapa? _marcadorSeleccionado;
   final String _nodoActual = 'entrada';
   bool _isNavigating = false;
@@ -238,11 +240,13 @@ class _PantallaMapaState extends State<PantallaMapa>
 
   void _mostrarInfoMarcador(MarcadorMapa marcador) {
     final nuevaRuta = grafoMapa.encontrarRutaMasCorta(_nodoActual, marcador.id);
+    final rutaSvg = ServicioRutasSvg.obtenerRutaHacia(marcador);
     setState(() {
       _marcadorSeleccionado = marcador;
       // Si el usuario toca un baño, iniciar de inmediato la navegación activa hacia él
       _isNavigating = marcador.esBanio;
       _rutaActual = nuevaRuta;
+      _rutaSvgActual = rutaSvg;
     });
     _centrarEnPunto(marcador.x, marcador.y);
     _routeProgressController.forward(from: 0);
@@ -264,6 +268,7 @@ class _PantallaMapaState extends State<PantallaMapa>
         _marcadorSeleccionado = null;
         _isNavigating = false;
         _rutaActual = [];
+        _rutaSvgActual = null;
         _mostrarBanios = false;
       });
       return;
@@ -299,6 +304,7 @@ class _PantallaMapaState extends State<PantallaMapa>
       _marcadorSeleccionado = destino;
       _isNavigating = true;
       _rutaActual = rutaFinal;
+      _rutaSvgActual = ServicioRutasSvg.obtenerRutaHacia(destino);
     });
 
     _centrarEnPunto(destino.x, destino.y);
@@ -421,12 +427,69 @@ class _PantallaMapaState extends State<PantallaMapa>
                             painter: RutaPainter(
                               _rutaActual,
                               _isNavigating,
+                              rutaSvg: _rutaSvgActual,
                               progress: _routeProgressController.value,
                             ),
                           );
                         },
                       ),
                     ),
+                    // MARCADOR GUÍA ANIMADO QUE VIAJA POR LA CURVA SVG
+                    if (_rutaSvgActual != null)
+                      AnimatedBuilder(
+                        animation: _routeProgressController,
+                        builder: (context, child) {
+                          if (_routeProgressController.value <= 0.0) {
+                            return const SizedBox.shrink();
+                          }
+                          final metrics = _rutaSvgActual!.computeMetrics().toList();
+                          if (metrics.isEmpty) return const SizedBox.shrink();
+
+                          final totalLength = metrics.fold(0.0, (acc, m) => acc + m.length);
+                          final targetDist = _routeProgressController.value * totalLength;
+
+                          Offset puntoGuia = Offset.zero;
+                          double distAcumulada = 0.0;
+                          for (final metric in metrics) {
+                            if (targetDist <= distAcumulada + metric.length) {
+                              final localDist = targetDist - distAcumulada;
+                              puntoGuia = metric.getTangentForOffset(localDist)?.position ?? Offset.zero;
+                              break;
+                            }
+                            distAcumulada += metric.length;
+                          }
+                          if (puntoGuia == Offset.zero && metrics.isNotEmpty) {
+                            puntoGuia = metrics.last.getTangentForOffset(metrics.last.length)?.position ?? Offset.zero;
+                          }
+
+                          return Positioned(
+                            left: puntoGuia.dx - 18,
+                            top: puntoGuia.dy - 34,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: _isNavigating
+                                    ? const Color(0xFF0E6568)
+                                    : const Color(0xFFE65100),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 2),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black38,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.navigation_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     // PARADEROS DE ANIMALES
                     ...marcadores.map((marcador) {
                       return Positioned(
@@ -665,6 +728,7 @@ class _PantallaMapaState extends State<PantallaMapa>
               onCerrarSeleccion: () => setState(() {
                 _marcadorSeleccionado = null;
                 _rutaActual = [];
+                _rutaSvgActual = null;
               }),
               onIniciarNavegacion: () {
                 setState(() => _isNavigating = true);
@@ -675,6 +739,7 @@ class _PantallaMapaState extends State<PantallaMapa>
                   _isNavigating = false;
                   _marcadorSeleccionado = null;
                   _rutaActual = [];
+                  _rutaSvgActual = null;
                 });
               },
             ),
