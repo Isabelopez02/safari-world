@@ -132,15 +132,15 @@ class AnimalService extends ChangeNotifier {
         .toList();
   }
 
-  /// Retorna la lista de hábitats disponibles en el zoológico.
+  /// Retorna la lista de hábitats y zonas disponibles en el zoológico.
   List<String> obtenerHabitats() {
     return const [
       'Todos',
-      'Sabana Africana',
-      'Selva Tropical',
-      'Mundo Acuático',
-      'La Granja',
-      'Bosque & Montaña',
+      'Granja Interactiva',
+      'Zona Internacional',
+      'Zona Costa',
+      'Zona Sierra',
+      'Zona Selva',
     ];
   }
 

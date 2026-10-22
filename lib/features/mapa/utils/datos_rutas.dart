@@ -1,93 +1,120 @@
+import 'dart:ui';
 import 'pathfinding.dart';
+import '../../../../core/data/datos_marcadores.dart';
 
 // Este es el grafo (red de caminos) que representa tu mapa
-final GrafoZoolologico grafoMapa = GrafoZoolologico()
-  // 1. NODOS PRINCIPALES (Los cruces y caminos de tierra)
-  // Usé aproximaciones visuales según tu imagen. Puedes ajustarlos luego tocando tu mapa!
-  ..agregarNodo('entrada', 900, 770)
-  ..agregarNodo('plaza_principal', 900, 680)
-  // Ruta Izquierda (Granja y Monos)
-  ..agregarNodo('camino_izq_1', 700, 700)
-  ..agregarNodo('camino_izq_2', 400, 720) // Frente granja
-  ..agregarNodo('camino_izq_3', 180, 650) // Curva izq
-  ..agregarNodo('camino_izq_4', 200, 450) // Subiendo izq
-  ..agregarNodo('camino_izq_5', 380, 450) // Frente monos
-  // Ruta Centro-Izquierda (Cocodrilo y Sabana)
-  ..agregarNodo('camino_c_izq_1', 650, 450)
-  ..agregarNodo('camino_c_izq_2', 650, 360) // Frente Sabana
-  // Ruta Centro (Elefante y Osos)
-  ..agregarNodo('camino_centro_1', 950, 600)
-  ..agregarNodo('camino_centro_2', 950, 450) // Osos
-  // Ruta Derecha (Acuáticos, Aves y Felinos)
-  ..agregarNodo('camino_der_1', 1150, 700) // Pinguinos
-  ..agregarNodo('camino_der_2', 1350, 680) // Pelicanos/Nutrias
-  ..agregarNodo('camino_der_3', 1350, 560) // Felinos
-  ..agregarNodo('camino_der_4', 1250, 400) // Acuaticos norte
-  // 2. CONEXIONES DE LOS CAMINOS (Por donde se puede caminar)
-  ..agregarArista('entrada', 'plaza_principal')
-  ..agregarArista('plaza_principal', 'camino_izq_1')
-  ..agregarArista('camino_izq_1', 'camino_izq_2')
-  ..agregarArista('camino_izq_2', 'camino_izq_3')
-  ..agregarArista('camino_izq_3', 'camino_izq_4')
-  ..agregarArista('camino_izq_4', 'camino_izq_5')
-  ..agregarArista('camino_izq_1', 'camino_c_izq_1')
-  ..agregarArista('camino_izq_5', 'camino_c_izq_1')
-  ..agregarArista('camino_c_izq_1', 'camino_c_izq_2')
-  ..agregarArista('plaza_principal', 'camino_centro_1')
-  ..agregarArista('camino_centro_1', 'camino_centro_2')
-  ..agregarArista('camino_centro_2', 'camino_c_izq_2')
-  ..agregarArista('camino_centro_2', 'camino_der_4')
-  ..agregarArista('plaza_principal', 'camino_der_1')
-  ..agregarArista('camino_der_1', 'camino_der_2')
-  ..agregarArista('camino_der_2', 'camino_der_3')
-  ..agregarArista('camino_der_3', 'camino_der_4')
-  // 3. NODOS DE LOS ANIMALES (Tus coordenadas exactas)
-  ..agregarNodo('A01', 346, 287) // Chimpancé
-  ..agregarNodo('A02', 438, 305) // Mono
-  ..agregarNodo('A03', 570, 214) // Cebra
-  ..agregarNodo('A04', 634, 273) // Camello
-  ..agregarNodo('A05', 709, 277) // Jirafa
-  ..agregarNodo('A06', 904, 308) // Oso 1
-  ..agregarNodo('A07', 1026, 292) // Oso 2
-  ..agregarNodo('A08', 1170, 233) // Delfín
-  ..agregarNodo('A09', 1279, 277) // Foca
-  ..agregarNodo('A10', 1451, 414) // León
-  ..agregarNodo('A11', 1378, 474) // Tigre
-  ..agregarNodo('A12', 1518, 494) // Leopardo
-  ..agregarNodo('A13', 1123, 539) // Elefante
-  ..agregarNodo('A14', 1270, 647) // Pingüino
-  ..agregarNodo('A15', 1369, 603) // Nutria
-  ..agregarNodo('A16', 1466, 638) // Pelícano
-  ..agregarNodo('A17', 664, 554) // Cocodrilo
-  ..agregarNodo('A18', 273, 638) // Vaca
-  ..agregarNodo('A19', 377, 650) // Oveja
-  ..agregarNodo('A20', 458, 635) // Cerdo
-  // BAÑOS (WC)
-  ..agregarNodo('B01', 420, 580)
-  ..agregarNodo('B02', 900, 520)
-  ..agregarNodo('B03', 1300, 720)
-  // 4. CONECTAR ANIMALES AL CAMINO MÁS CERCANO
-  ..agregarArista('camino_izq_5', 'A01')
-  ..agregarArista('camino_izq_5', 'A02')
-  ..agregarArista('camino_c_izq_2', 'A03')
-  ..agregarArista('camino_c_izq_2', 'A04')
-  ..agregarArista('camino_c_izq_2', 'A05')
-  ..agregarArista('camino_centro_2', 'A06')
-  ..agregarArista('camino_centro_2', 'A07')
-  ..agregarArista('camino_der_4', 'A08')
-  ..agregarArista('camino_der_4', 'A09')
-  ..agregarArista('camino_der_3', 'A10')
-  ..agregarArista('camino_der_3', 'A11')
-  ..agregarArista('camino_der_3', 'A12')
-  ..agregarArista('camino_centro_1', 'A13')
-  ..agregarArista('camino_der_1', 'A14')
-  ..agregarArista('camino_der_2', 'A15')
-  ..agregarArista('camino_der_2', 'A16')
-  ..agregarArista('camino_izq_1', 'A17')
-  ..agregarArista('camino_izq_2', 'A18')
-  ..agregarArista('camino_izq_2', 'A19')
-  ..agregarArista('camino_izq_2', 'A20')
-  // CONEXIONES DE BAÑOS
-  ..agregarArista('camino_izq_2', 'B01')
-  ..agregarArista('camino_centro_2', 'B02')
-  ..agregarArista('camino_der_1', 'B03');
+final GrafoZoolologico grafoMapa = () {
+  final grafo = GrafoZoolologico()
+    // 1. NODOS PRINCIPALES DE LOS CAMINOS Y CRUCES DEL PARQUE
+    ..agregarNodo('entrada', 878.4, 852.3)
+    ..agregarNodo('plaza_principal', 900.0, 680.0)
+    // Caminos hacia Costa y Granja (Oeste / Suroeste)
+    ..agregarNodo('camino_costa_1', 750.0, 500.0)
+    ..agregarNodo('camino_costa_2', 850.0, 480.0)
+    ..agregarNodo('camino_costa_norte', 720.0, 400.0)
+    ..agregarNodo('camino_caballeriza', 650.0, 300.0)
+    // Caminos Granja y Norte
+    ..agregarNodo('camino_granja', 1150.0, 200.0)
+    // Caminos Internacional (Norte / Este)
+    ..agregarNodo('camino_inter_1', 1150.0, 320.0)
+    ..agregarNodo('camino_inter_2', 1250.0, 320.0)
+    ..agregarNodo('camino_inter_3', 1350.0, 300.0)
+    ..agregarNodo('camino_inter_este', 1400.0, 260.0)
+    // Caminos Selva (Centro - Este)
+    ..agregarNodo('camino_selva_1', 1280.0, 450.0)
+    ..agregarNodo('camino_selva_2', 1350.0, 520.0)
+    ..agregarNodo('camino_selva_3', 1300.0, 600.0)
+    // Caminos Sierra (Sur - Este)
+    ..agregarNodo('camino_sierra_1', 1200.0, 680.0)
+    ..agregarNodo('camino_sierra_2', 1280.0, 750.0)
+    // 2. CONEXIONES DE CAMINOS PRINCIPALES
+    ..agregarArista('entrada', 'plaza_principal')
+    ..agregarArista('plaza_principal', 'camino_costa_1')
+    ..agregarArista('camino_costa_1', 'camino_costa_2')
+    ..agregarArista('camino_costa_1', 'camino_costa_norte')
+    ..agregarArista('camino_costa_norte', 'camino_caballeriza')
+    ..agregarArista('plaza_principal', 'camino_selva_1')
+    ..agregarArista('camino_costa_2', 'camino_inter_1')
+    ..agregarArista('camino_inter_1', 'camino_granja')
+    ..agregarArista('camino_inter_1', 'camino_inter_2')
+    ..agregarArista('camino_inter_2', 'camino_inter_3')
+    ..agregarArista('camino_inter_3', 'camino_inter_este')
+    ..agregarArista('camino_inter_2', 'camino_selva_1')
+    ..agregarArista('camino_selva_1', 'camino_selva_2')
+    ..agregarArista('camino_selva_2', 'camino_selva_3')
+    ..agregarArista('camino_selva_3', 'camino_sierra_1')
+    ..agregarArista('camino_sierra_1', 'camino_sierra_2')
+    ..agregarArista('plaza_principal', 'camino_sierra_1');
+
+  // 1. Agregar todos los marcadores de animales
+  for (final marcador in marcadoresZoologico) {
+    grafo.agregarNodo(marcador.id, marcador.x, marcador.y);
+
+    String? nodoMasCercano;
+    double distMin = double.infinity;
+
+    for (final caminoId in [
+      'entrada',
+      'plaza_principal',
+      'camino_costa_1',
+      'camino_costa_2',
+      'camino_costa_norte',
+      'camino_caballeriza',
+      'camino_granja',
+      'camino_inter_1',
+      'camino_inter_2',
+      'camino_inter_3',
+      'camino_inter_este',
+      'camino_selva_1',
+      'camino_selva_2',
+      'camino_selva_3',
+      'camino_sierra_1',
+      'camino_sierra_2',
+    ]) {
+      final caminoNodo = grafo.nodos[caminoId];
+      if (caminoNodo != null) {
+        final dist = (caminoNodo.posicion - Offset(marcador.x, marcador.y)).distance;
+        if (dist < distMin) {
+          distMin = dist;
+          nodoMasCercano = caminoId;
+        }
+      }
+    }
+
+    if (nodoMasCercano != null) {
+      grafo.agregarArista(nodoMasCercano, marcador.id);
+    }
+  }
+
+  // 2. Agregar los baños al grafo
+  for (final banio in baniosZoologico) {
+    grafo.agregarNodo(banio.id, banio.x, banio.y);
+
+    String? nodoMasCercano;
+    double distMin = double.infinity;
+
+    for (final caminoId in [
+      'plaza_principal',
+      'camino_costa_1',
+      'camino_costa_2',
+      'camino_inter_1',
+      'camino_selva_2',
+      'camino_sierra_1',
+    ]) {
+      final caminoNodo = grafo.nodos[caminoId];
+      if (caminoNodo != null) {
+        final dist = (caminoNodo.posicion - Offset(banio.x, banio.y)).distance;
+        if (dist < distMin) {
+          distMin = dist;
+          nodoMasCercano = caminoId;
+        }
+      }
+    }
+
+    if (nodoMasCercano != null) {
+      grafo.agregarArista(nodoMasCercano, banio.id);
+    }
+  }
+
+  return grafo;
+}();

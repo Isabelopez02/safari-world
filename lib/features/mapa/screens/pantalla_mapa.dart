@@ -494,7 +494,7 @@ class _PantallaMapaState extends State<PantallaMapa>
                     ...marcadores.map((marcador) {
                       return Positioned(
                         left: marcador.x - 52,
-                        top: marcador.y - 40,
+                        top: marcador.y - 29,
                         child: MarcadorAnimado(
                           marcador: marcador,
                           isSelected: _marcadorSeleccionado?.id == marcador.id,
@@ -507,7 +507,7 @@ class _PantallaMapaState extends State<PantallaMapa>
                       ...banios.map((banio) {
                         return Positioned(
                           left: banio.x - 38,
-                          top: banio.y - 32,
+                          top: banio.y - 22,
                           child: MarcadorAnimado(
                             marcador: banio,
                             isSelected: _marcadorSeleccionado?.id == banio.id,

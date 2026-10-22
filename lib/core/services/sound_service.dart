@@ -9,26 +9,73 @@ class SoundService {
 
   // Diccionario de onomatopeyas y expresiones sonoras por animal
   static const Map<String, String> _onomatopeyas = {
-    'Elefante': '¡Paoooh! 🐘',
-    'León': '¡Groaaar! 🦁',
-    'Tigre': '¡Grrr! 🐯',
-    'Leopardo': '¡Rrrhh! 🐆',
-    'Mono': '¡Uh-uh ah-ah! 🐒',
-    'Chimpancé': '¡Uh-ah-ah! 🦧',
-    'Oso Pardo': '¡Gromph! 🐻',
-    'Oso Frontino': '¡Groar! 🐻',
-    'Pingüino': '¡Honk honk! 🐧',
-    'Foca': '¡Arf arf! 🦭',
-    'Delfín': '¡Click-click! 🐬',
-    'Nutria': '¡Squeak! 🦦',
-    'Cebra': '¡Hiin-hiin! 🦓',
-    'Jirafa': '¡Huuuum! 🦒',
-    'Camello': '¡Grumph! 🐪',
-    'Cocodrilo': '¡Snap! 🐊',
-    'Pelícano': '¡Clack! 🪶',
+    // Granja Interactiva
+    'Vacas Holstein': '¡Muuu! 🐮',
     'Vaca': '¡Muuu! 🐮',
+    'Ovejas': '¡Beee! 🐑',
     'Oveja': '¡Beee! 🐑',
+
+    // Zona Internacional
+    'Rinoceronte': '¡Snort-snort! 🦏',
+    'Leones': '¡Groaaar! 🦁',
+    'León': '¡Groaaar! 🦁',
+    'Avestruz': '¡Boom-boom! 🦤',
+    'Búfalos de agua': '¡Mruuuh! 🐃',
+    'Hipopótamos del Nilo': '¡Grunt-grunt! 🦛',
+    'Dromedarios': '¡Grumph! 🐪',
+    'Camello': '¡Grumph! 🐪',
+    'Tigre de Bengala': '¡Grrr-roaaar! 🐯',
+    'Tigre': '¡Grrr! 🐯',
+    'Oso de Anteojos (Zona Internacional)': '¡Groar! 🐻',
+    'Oso Frontino': '¡Groar! 🐻',
+    'Cebra de Grant': '¡Hiin-hiin! 🦓',
+    'Cebra': '¡Hiin-hiin! 🦓',
+    'Tortugas': '¡Hiss-clack! 🐢',
+    'Tigre Blanco': '¡Roaaar! 🐯',
+    'Jirafa': '¡Huuuum! 🦒',
+    'Canguros': '¡Boing-boing! 🦘',
+    'Suricatas': '¡Pip-pip-chirp! 🐾',
+
+    // Zona Costa
+    'Gallos (Villa Carmelo)': '¡Ki-kiri-kiii! 🐓',
+    'Pavo Real (Villa Carmelo)': '¡May-awe! 🦚',
+    'Pelícanos / Aves Guaneras': '¡Clack-clack! 🪶',
+    'Pelícano': '¡Clack! 🪶',
+    'Peces (Acuario)': '¡Glup-glup! 🐠',
+    'Lobos de Mar': '¡Arf-arf-ouh! 🦭',
+    'Foca': '¡Arf arf! 🦭',
+    'Cocodrilo de Tumbes': '¡Snap-croc! 🐊',
+    'Cocodrilo': '¡Snap! 🐊',
+    'Flamencos': '¡Honk-honk! 🦩',
+    'Pingüinos de Humboldt': '¡Honk-honk! 🐧',
+    'Pingüino': '¡Honk honk! 🐧',
+
+    // Zona Sierra
+    'Caballos (Caballeriza)': '¡Hiiiiin! 🐴',
+    'Venados': '¡Snort! 🦌',
+    'Cóndor Andino': '¡Swoosh! 🦅',
+    'Alpacas': '¡Hummm-hummm! 🦙',
+    'Zorro Andino': '¡Yap-yap! 🦊',
+    'Puma': '¡Purrr-hiss! 🐆',
+    'Águila Mora': '¡Kreee-kreee! 🦅',
+    'Vicuñas': '¡Kweee-kweee! 🦙',
+
+    // Zona Selva
+    'Reptiles / Serpientes (Herpetario)': '¡Tssss-hiss! 🐍',
+    'Guacamayos': '¡Rrrraaa-caw! 🦜',
+    'Tapir (Sachavaca)': '¡Pheeew! 🦛',
+    'Isla de Monos': '¡Uh-uh ah-ah! 🐒',
+    'Mono': '¡Uh-uh ah-ah! 🐒',
+    'Otorongo': '¡Grrrr-uh! 🐆',
+    'Nutria Gigante (Lobo de río)': '¡Hahaha-squeak! 🦦',
+    'Nutria': '¡Squeak! 🦦',
+    'Anaconda': '¡Ssssss! 🐍',
+    'Sajino': '¡Chomp-oink! 🐗',
     'Cerdo': '¡Oink! 🐷',
+    'Oso Perezoso / Mamíferos menores': '¡Zzzz-ah! 🦥',
+    'Elefante': '¡Paoooh! 🐘',
+    'Chimpancé': '¡Uh-ah-ah! 🦧',
+    'Delfín': '¡Click-click! 🐬',
   };
 
   /// Obtiene la onomatopeya o expresión característica del animal
@@ -38,19 +85,8 @@ class SoundService {
 
   /// Feedback al seleccionar un marcador o animal
   Future<void> playAnimalTap(String animalNombre) async {
-    // 1. Feedback háptico agradable (vibración física que se siente en mano)
     await HapticFeedback.mediumImpact();
-
-    // 2. Click táctil de sistema
     await SystemSound.play(SystemSoundType.click);
-
-    // NOTA PARA EL DESARROLLADOR:
-    // Para reproducir un archivo de audio real de animal (.mp3):
-    // 1. Agrega 'audioplayers: ^6.0.0' en tu pubspec.yaml
-    // 2. Coloca tus archivos en assets/audio/ (ej. assets/audio/elefante.mp3)
-    // 3. Descomenta:
-    // final player = AudioPlayer();
-    // await player.play(AssetSource('audio/${animalNombre.toLowerCase()}.mp3'));
   }
 
   /// Feedback al interactuar con botones o navegación
