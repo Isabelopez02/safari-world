@@ -8,6 +8,7 @@ import 'package:zoologico_front/features/pantalla_principal/pantalla_detalle_sho
 
 import 'widgets/animales_carrusel.dart';
 import 'widgets/banner_mapa.dart';
+import 'widgets/dialogo_permiso_notificaciones.dart';
 import 'widgets/emergencia_card.dart';
 import 'widgets/hero_header.dart';
 import 'widgets/show_acuatico_card.dart';
@@ -21,6 +22,14 @@ class PantallaPrincipal extends StatefulWidget {
 
 class _PantallaPrincipalState extends State<PantallaPrincipal> {
   DateTime? _lastBackPressTime;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      DialogoPermisoNotificaciones.verificarYMostrar(context);
+    });
+  }
 
   void _navigateToMapExploraciones(BuildContext context) {
     SoundService.instance.playButtonTap();

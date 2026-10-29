@@ -1,189 +1,211 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
-/// Barra superior de navegación y controles del mapa (Regresar, Baños y Guía)
+/// Barra superior simplificada y despejada (Regresar, Guía y Emergencia SOS)
 class BarraSuperiorMapa extends StatelessWidget {
   final VoidCallback onRegresar;
-  final bool mostrarBanios;
-  final VoidCallback onToggleBanios;
+  final VoidCallback onSOS;
   final int tutorialStep;
   final VoidCallback onToggleGuia;
   final GlobalKey keyComoFunciona;
+  final GlobalKey? keyHelp;
 
   const BarraSuperiorMapa({
     super.key,
     required this.onRegresar,
-    required this.mostrarBanios,
-    required this.onToggleBanios,
+    required this.onSOS,
     required this.tutorialStep,
     required this.onToggleGuia,
     required this.keyComoFunciona,
+    this.keyHelp,
   });
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
         child: Row(
           children: [
-            // Botón Regresar de alto contraste
-            GestureDetector(
-              onTap: onRegresar,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 9,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.verdeAzulado,
-                    width: 1.8,
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black38,
-                      blurRadius: 8,
-                      offset: Offset(0, 3),
+            // BOTÓN REGRESAR CON EFECTO CRISTAL ELEVADO
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    onRegresar();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 9,
                     ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      size: 14,
-                      color: AppColors.verdeAzulado,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Regresar',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textoOscuro,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.90),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(0xFFCBD5E1),
+                        width: 1.2,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.12),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
-                  ],
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          size: 14,
+                          color: AppColors.verdeAzulado,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Regresar',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                            color: const Color(0xFF1E293B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
 
             const Spacer(),
 
-            // Chip Filtro Baños
-            GestureDetector(
-              onTap: onToggleBanios,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 9,
-                ),
-                decoration: BoxDecoration(
-                  color: mostrarBanios
-                      ? Colors.blue.shade700
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.blue.shade700,
-                    width: 1.8,
+            // BOTÓN GUÍA RÁPIDA CON CRISTAL
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: GestureDetector(
+                  key: keyComoFunciona,
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    SoundService.instance.playButtonTap();
+                    onToggleGuia();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 9,
+                    ),
+                    decoration: BoxDecoration(
+                      color: tutorialStep > 0
+                          ? const Color(0xFFF59E0B)
+                          : Colors.white.withValues(alpha: 0.90),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: tutorialStep > 0
+                            ? const Color(0xFFD97706)
+                            : const Color(0xFFCBD5E1),
+                        width: 1.2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.12),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.lightbulb_rounded,
+                          size: 16,
+                          color: tutorialStep > 0
+                              ? Colors.white
+                              : const Color(0xFFD97706),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          tutorialStep > 0 ? 'Cerrar Guía' : 'Guía',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w900,
+                            color: tutorialStep > 0
+                                ? Colors.white
+                                : const Color(0xFF1E293B),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black38,
-                      blurRadius: 8,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.wc_rounded,
-                      size: 15,
-                      color: mostrarBanios
-                          ? Colors.white
-                          : Colors.blue.shade700,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Baños',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w900,
-                        color: mostrarBanios
-                            ? Colors.white
-                            : Colors.blue.shade800,
-                      ),
-                    ),
-                    if (mostrarBanios) ...[
-                      const SizedBox(width: 4),
-                      const Icon(
-                        Icons.close_rounded,
-                        size: 13,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ],
                 ),
               ),
             ),
 
             const SizedBox(width: 8),
 
-            // Botón Guía Tutorial (Toggle instantáneo)
-            GestureDetector(
-              key: keyComoFunciona,
-              onTap: () {
-                SoundService.instance.playButtonTap();
-                onToggleGuia();
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 9,
-                ),
-                decoration: BoxDecoration(
-                  color: tutorialStep > 0
-                      ? const Color(0xFFF59E0B)
-                      : AppColors.verdeAzulado,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1.5,
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black38,
-                      blurRadius: 8,
-                      offset: Offset(0, 3),
+            // BOTÓN EMERGENCIA SOS INTEGRADO EN CABECERA (Despeja el mapa)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: GestureDetector(
+                  key: keyHelp,
+                  onTap: () {
+                    HapticFeedback.mediumImpact();
+                    SoundService.instance.playButtonTap();
+                    onSOS();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 9,
                     ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.lightbulb_rounded,
-                      size: 16,
-                      color: Color(0xFFFFD54F),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      tutorialStep > 0 ? 'Cerrar Guía' : 'Guía',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w900,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFDC2626), // Rojo emergencia nítido
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
                         color: Colors.white,
+                        width: 1.2,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFDC2626).withValues(alpha: 0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
-                  ],
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.phone_in_talk_rounded,
+                          size: 15,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'SOS',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

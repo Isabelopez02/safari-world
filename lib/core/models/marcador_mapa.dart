@@ -18,6 +18,7 @@ class MarcadorMapa {
   final String? imagen;
   final bool esBanio;
   final Color? colorZona;
+  final String? tipoServicio;
 
   MarcadorMapa({
     required this.id,
@@ -31,6 +32,7 @@ class MarcadorMapa {
     this.imagen,
     this.esBanio = false,
     this.colorZona,
+    this.tipoServicio,
     double? porcentajeX,
     double? porcentajeY,
   })  : porcentajeX = porcentajeX ?? (x / mapaAnchoPorDefecto * 100.0),
@@ -49,6 +51,7 @@ class MarcadorMapa {
     String? imagen,
     bool esBanio = false,
     Color? colorZona,
+    String? tipoServicio,
     double anchoBase = mapaAnchoPorDefecto,
     double altoBase = mapaAltoPorDefecto,
   }) {
@@ -64,6 +67,7 @@ class MarcadorMapa {
       imagen: imagen,
       esBanio: esBanio,
       colorZona: colorZona,
+      tipoServicio: tipoServicio ?? (esBanio ? 'banio' : null),
       porcentajeX: porcentajeX,
       porcentajeY: porcentajeY,
     );

@@ -1,6 +1,8 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,6 +13,7 @@ import 'package:zoologico_front/core/theme/app_colors.dart';
 
 import '../utils/datos_rutas.dart';
 import '../utils/servicio_rutas_svg.dart';
+import '../widgets/barra_filtros_mapa.dart';
 import '../widgets/barra_inferior_mapa.dart';
 import '../widgets/barra_superior_mapa.dart';
 import '../widgets/capa_trazos_mapa.dart';
@@ -61,11 +64,13 @@ class _PantallaMapaState extends State<PantallaMapa>
   final String _nodoActual = 'entrada';
   bool _isNavigating = false;
   bool _mostrarBanios = false;
+  FiltroServicioMapa _filtroServicio = FiltroServicioMapa.todos;
 
   // Marcadores cargados desde AnimalService
   final List<MarcadorMapa> marcadores = AnimalService.instance
       .obtenerTodosLosAnimales();
   final List<MarcadorMapa> banios = AnimalService.instance.obtenerBanios();
+  final List<MarcadorMapa> accesos = AnimalService.instance.obtenerAccesos();
 
   @override
   void initState() {
@@ -176,18 +181,88 @@ class _PantallaMapaState extends State<PantallaMapa>
   }
 
   void _centrarEnUbicacionInicial([bool animate = true]) {
-    final size = MediaQuery.of(context).size;
-    final double scale = math.max(
-      size.width / mapaAncho,
-      size.height / mapaAlto,
-    );
-    final dx = (size.width - mapaAncho * scale) / 2;
-    final dy = (size.height - mapaAlto * scale) / 2;
-    final targetMatrix = Matrix4.identity()
-      ..translateByVector3(vmath.Vector3(dx, dy, 0.0))
-      ..scaleByVector3(vmath.Vector3(scale, scale, 1.0));
+    final nodo = grafoMapa.nodos[_nodoActual];
+    if (nodo != null) {
+      _centrarEnPunto(nodo.posicion.dx, nodo.posicion.dy);
+    } else {
+      final size = MediaQuery.of(context).size;
+      final double scale = math.max(
+        size.width / mapaAncho,
+        size.height / mapaAlto,
+      );
+      final dx = (size.width - mapaAncho * scale) / 2;
+      final dy = (size.height - mapaAlto * scale) / 2;
+      final targetMatrix = Matrix4.identity()
+        ..translateByVector3(vmath.Vector3(dx, dy, 0.0))
+        ..scaleByVector3(vmath.Vector3(scale, scale, 1.0));
 
-    _limitarYCentrar(targetMatrix, animate);
+      _limitarYCentrar(targetMatrix, animate);
+    }
+  }
+
+  bool _isMarkerMatchingFilter(MarcadorMapa marcador) {
+    switch (_filtroServicio) {
+      case FiltroServicioMapa.todos:
+        return true;
+      case FiltroServicioMapa.banio:
+        return marcador.esBanio || marcador.tipoServicio == 'banio';
+      case FiltroServicioMapa.estacionamiento:
+        return marcador.tipoServicio == 'estacionamiento';
+      case FiltroServicioMapa.boleteria:
+        return marcador.tipoServicio == 'boleteria';
+      case FiltroServicioMapa.salida:
+        return marcador.tipoServicio == 'salida';
+      case FiltroServicioMapa.juegos:
+        return marcador.tipoServicio == 'juegos';
+    }
+  }
+
+  void _onFiltroCambiado(FiltroServicioMapa nuevoFiltro) {
+    setState(() {
+      _filtroServicio = nuevoFiltro;
+      if (nuevoFiltro == FiltroServicioMapa.banio) {
+        _mostrarBanios = true;
+      }
+    });
+
+    if (nuevoFiltro != FiltroServicioMapa.todos) {
+      MarcadorMapa? objetivo;
+      if (nuevoFiltro == FiltroServicioMapa.banio) {
+        objetivo = _encontrarBanioMasCercano();
+      } else {
+        final matches =
+            accesos.where((a) => _isMarkerMatchingFilter(a)).toList();
+        if (matches.isNotEmpty) {
+          objetivo = matches.first;
+        }
+      }
+
+      if (objetivo != null) {
+        _centrarEnPunto(objetivo.x, objetivo.y);
+      }
+    } else {
+      _onMyLocationPressed();
+    }
+  }
+
+  MarcadorMapa? _encontrarBanioMasCercano() {
+    MarcadorMapa? mejorBanio;
+    double menorDistancia = double.infinity;
+
+    for (final banio in banios) {
+      final ruta = grafoMapa.encontrarRutaMasCorta(_nodoActual, banio.id);
+      if (ruta.isNotEmpty) {
+        double dist = 0;
+        for (int i = 0; i < ruta.length - 1; i++) {
+          dist += (ruta[i] - ruta[i + 1]).distance;
+        }
+        if (dist < menorDistancia) {
+          menorDistancia = dist;
+          mejorBanio = banio;
+        }
+      }
+    }
+    return mejorBanio ?? (banios.isNotEmpty ? banios.first : null);
   }
 
   void _centrarEnPunto(double x, double y) {
@@ -198,7 +273,7 @@ class _PantallaMapaState extends State<PantallaMapa>
     );
     final double currentScale = _transformationController.value
         .getMaxScaleOnAxis();
-    final double zoomScale = math.max(currentScale, math.max(minMapScale, 1.4));
+    final double zoomScale = math.max(currentScale, math.max(minMapScale, 1.35));
 
     final double dx = (size.width / 2) - (x * zoomScale);
     final double dy = (size.height / 2) - (y * zoomScale);
@@ -250,90 +325,6 @@ class _PantallaMapaState extends State<PantallaMapa>
     });
     _centrarEnPunto(marcador.x, marcador.y);
     _routeProgressController.forward(from: 0);
-  }
-
-  void _dirigirAlBanioMasCercano() {
-    SoundService.instance.playButtonTap();
-
-    // 1. Mostrar los paraderos de baños en el mapa si estaban ocultos
-    setState(() {
-      _mostrarBanios = true;
-    });
-
-    // 2. Si ya estábamos navegando a un baño y se vuelve a presionar, toggle off
-    if (_marcadorSeleccionado != null &&
-        _marcadorSeleccionado!.esBanio &&
-        _isNavigating) {
-      setState(() {
-        _marcadorSeleccionado = null;
-        _isNavigating = false;
-        _rutaActual = [];
-        _rutaSvgActual = null;
-        _mostrarBanios = false;
-      });
-      return;
-    }
-
-    // 3. Buscar el baño más cercano calculando la ruta más corta
-    MarcadorMapa? mejorBanio;
-    List<Offset> mejorRuta = [];
-    double menorDistancia = double.infinity;
-
-    for (final banio in banios) {
-      final ruta = grafoMapa.encontrarRutaMasCorta(_nodoActual, banio.id);
-      if (ruta.isNotEmpty) {
-        double dist = 0;
-        for (int i = 0; i < ruta.length - 1; i++) {
-          dist += (ruta[i] - ruta[i + 1]).distance;
-        }
-        if (dist < menorDistancia) {
-          menorDistancia = dist;
-          mejorBanio = banio;
-          mejorRuta = ruta;
-        }
-      }
-    }
-
-    final destino = mejorBanio ?? banios.first;
-    final rutaFinal = mejorRuta.isNotEmpty
-        ? mejorRuta
-        : grafoMapa.encontrarRutaMasCorta(_nodoActual, destino.id);
-
-    // 4. Activar navegación directa hacia el paradero del baño
-    setState(() {
-      _marcadorSeleccionado = destino;
-      _isNavigating = true;
-      _rutaActual = rutaFinal;
-      _rutaSvgActual = ServicioRutasSvg.obtenerRutaHacia(destino);
-    });
-
-    _centrarEnPunto(destino.x, destino.y);
-    _routeProgressController.forward(from: 0);
-
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.blue.shade700,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        content: Row(
-          children: [
-            const Icon(Icons.wc_rounded, color: Colors.white, size: 20),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Dirigiéndote al paradero de ${destino.nombre} (#${destino.id})',
-                style: GoogleFonts.urbanist(
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
-        duration: const Duration(seconds: 3),
-      ),
-    );
   }
 
   Rect _getRect(GlobalKey key) {
@@ -394,6 +385,9 @@ class _PantallaMapaState extends State<PantallaMapa>
       screenSize.width / mapaAncho,
       screenSize.height / mapaAlto,
     );
+    final double currentScale =
+        _transformationController.value.getMaxScaleOnAxis();
+    final bool mostrarEtiquetasAnimales = currentScale >= 1.25;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -435,29 +429,75 @@ class _PantallaMapaState extends State<PantallaMapa>
                     ),
                     // PARADEROS DE ANIMALES
                     ...marcadores.map((marcador) {
+                      final bool matches = _isMarkerMatchingFilter(marcador);
+                      final bool isDimmed =
+                          _filtroServicio != FiltroServicioMapa.todos &&
+                          !matches;
+                      final bool isHighlighted =
+                          _filtroServicio != FiltroServicioMapa.todos &&
+                          matches;
+
                       return Positioned(
                         left: marcador.x - 35,
                         top: marcador.y - 14,
                         child: MarcadorAnimado(
                           marcador: marcador,
                           isSelected: _marcadorSeleccionado?.id == marcador.id,
+                          isDimmed: isDimmed,
+                          isHighlighted: isHighlighted,
+                          mostrarEtiqueta: mostrarEtiquetasAnimales,
                           onTap: () => _mostrarInfoMarcador(marcador),
                         ),
                       );
                     }),
-                    // PARADEROS DE BAÑOS (si el filtro está activo)
-                    if (_mostrarBanios)
+                    // PARADEROS DE BAÑOS (si el filtro está activo o se filtraron baños)
+                    if (_mostrarBanios ||
+                        _filtroServicio == FiltroServicioMapa.banio)
                       ...banios.map((banio) {
+                        final bool matches = _isMarkerMatchingFilter(banio);
+                        final bool isDimmed =
+                            _filtroServicio != FiltroServicioMapa.todos &&
+                            !matches;
+                        final bool isHighlighted =
+                            _filtroServicio != FiltroServicioMapa.todos &&
+                            matches;
+
                         return Positioned(
                           left: banio.x - 27,
                           top: banio.y - 12,
                           child: MarcadorAnimado(
                             marcador: banio,
                             isSelected: _marcadorSeleccionado?.id == banio.id,
+                            isDimmed: isDimmed,
+                            isHighlighted: isHighlighted,
+                            mostrarEtiqueta: true,
                             onTap: () => _mostrarInfoMarcador(banio),
                           ),
                         );
                       }),
+                    // PARADEROS DE ACCESOS, ESTACIONAMIENTOS, SALIDAS Y JUEGOS
+                    ...accesos.map((acceso) {
+                      final bool matches = _isMarkerMatchingFilter(acceso);
+                      final bool isDimmed =
+                          _filtroServicio != FiltroServicioMapa.todos &&
+                          !matches;
+                      final bool isHighlighted =
+                          _filtroServicio != FiltroServicioMapa.todos &&
+                          matches;
+
+                      return Positioned(
+                        left: acceso.x - 35,
+                        top: acceso.y - 14,
+                        child: MarcadorAnimado(
+                          marcador: acceso,
+                          isSelected: _marcadorSeleccionado?.id == acceso.id,
+                          isDimmed: isDimmed,
+                          isHighlighted: isHighlighted,
+                          mostrarEtiqueta: true,
+                          onTap: () => _mostrarInfoMarcador(acceso),
+                        ),
+                      );
+                    }),
                     // ONDA DE RADAR EXPANSIVA EN LA UBICACIÓN DEL USUARIO
                     if (grafoMapa.nodos.containsKey(_nodoActual)) ...[
                       Positioned(
@@ -567,12 +607,12 @@ class _PantallaMapaState extends State<PantallaMapa>
             ),
           ),
 
-          // SOMBRA AMBIENTAL SUPERIOR PARA CONTRASTE DEL MAPA
+          // SOMBRA AMBIENTAL SUPERIOR PARA CONTRASTE DEL MAPA Y FILTROS
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            height: 120,
+            height: 160,
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
@@ -580,7 +620,8 @@ class _PantallaMapaState extends State<PantallaMapa>
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withValues(alpha: 0.55),
+                      Colors.black.withValues(alpha: 0.65),
+                      Colors.black.withValues(alpha: 0.25),
                       Colors.transparent,
                     ],
                   ),
@@ -589,74 +630,97 @@ class _PantallaMapaState extends State<PantallaMapa>
             ),
           ),
 
-          // BARRA SUPERIOR MODULAR (Regresar, Baños y Guía)
+          // BARRA SUPERIOR MODULAR (Regresar, Baños y Guía) + BARRA DE FILTROS RÁPIDOS
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            child: BarraSuperiorMapa(
-              onRegresar: () => Navigator.pop(context),
-              mostrarBanios: _mostrarBanios,
-              onToggleBanios: _dirigirAlBanioMasCercano,
-              tutorialStep: _tutorialStep,
-              onToggleGuia: () {
-                setState(() {
-                  _tutorialStep = (_tutorialStep > 0 ? 0 : 1);
-                });
-              },
-              keyComoFunciona: _keyComoFunciona,
-            ),
-          ),
-
-          // BOTONES FLOTANTES CIRCULARES PERFECTOS (SOS, Búsqueda, Mi Ubicación)
-          // Con padding inferior dinámico para que no los tape la barra del celular
-          Positioned(
-            right: 16,
-            bottom: 140 + MediaQuery.of(context).padding.bottom,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Botón Emergencia SOS
-                _buildCircularActionButton(
-                  key: _keyHelp,
-                  color: const Color(0xFFD32F2F),
-                  iconColor: Colors.white,
-                  icon: Icons.phone_in_talk_rounded,
-                  size: 46,
-                  iconSize: 20,
-                  onPressed: () {
-                    EmergencyService.instance.mostrarModalEmergencia(context);
+                BarraSuperiorMapa(
+                  onRegresar: () => Navigator.pop(context),
+                  onSOS: () => EmergencyService.instance.mostrarModalEmergencia(context),
+                  keyHelp: _keyHelp,
+                  tutorialStep: _tutorialStep,
+                  onToggleGuia: () {
+                    setState(() {
+                      _tutorialStep = (_tutorialStep > 0 ? 0 : 1);
+                    });
                   },
+                  keyComoFunciona: _keyComoFunciona,
                 ),
-                const SizedBox(height: 12),
-
-                // Botón Búsqueda y Exploraciones
-                _buildCircularActionButton(
-                  key: _keySearch,
-                  color: Colors.white,
-                  iconColor: AppColors.verdeAzulado,
-                  icon: Icons.search_rounded,
-                  size: 46,
-                  iconSize: 22,
-                  onPressed: () => _mostrarAnimalesPorVisitar(context),
-                ),
-                const SizedBox(height: 16),
-
-                // Botón Mi Ubicación Radar
-                _buildCircularActionButton(
-                  key: _keyFab,
-                  color: AppColors.verdeAzulado,
-                  iconColor: Colors.white,
-                  icon: Icons.my_location_rounded,
-                  size: 54,
-                  iconSize: 26,
-                  onPressed: _onMyLocationPressed,
+                BarraFiltrosMapa(
+                  filtroSeleccionado: _filtroServicio,
+                  onFiltroCambiado: _onFiltroCambiado,
                 ),
               ],
             ),
           ),
 
-          // COMPONENTE BARRA INFERIOR REUTILIZABLE
+          // ISLA FLOTANTE DE CONTROL DERECHO (Buscar + Mi Ubicación con Cristal)
+          Positioned(
+            right: 16,
+            bottom: 110 + MediaQuery.of(context).padding.bottom,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.90),
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(
+                      color: const Color(0xFFCBD5E1),
+                      width: 1.2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.12),
+                        blurRadius: 14,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        key: _keySearch,
+                        icon: const Icon(Icons.search_rounded),
+                        color: AppColors.verdeAzulado,
+                        iconSize: 22,
+                        tooltip: 'Buscar en el parque',
+                        onPressed: () {
+                          HapticFeedback.lightImpact();
+                          _mostrarAnimalesPorVisitar(context);
+                        },
+                      ),
+                      Container(
+                        width: 22,
+                        height: 1,
+                        color: const Color(0xFFE2E8F0),
+                      ),
+                      IconButton(
+                        key: _keyFab,
+                        icon: const Icon(Icons.my_location_rounded),
+                        color: AppColors.verdeAzulado,
+                        iconSize: 22,
+                        tooltip: 'Mi ubicación',
+                        onPressed: () {
+                          HapticFeedback.lightImpact();
+                          _onMyLocationPressed();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // COMPONENTE BARRA INFERIOR REUTILIZABLE (Cápsula Flotante)
           Positioned(
             bottom: 0,
             left: 0,
@@ -706,43 +770,6 @@ class _PantallaMapaState extends State<PantallaMapa>
               onSkip: _finishTutorial,
             ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildCircularActionButton({
-    Key? key,
-    required Color color,
-    required Color iconColor,
-    required IconData icon,
-    required double size,
-    required double iconSize,
-    required VoidCallback onPressed,
-  }) {
-    return GestureDetector(
-      key: key,
-      onTap: () {
-        SoundService.instance.playButtonTap();
-        onPressed();
-      },
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2.5),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 8,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Icon(icon, color: iconColor, size: iconSize),
-        ),
       ),
     );
   }

@@ -108,7 +108,7 @@ class TutorialOverlay extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  'GUÍA DE SAFARI · PASO $step DE $totalSteps',
+                                  'PASO $step/$totalSteps',
                                   style: GoogleFonts.urbanist(
                                     color: AppColors.verdeAzulado,
                                     fontSize: 11,

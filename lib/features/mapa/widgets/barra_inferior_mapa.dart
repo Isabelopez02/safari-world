@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
@@ -38,49 +39,60 @@ class BarraInferiorMapa extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      child: Container(
-        key: keyAnimales,
-        padding: EdgeInsets.fromLTRB(
-          22,
-          14,
-          22,
-          14 + MediaQuery.of(context).padding.bottom,
-        ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 14,
-              offset: Offset(0, -5),
-            ),
-          ],
-        ),
-        child: AnimatedSwitcher(
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+        child: AnimatedSize(
           duration: const Duration(milliseconds: 300),
-          switchInCurve: Curves.easeOutBack,
-          transitionBuilder: (child, animation) {
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 0.12),
-                end: Offset.zero,
-              ).animate(animation),
-              child: FadeTransition(opacity: animation, child: child),
-            );
-          },
-          child: KeyedSubtree(
-            key: ValueKey(
-              '${marcadorSeleccionado?.id ?? -1}_${isNavigating ? "nav" : "view"}',
+          curve: Curves.easeInOut,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                key: keyAnimales,
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.94),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: const Color(0xFFCBD5E1),
+                    width: 1.2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.12),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  switchInCurve: Curves.easeOutBack,
+                  transitionBuilder: (child, animation) {
+                    return SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 0.12),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: FadeTransition(opacity: animation, child: child),
+                    );
+                  },
+                  child: KeyedSubtree(
+                    key: ValueKey(
+                      '${marcadorSeleccionado?.id ?? -1}_${isNavigating ? "nav" : "view"}',
+                    ),
+                    child: marcadorSeleccionado == null
+                        ? _buildBarraExploracion(context)
+                        : (!isNavigating
+                              ? _buildBarraVistaPrevia(context)
+                              : _buildBarraNavegando(context)),
+                  ),
+                ),
+              ),
             ),
-            child: marcadorSeleccionado == null
-                ? _buildBarraExploracion(context)
-                : (!isNavigating
-                      ? _buildBarraVistaPrevia(context)
-                      : _buildBarraNavegando(context)),
           ),
         ),
       ),
@@ -89,6 +101,8 @@ class BarraInferiorMapa extends StatelessWidget {
 
   Widget _buildBarraExploracion(BuildContext context) {
     final int visitados = marcadores.where((m) => m.visitado).length;
+    final double pct =
+        marcadores.isEmpty ? 0.0 : (visitados / marcadores.length);
 
     return GestureDetector(
       onTap: onTapExploraciones,
@@ -104,81 +118,112 @@ class BarraInferiorMapa extends StatelessWidget {
                 child: const Icon(
                   Icons.keyboard_arrow_up_rounded,
                   color: AppColors.verdeAzulado,
-                  size: 26,
+                  size: 22,
                 ),
               );
             },
           ),
-          const SizedBox(height: 2),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Tus Exploraciones',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.verdePrincipal,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.explore_rounded,
+                          size: 18,
+                          color: AppColors.verdeAzulado,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Tus Exploraciones',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 16.5,
+                            fontWeight: FontWeight.w900,
+                            color: const Color(0xFF1E293B),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 3),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 3,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.verdeAzulado.withValues(alpha: 0.18),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '$visitados/${marcadores.length} descubiertos',
+                    const SizedBox(height: 3),
+                    Text(
+                      '$visitados de ${marcadores.length} animales descubiertos (${(pct * 100).toInt()}%)',
                       style: GoogleFonts.urbanist(
                         fontSize: 12,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.verdeAzulado,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                children: List.generate(
-                  marcadores.length > 3 ? 3 : marcadores.length,
-                  (index) {
-                    final m = marcadores[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 4.0),
-                      child: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: m.visitado
-                              ? AppColors.verdeClaro
-                              : Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: m.visitado
-                                ? Colors.transparent
-                                : Colors.grey.withValues(alpha: 0.3),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: SizedBox(
+                        width: 160,
+                        child: LinearProgressIndicator(
+                          value: pct,
+                          backgroundColor:
+                              AppColors.verdeAzulado.withValues(alpha: 0.15),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            AppColors.verdeAzulado,
                           ),
-                        ),
-                        child: Icon(
-                          m.icono,
-                          color: m.visitado ? Colors.white : Colors.grey,
-                          size: 18,
+                          minHeight: 4.5,
                         ),
                       ),
-                    );
-                  },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              // BOTÓN ELEGANTE EXPLORAR (Reemplaza los 3 circulitos confusos)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 9,
+                ),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      AppColors.verdeAzulado,
+                      AppColors.verdePrincipal,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.verdeAzulado.withValues(alpha: 0.35),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Explorar',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 2),
         ],
       ),
     );

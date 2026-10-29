@@ -10,12 +10,18 @@ class MarcadorAnimado extends StatefulWidget {
   final MarcadorMapa marcador;
   final VoidCallback onTap;
   final bool isSelected;
+  final bool isDimmed;
+  final bool isHighlighted;
+  final bool mostrarEtiqueta;
 
   const MarcadorAnimado({
     super.key,
     required this.marcador,
     required this.onTap,
     this.isSelected = false,
+    this.isDimmed = false,
+    this.isHighlighted = false,
+    this.mostrarEtiqueta = true,
   });
 
   @override
@@ -126,8 +132,33 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.marcador.esBanio) return _buildBathroomPin();
-    return _buildAnimalParadero();
+    final Widget pinWidget = widget.marcador.esBanio
+        ? _buildBathroomPin()
+        : _buildAnimalParadero();
+
+    // Si el filtro no coincide con este marcador, se torna plomo (grayscale) con opacidad reducida
+    if (widget.isDimmed) {
+      return AnimatedOpacity(
+        duration: const Duration(milliseconds: 260),
+        opacity: 0.28,
+        child: ColorFiltered(
+          colorFilter: const ColorFilter.matrix(<double>[
+            0.2126, 0.7152, 0.0722, 0, 0,
+            0.2126, 0.7152, 0.0722, 0, 0,
+            0.2126, 0.7152, 0.0722, 0, 0,
+            0,      0,      0,      1, 0,
+          ]),
+          child: pinWidget,
+        ),
+      );
+    }
+
+    // Marcador activo o enfocado: opacidad total y colores vívidos
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 260),
+      opacity: 1.0,
+      child: pinWidget,
+    );
   }
 
   Widget _buildAnimalParadero() {
@@ -201,62 +232,65 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                     child: _buildAvatarWithPulse(pinSize, borderColor),
                   ),
                 ),
-                // Letras más pegadas a la imagen y con tamaño más pequeño y legible
-                Transform.translate(
-                  offset: const Offset(0, -2.5),
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 66),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 4,
-                      vertical: 1.0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B), // Azul grafito oscuro de alto contraste
-                      borderRadius: BorderRadius.circular(6),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black45,
-                          blurRadius: 3,
-                          offset: Offset(0, 1),
+                // Letras solo visibles si mostrarEtiqueta está activo o si el marcador está seleccionado/enfocado
+                if (widget.mostrarEtiqueta ||
+                    widget.isSelected ||
+                    widget.isHighlighted)
+                  Transform.translate(
+                    offset: const Offset(0, -2.5),
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 66),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 1.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E293B), // Azul grafito oscuro de alto contraste
+                        borderRadius: BorderRadius.circular(6),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black45,
+                            blurRadius: 3,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                        border: Border.all(
+                          color: widget.isSelected
+                              ? const Color(0xFFFFB74D)
+                              : colorZona,
+                          width: 1.0,
                         ),
-                      ],
-                      border: Border.all(
-                        color: widget.isSelected
-                            ? const Color(0xFFFFB74D)
-                            : colorZona,
-                        width: 1.0,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            widget.marcador.visitado ? '✓ ' : '🐾 ',
+                            style: TextStyle(
+                              fontSize: 6.5,
+                              color: widget.marcador.visitado
+                                  ? const Color(0xFF81C784)
+                                  : const Color(0xFFFFD54F),
+                            ),
+                          ),
+                          Flexible(
+                            child: Text(
+                              widget.marcador.nombre,
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 8.0,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                letterSpacing: 0.1,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          widget.marcador.visitado ? '✓ ' : '🐾 ',
-                          style: TextStyle(
-                            fontSize: 6.5,
-                            color: widget.marcador.visitado
-                                ? const Color(0xFF81C784)
-                                : const Color(0xFFFFD54F),
-                          ),
-                        ),
-                        Flexible(
-                          child: Text(
-                            widget.marcador.nombre,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.urbanist(
-                              fontSize: 8.0,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              letterSpacing: 0.1,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
-                ),
               ],
             ),
           ],
@@ -427,35 +461,38 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                 );
               },
             ),
-            Transform.translate(
-              offset: const Offset(0, -2),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0D47A1),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1.0,
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black38,
-                      blurRadius: 3,
-                      offset: Offset(0, 1),
+            if (widget.mostrarEtiqueta ||
+                widget.isSelected ||
+                widget.isHighlighted)
+              Transform.translate(
+                offset: const Offset(0, -2),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0D47A1),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 1.0,
                     ),
-                  ],
-                ),
-                child: Text(
-                  '🚻 Baños',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 7.5,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 3,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    '🚻 Baños',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 7.5,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),

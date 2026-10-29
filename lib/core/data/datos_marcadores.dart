@@ -464,33 +464,104 @@ final List<MarcadorMapa> marcadoresZoologico = [
   ),
 ];
 
-/// Lista de baños (WC) del mapa
+/// Lista de baños (WC) del mapa (4 servicios higiénicos distribuidos estratégicamente)
 final List<MarcadorMapa> baniosZoologico = [
   MarcadorMapa.desdePorcentaje(
     id: 'B01',
-    nombre: 'Baño Granja & Costa',
+    nombre: 'Baño Entrada & Plaza Principal',
+    porcentajeX: 46.0,
+    porcentajeY: 76.0,
+    icono: Icons.wc_rounded,
+    habitat: 'Entrada y Plaza Central',
+    esBanio: true,
+    tipoServicio: 'banio',
+    colorZona: const Color(0xFF0284C7),
+  ),
+  MarcadorMapa.desdePorcentaje(
+    id: 'B02',
+    nombre: 'Baño Costa & Acuario',
     porcentajeX: 42.0,
     porcentajeY: 50.0,
     icono: Icons.wc_rounded,
     habitat: 'Zona Costa',
     esBanio: true,
+    tipoServicio: 'banio',
+    colorZona: const Color(0xFF0284C7),
   ),
   MarcadorMapa.desdePorcentaje(
-    id: 'B02',
+    id: 'B03',
     nombre: 'Baño Central Internacional',
     porcentajeX: 60.0,
     porcentajeY: 45.0,
     icono: Icons.wc_rounded,
     habitat: 'Zona Internacional',
     esBanio: true,
+    tipoServicio: 'banio',
+    colorZona: const Color(0xFF0284C7),
   ),
   MarcadorMapa.desdePorcentaje(
-    id: 'B03',
+    id: 'B04',
     nombre: 'Baño Zona Sierra & Selva',
     porcentajeX: 68.0,
     porcentajeY: 65.0,
     icono: Icons.wc_rounded,
     habitat: 'Zona Selva',
     esBanio: true,
+    tipoServicio: 'banio',
+    colorZona: const Color(0xFF0284C7),
+  ),
+];
+
+/// Lista de accesos y servicios clave (conectados a nodos principales para rápido acceso)
+final List<MarcadorMapa> accesosZoologico = [
+  MarcadorMapa.desdePorcentaje(
+    id: 'ENT_01',
+    nombre: 'Boletería & Entrada Principal',
+    porcentajeX: 59, // Exactamente en nodo 'entrada' (878.4, 852.3)
+    porcentajeY: 60,
+    icono: Icons.confirmation_number_rounded,
+    habitat: 'Entrada y Plaza Central',
+    colorZona: const Color(0xFFD97706),
+    tipoServicio: 'boleteria',
+  ),
+  MarcadorMapa.desdePorcentaje(
+    id: 'SAL_01',
+    nombre: 'Salida Principal & Retorno',
+    porcentajeX: 55, // Pórtico peatonal de salida (separado de la entrada)
+    porcentajeY: 65,
+    icono: Icons.logout_rounded,
+    habitat: 'Entrada y Plaza Central',
+    colorZona: const Color(0xFFE11D48),
+    tipoServicio: 'salida',
+  ),
+  MarcadorMapa.desdePorcentaje(
+    id: 'EST_01',
+    nombre: 'Estacionamiento Principal',
+    porcentajeX: 58.0, // Ubicado sobre la ilustración real de autos y palmeras "ESTACION..."
+    porcentajeY: 63.0,
+    icono: Icons.local_parking_rounded,
+    habitat: 'Entrada y Plaza Central',
+    colorZona: const Color(0xFF2563EB),
+    tipoServicio: 'estacionamiento',
+  ),
+  MarcadorMapa.desdePorcentaje(
+    id: 'EST_02',
+    nombre: 'Estacionamiento - Bahía 2',
+    porcentajeX: 79.0, // Bahía contigua del área de estacionamiento
+    porcentajeY: 25.0,
+    icono: Icons.local_parking_rounded,
+    habitat: 'Entrada y Plaza Central',
+    colorZona: const Color(0xFF3B82F6),
+    tipoServicio: 'estacionamiento',
+  ),
+  MarcadorMapa.desdePorcentaje(
+    id: 'JUE_01',
+    nombre: 'Zona de Juegos Infantiles',
+    porcentajeX: 46, // En la plaza recreativa central junto a 'plaza_principal'
+    porcentajeY: 40,
+    icono: Icons.attractions_rounded, // Carrusel / Juegos mecánicos infantiles
+    habitat: 'Entrada y Plaza Central',
+    colorZona: const Color(0xFF9333EA),
+    tipoServicio: 'juegos',
   ),
 ];

@@ -94,12 +94,14 @@ final GrafoZoolologico grafoMapa = () {
     double distMin = double.infinity;
 
     for (final caminoId in [
+      'entrada',
       'plaza_principal',
       'camino_costa_1',
       'camino_costa_2',
       'camino_inter_1',
       'camino_selva_2',
       'camino_sierra_1',
+      'camino_sierra_2',
     ]) {
       final caminoNodo = grafo.nodos[caminoId];
       if (caminoNodo != null) {
@@ -113,6 +115,34 @@ final GrafoZoolologico grafoMapa = () {
 
     if (nodoMasCercano != null) {
       grafo.agregarArista(nodoMasCercano, banio.id);
+    }
+  }
+
+  // 3. Agregar accesos, estacionamientos y salidas al grafo
+  for (final acceso in accesosZoologico) {
+    grafo.agregarNodo(acceso.id, acceso.x, acceso.y);
+
+    String? nodoMasCercano;
+    double distMin = double.infinity;
+
+    for (final caminoId in [
+      'entrada',
+      'plaza_principal',
+      'camino_costa_1',
+      'camino_sierra_2',
+    ]) {
+      final caminoNodo = grafo.nodos[caminoId];
+      if (caminoNodo != null) {
+        final dist = (caminoNodo.posicion - Offset(acceso.x, acceso.y)).distance;
+        if (dist < distMin) {
+          distMin = dist;
+          nodoMasCercano = caminoId;
+        }
+      }
+    }
+
+    if (nodoMasCercano != null) {
+      grafo.agregarArista(nodoMasCercano, acceso.id);
     }
   }
 

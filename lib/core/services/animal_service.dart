@@ -144,9 +144,46 @@ class AnimalService extends ChangeNotifier {
     ];
   }
 
-  /// Retorna todos los paraderos de baños disponibles.
+  /// Retorna exclusivamente la lista de los 5 hábitats principales sin 'Todos'.
+  List<String> obtenerHabitatsPrincipales() {
+    return const [
+      'Granja Interactiva',
+      'Zona Internacional',
+      'Zona Costa',
+      'Zona Sierra',
+      'Zona Selva',
+    ];
+  }
+
+  /// Retorna la cantidad total de animales en un hábitat específico.
+  int totalEnHabitat(String habitat) {
+    if (habitat == 'Todos') return totalAnimales;
+    return marcadoresZoologico.where((a) => a.habitat == habitat).length;
+  }
+
+  /// Retorna la cantidad de animales visitados en un hábitat específico.
+  int totalVisitadosEnHabitat(String habitat) {
+    if (habitat == 'Todos') return totalVisitados;
+    return marcadoresZoologico
+        .where((a) => a.habitat == habitat && _visitadosIds.contains(a.id))
+        .length;
+  }
+
+  /// Retorna el porcentaje de avance (0.0 a 1.0) en un hábitat específico.
+  double porcentajeVisitadosEnHabitat(String habitat) {
+    final total = totalEnHabitat(habitat);
+    if (total == 0) return 0.0;
+    return totalVisitadosEnHabitat(habitat) / total;
+  }
+
+  /// Retorna todos los paraderos de baños disponibles (4 en total).
   List<MarcadorMapa> obtenerBanios() {
     return List.unmodifiable(baniosZoologico);
+  }
+
+  /// Retorna los puntos de acceso, entradas, salidas y estacionamientos.
+  List<MarcadorMapa> obtenerAccesos() {
+    return List.unmodifiable(accesosZoologico);
   }
 
   /// Busca animales por nombre o hábitat.
