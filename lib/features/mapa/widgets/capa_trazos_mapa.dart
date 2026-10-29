@@ -61,8 +61,8 @@ class CapaTrazosMapa extends StatelessWidget {
           ),
         ),
 
-        // 3. Marcador guía animado que se desplaza exactamente sobre la curva SVG
-        if (rutaSvg != null && progreso > 0.0)
+        // 3. Marcador guía animado que se desplaza exactamente sobre la curva SVG (solo durante navegación activa)
+        if (estaNavegando && rutaSvg != null && progreso > 0.0)
           _buildMarcadorGuiaAnimado(),
       ],
     );

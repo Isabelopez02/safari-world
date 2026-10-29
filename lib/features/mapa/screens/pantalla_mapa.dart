@@ -314,8 +314,14 @@ class _PantallaMapaState extends State<PantallaMapa>
   }
 
   void _mostrarInfoMarcador(MarcadorMapa marcador) {
+    final origen =
+        grafoMapa.nodos[_nodoActual]?.posicion ??
+        ServicioRutasSvg.puntoEntradaOficial;
     final nuevaRuta = grafoMapa.encontrarRutaMasCorta(_nodoActual, marcador.id);
-    final rutaSvg = ServicioRutasSvg.obtenerRutaHacia(marcador);
+    final rutaSvg = ServicioRutasSvg.obtenerRutaHacia(
+      marcador,
+      origen: origen,
+    );
     setState(() {
       _marcadorSeleccionado = marcador;
       // Si el usuario toca un baño, iniciar de inmediato la navegación activa hacia él

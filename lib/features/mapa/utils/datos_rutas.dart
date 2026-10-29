@@ -6,7 +6,8 @@ import '../../../../core/data/datos_marcadores.dart';
 final GrafoZoolologico grafoMapa = () {
   final grafo = GrafoZoolologico()
     // 1. NODOS PRINCIPALES DE LOS CAMINOS Y CRUCES DEL PARQUE
-    ..agregarNodo('entrada', 878.4, 852.3)
+    // 'entrada' en 58% X (1113.6) y 58% Y (626.4) según ubicación del usuario
+    ..agregarNodo('entrada', 1113.6, 626.4)
     ..agregarNodo('plaza_principal', 900.0, 680.0)
     // Caminos hacia Costa y Granja (Oeste / Suroeste)
     ..agregarNodo('camino_costa_1', 750.0, 500.0)

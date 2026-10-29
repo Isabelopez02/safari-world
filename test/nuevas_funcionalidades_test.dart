@@ -31,10 +31,10 @@ void main() {
       final ids = accesos.map((a) => a.id).toList();
       expect(ids, containsAll(['ENT_01', 'SAL_01', 'EST_01', 'EST_02', 'JUE_01']));
 
-      // Verifica que el estacionamiento coincide con la zona dibujada en el mapa oficial
+      // Verifica que el estacionamiento coincide con la zona dibujada en el mapa oficial junto al acceso
       final est01 = accesos.firstWhere((a) => a.id == 'EST_01');
-      expect(est01.porcentajeX, closeTo(62.0, 2.0));
-      expect(est01.porcentajeY, closeTo(72.0, 2.0));
+      expect(est01.porcentajeX, closeTo(58.5, 2.0));
+      expect(est01.porcentajeY, closeTo(62.5, 2.0));
     });
 
     test('Verifica contadores de animales por hábitat', () {

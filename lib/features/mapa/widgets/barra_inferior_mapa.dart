@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -232,51 +233,31 @@ class BarraInferiorMapa extends StatelessWidget {
   Widget _buildBarraVistaPrevia(BuildContext context) {
     final sel = marcadorSeleccionado!;
 
+    // Distancia y tiempo estimado desde la ubicación actual del usuario (58%, 58% -> 1113.6, 626.4)
+    const userPos = Offset(1113.6, 626.4);
+    final distPx = (Offset(sel.x, sel.y) - userPos).distance;
+    final int metros = (distPx * (800 / 1920)).round().clamp(25, 950);
+    final int minutos = math.max(1, (metros / 65).round());
+
+    final bool esServicio = sel.esBanio || sel.tipoServicio != null;
+    final Color colorAcento = sel.esBanio
+        ? const Color(0xFF0284C7)
+        : (sel.colorZona ?? AppColors.verdeAzulado);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // 1. BANNER NOTORIO DE ATENCIÓN: INDICA CLARAMENTE QUE SE SELECCIONÓ EL ANIMAL
-        Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-          decoration: BoxDecoration(
-            color: sel.esBanio
-                ? Colors.blue.shade50
-                : AppColors.verdeAzulado.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: sel.esBanio
-                  ? Colors.blue.shade300
-                  : AppColors.verdeAzulado.withValues(alpha: 0.35),
-              width: 1.2,
+        // 1. DRAG HANDLE SUTIL (Estilo Bottom Sheet moderno iOS / Material 3)
+        Center(
+          child: Container(
+            width: 38,
+            height: 4,
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(2),
             ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                sel.esBanio ? Icons.wc_rounded : Icons.pets_rounded,
-                color: sel.esBanio
-                    ? Colors.blue.shade700
-                    : AppColors.verdeAzulado,
-                size: 16,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  sel.esBanio
-                      ? '📍 ¡Baños seleccionados! Elige una opción abajo 👇'
-                      : '📍 ¡Seleccionaste a ${sel.nombre}! Elige una opción abajo 👇',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w900,
-                    color: sel.esBanio
-                        ? Colors.blue.shade800
-                        : AppColors.verdeAzulado,
-                  ),
-                ),
-              ),
-            ],
           ),
         ),
 
@@ -284,67 +265,105 @@ class BarraInferiorMapa extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // AVATAR DEL ANIMAL O SERVICIO
             Container(
               width: 54,
               height: 54,
               decoration: BoxDecoration(
-                color: sel.esBanio
-                    ? Colors.blue.shade50
-                    : AppColors.verdeAzulado.withValues(alpha: 0.15),
+                color: colorAcento.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: sel.esBanio
-                      ? Colors.blue.shade200
-                      : AppColors.verdeAzulado.withValues(alpha: 0.3),
+                  color: colorAcento.withValues(alpha: 0.35),
                   width: 1.5,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: colorAcento.withValues(alpha: 0.12),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(14),
                 child: sel.esBanio
-                    ? Icon(
+                    ? const Icon(
                         Icons.wc_rounded,
-                        color: Colors.blue.shade700,
+                        color: Color(0xFF0284C7),
                         size: 28,
                       )
                     : (sel.imagen != null
-                          ? Image.asset(sel.imagen!, fit: BoxFit.cover)
-                          : Icon(
+                        ? Image.asset(sel.imagen!, fit: BoxFit.cover)
+                        : Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  colorAcento.withValues(alpha: 0.15),
+                                  colorAcento.withValues(alpha: 0.3),
+                                ],
+                              ),
+                            ),
+                            child: Icon(
                               sel.icono,
-                              color: AppColors.verdeAzulado,
+                              color: colorAcento,
                               size: 28,
-                            )),
+                            ),
+                          )),
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 12),
+
+            // TÍTULO Y METADATOS HUMANOS (HÁBITAT + DISTANCIA REAL A PIE)
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     sel.esBanio ? 'Servicios Higiénicos' : sel.nombre,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.urbanist(
-                      fontSize: 19,
+                      fontSize: 18.5,
                       fontWeight: FontWeight.w900,
-                      color: sel.esBanio
-                          ? Colors.blue.shade800
-                          : AppColors.textoOscuro,
+                      color: AppColors.textoOscuro,
                     ),
                   ),
-                  Text(
-                    sel.esBanio
-                        ? 'Baños públicos disponibles'
-                        : '${sel.categoria} · Zona #${sel.id}',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 13,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w700,
-                    ),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: [
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          color: colorAcento,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          sel.esBanio
+                              ? 'Baños públicos · ~$minutos min ($metros m)'
+                              : '${sel.habitat} · ~$minutos min a pie ($metros m)',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.urbanist(
+                            fontSize: 12.5,
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            if (!sel.esBanio)
+
+            // BOTÓN MARCAR VISITADO (Si es animal)
+            if (!esServicio) ...[
               GestureDetector(
                 onTap: () async {
                   SoundService.instance.playButtonTap();
@@ -374,8 +393,8 @@ class BarraInferiorMapa extends StatelessWidget {
                       Icon(
                         sel.visitado
                             ? Icons.check_circle_rounded
-                            : Icons.add_circle_outline_rounded,
-                        size: 14,
+                            : Icons.add_task_rounded,
+                        size: 15,
                         color: sel.visitado
                             ? const Color(0xFF2E7D32)
                             : Colors.grey.shade700,
@@ -395,6 +414,9 @@ class BarraInferiorMapa extends StatelessWidget {
                   ),
                 ),
               ),
+            ],
+
+            // BOTÓN CERRAR SELECCIÓN
             IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(6),
@@ -402,19 +424,19 @@ class BarraInferiorMapa extends StatelessWidget {
                   color: Colors.grey.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.close, color: Colors.black54, size: 18),
+                child: const Icon(Icons.close_rounded, color: Colors.black54, size: 18),
               ),
               onPressed: onCerrarSeleccion,
             ),
           ],
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
 
-        // 3. BOTONES DE ACCIÓN: VER FICHA vs IR CON GPS
+        // 3. BOTONES DE ACCIÓN: VER FICHA vs INICIAR GUÍA
         Row(
           children: [
-            if (!sel.esBanio) ...[
+            if (!esServicio) ...[
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
@@ -436,19 +458,19 @@ class BarraInferiorMapa extends StatelessWidget {
                     'Ver Ficha',
                     style: GoogleFonts.urbanist(
                       fontWeight: FontWeight.w900,
-                      fontSize: 14.5,
+                      fontSize: 14,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.verdePrincipal,
                     side: const BorderSide(
                       color: AppColors.verdePrincipal,
-                      width: 2,
+                      width: 1.8,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(22),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
               ),
@@ -466,21 +488,23 @@ class BarraInferiorMapa extends StatelessWidget {
                   size: 18,
                 ),
                 label: Text(
-                  sel.esBanio ? 'Ir a los Baños' : 'Ir con GPS',
+                  sel.esBanio
+                      ? 'Guiarme al Baño ($metros m)'
+                      : 'Iniciar Guía ($metros m)',
                   style: GoogleFonts.urbanist(
                     color: Colors.white,
                     fontWeight: FontWeight.w900,
-                    fontSize: 14.5,
+                    fontSize: 14,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: sel.esBanio
-                      ? Colors.blue.shade600
+                      ? const Color(0xFF0284C7)
                       : AppColors.verdeAzulado,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(22),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   elevation: 2,
                 ),
               ),

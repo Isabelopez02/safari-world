@@ -35,8 +35,8 @@ class ServicioRutasSvg {
 
   static final ServicioRutasSvg instance = ServicioRutasSvg._();
 
-  // Punto de partida oficial (Entrada principal del zoológico)
-  static const Offset puntoEntradaOficial = Offset(878.4, 852.3);
+  // Punto de partida oficial (Ubicación actual del usuario: 58% X, 58% Y)
+  static const Offset puntoEntradaOficial = Offset(1113.6, 626.4);
 
   final List<Offset> _nodos = [];
   final List<List<AristaSvg>> _adyacencia = [];
