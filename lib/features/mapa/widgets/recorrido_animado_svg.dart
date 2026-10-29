@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:path_drawing/path_drawing.dart';
+import '../data/datos_trazos_svg.dart';
 
 import 'ruta_svg_painter.dart';
 
@@ -52,22 +53,7 @@ class RecorridoAnimadoSvg extends StatefulWidget {
   /// Utilidad para extraer todos los atributos d="..." de un archivo SVG completo
   /// y unificarlos en un solo objeto Path.
   static Path parsearSvgCompleto(String contenidoSvg) {
-    final exp = RegExp(r'd="([^"]+)"');
-    final matches = exp.allMatches(contenidoSvg);
-    final combinedPath = Path();
-
-    for (final match in matches) {
-      final d = match.group(1);
-      if (d != null && d.isNotEmpty) {
-        try {
-          final subPath = parseSvgPathData(d);
-          combinedPath.addPath(subPath, Offset.zero);
-        } catch (_) {
-          // Ignorar trazos con sintaxis no compatible
-        }
-      }
-    }
-    return combinedPath;
+    return DatosTrazosSvg.obtenerPathCompleto(contenidoSvg);
   }
 
   @override

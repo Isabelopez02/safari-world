@@ -4,13 +4,17 @@ import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
 /// Encabezado Safari Aventura: sin saturación de badges, con tipografía gruesa
-/// y legible, e íconos intuitivos para evitar fatiga visual.
+/// y legible, e íconos interactivos y ergonómicos para móvil.
 class HeroHeader extends StatelessWidget {
   final VoidCallback onNavegarTap;
+  final VoidCallback? onExploracionesTap;
+  final VoidCallback? onShowAcuaticoTap;
 
   const HeroHeader({
     super.key,
     required this.onNavegarTap,
+    this.onExploracionesTap,
+    this.onShowAcuaticoTap,
   });
 
   @override
@@ -22,12 +26,12 @@ class HeroHeader extends StatelessWidget {
         children: [
           // 1. CHIP ÚNICO Y LIMPIO DE BIENVENIDA
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.35),
+              color: Colors.black.withValues(alpha: 0.40),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: Colors.white.withValues(alpha: 0.35),
                 width: 1.2,
               ),
             ),
@@ -92,7 +96,7 @@ class HeroHeader extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.3),
+                        color: Colors.black.withValues(alpha: 0.35),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -158,7 +162,7 @@ class HeroHeader extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(
                 horizontal: 20,
-                vertical: 12,
+                vertical: 14,
               ),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
@@ -187,15 +191,15 @@ class HeroHeader extends StatelessWidget {
                 children: [
                   const Icon(
                     Icons.explore_rounded,
-                    size: 20,
+                    size: 22,
                     color: Colors.white,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   Flexible(
                     child: Text(
                       'Explorar Mapa Interactivo',
                       style: GoogleFonts.urbanist(
-                        fontSize: 14.5,
+                        fontSize: 15,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
                         letterSpacing: 0.3,
@@ -203,10 +207,10 @@ class HeroHeader extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 8),
                   const Icon(
                     Icons.arrow_forward_rounded,
-                    size: 18,
+                    size: 19,
                     color: Colors.white70,
                   ),
                 ],
@@ -214,27 +218,30 @@ class HeroHeader extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // 3. SOLO 3 DESTACADOS VISUALES CON ÍCONOS (SIN SATURACIÓN DE BADGES)
+          // 3. PÍLDORAS INTERACTIVAS CON ÁREA TÁCTIL MÓVIL (TOUCH TARGET >= 44DP)
           Row(
             children: [
               _buildFeatureIconPill(
                 icon: Icons.pets_rounded,
-                label: '20 Animales',
+                label: '41 Paradas',
                 color: const Color(0xFFFFD54F),
+                onTap: onExploracionesTap ?? onNavegarTap,
               ),
               const SizedBox(width: 8),
               _buildFeatureIconPill(
                 icon: Icons.near_me_rounded,
                 label: 'Rutas GPS',
                 color: const Color(0xFF81D4FA),
+                onTap: onNavegarTap,
               ),
               const SizedBox(width: 8),
               _buildFeatureIconPill(
                 icon: Icons.water_drop_rounded,
-                label: 'Shows en Vivo',
+                label: 'Shows Acuáticos',
                 color: const Color(0xFFA5D6A7),
+                onTap: onShowAcuaticoTap ?? onNavegarTap,
               ),
             ],
           ),
@@ -247,34 +254,47 @@ class HeroHeader extends StatelessWidget {
     required IconData icon,
     required String label,
     required Color color,
+    VoidCallback? onTap,
   }) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.3),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            SoundService.instance.playButtonTap();
+            onTap?.call();
+          },
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.22),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 15, color: color),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                label,
-                style: GoogleFonts.urbanist(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
-                overflow: TextOverflow.ellipsis,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 44),
+            padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 8),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.35),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.28),
+                width: 1.1,
               ),
             ),
-          ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 15, color: color),
+                const SizedBox(width: 5),
+                Flexible(
+                  child: Text(
+                    label,
+                    style: GoogleFonts.urbanist(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

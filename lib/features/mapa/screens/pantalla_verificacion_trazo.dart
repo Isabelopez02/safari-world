@@ -36,7 +36,7 @@ class _PantallaVerificacionTrazoState extends State<PantallaVerificacionTrazo> {
   Future<void> _cargarSvgDesdeAssets() async {
     try {
       final contenido =
-          await rootBundle.loadString('assets/images/trazo_mapa.svg');
+          await rootBundle.loadString('assets/images/trazo.svg');
       if (mounted) {
         setState(() {
           _svgCompleto = contenido;

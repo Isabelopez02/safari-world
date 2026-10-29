@@ -5,13 +5,14 @@ import 'package:zoologico_front/features/pantalla_principal/pantalla_detalle_sho
 
 import 'shimmer_sweep.dart';
 
-/// Tarjeta 3D Pop-Out para el Show Acuático
+/// Tarjeta 3D Pop-Out para el Show Acuático optimizada para pantallas móviles
 class ShowAcuaticoCard extends StatelessWidget {
   const ShowAcuaticoCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         SoundService.instance.playButtonTap();
         Navigator.push(
@@ -22,14 +23,14 @@ class ShowAcuaticoCard extends StatelessWidget {
         );
       },
       child: SizedBox(
-        height: 185,
+        height: 190,
         child: Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.bottomCenter,
           children: [
             // 1. BASE DE LA TARJETA CON FONDO MARINO ELEGANTE
             Container(
-              height: 155,
+              height: 160,
               width: double.infinity,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
@@ -43,12 +44,12 @@ class ShowAcuaticoCard extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(26),
                 border: Border.all(
-                  color: const Color(0xFF26A69A).withValues(alpha: 0.35),
+                  color: const Color(0xFF26A69A).withValues(alpha: 0.45),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF0F3E4D).withValues(alpha: 0.28),
+                    color: const Color(0xFF0F3E4D).withValues(alpha: 0.32),
                     blurRadius: 18,
                     offset: const Offset(0, 8),
                   ),
@@ -88,8 +89,8 @@ class ShowAcuaticoCard extends StatelessWidget {
                     // CONTENIDO TEXTO A LA IZQUIERDA
                     Positioned(
                       left: 18,
-                      top: 16,
-                      bottom: 16,
+                      top: 14,
+                      bottom: 14,
                       right: 140,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +99,7 @@ class ShowAcuaticoCard extends StatelessWidget {
                           // BADGE EN VIVO
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 9,
+                              horizontal: 10,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
@@ -110,14 +111,14 @@ class ShowAcuaticoCard extends StatelessWidget {
                               children: [
                                 const Icon(
                                   Icons.water_drop_rounded,
-                                  size: 11,
+                                  size: 13,
                                   color: Colors.white,
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: 5),
                                 Text(
                                   'EN VIVO · 3 FUNCIONES',
                                   style: GoogleFonts.urbanist(
-                                    fontSize: 9.5,
+                                    fontSize: 10.5,
                                     fontWeight: FontWeight.w900,
                                     color: Colors.white,
                                     letterSpacing: 0.4,
@@ -135,30 +136,30 @@ class ShowAcuaticoCard extends StatelessWidget {
                               Text(
                                 'Shows Acuáticos',
                                 style: GoogleFonts.urbanist(
-                                  fontSize: 18,
+                                  fontSize: 19,
                                   fontWeight: FontWeight.w900,
                                   color: Colors.white,
                                   letterSpacing: -0.2,
                                 ),
                               ),
-                              const SizedBox(height: 2),
+                              const SizedBox(height: 3),
                               Text(
                                 'Focas y lobos marinos\n10:00 AM · 1:00 PM · 4:00 PM',
                                 style: GoogleFonts.urbanist(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white.withValues(alpha: 0.85),
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white.withValues(alpha: 0.92),
                                   height: 1.25,
                                 ),
                               ),
                             ],
                           ),
 
-                          // BOTÓN VER DETALLES
+                          // BOTÓN VER DETALLES (TOUCH TARGET ERGONÓMICO)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 7,
+                              horizontal: 16,
+                              vertical: 8,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -177,7 +178,7 @@ class ShowAcuaticoCard extends StatelessWidget {
                                 Text(
                                   'Ver detalles',
                                   style: GoogleFonts.urbanist(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w900,
                                     color: const Color(0xFF0F3E4D),
                                   ),
@@ -185,7 +186,7 @@ class ShowAcuaticoCard extends StatelessWidget {
                                 const SizedBox(width: 5),
                                 const Icon(
                                   Icons.arrow_forward_rounded,
-                                  size: 13,
+                                  size: 14,
                                   color: Color(0xFF0F3E4D),
                                 ),
                               ],
@@ -207,12 +208,14 @@ class ShowAcuaticoCard extends StatelessWidget {
               right: 8,
               top: 0,
               bottom: 6,
-              child: Image.asset(
-                'assets/images/pantalla_principal/foca.png',
-                height: 175,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.pets, size: 70, color: Colors.white70),
+              child: IgnorePointer(
+                child: Image.asset(
+                  'assets/images/pantalla_principal/foca.png',
+                  height: 180,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.pets, size: 70, color: Colors.white70),
+                ),
               ),
             ),
           ],

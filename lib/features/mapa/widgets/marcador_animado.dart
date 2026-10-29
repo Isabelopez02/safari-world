@@ -142,14 +142,14 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
               : colorZona);
 
     // Diámetro más compacto para que no sature el mapa ni tape zonas contiguas
-    final double pinSize = widget.isSelected ? 46.0 : 34.0;
+    final double pinSize = widget.isSelected ? 38.0 : 28.0;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _handleTap,
       child: SizedBox(
-        width: 80,
-        height: 90,
+        width: 70,
+        height: 74,
         child: Stack(
           alignment: Alignment.topCenter,
           clipBehavior: Clip.none,
@@ -166,8 +166,8 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                       opacity: _bubbleFade,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 7,
-                          vertical: 3,
+                          horizontal: 6,
+                          vertical: 2,
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.verdePrincipal,
@@ -180,7 +180,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                           sound,
                           style: GoogleFonts.urbanist(
                             color: Colors.white,
-                            fontSize: 10,
+                            fontSize: 9,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -190,7 +190,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                 ),
               ),
 
-            // CONTENIDO DEL PARADERO (AVATAR CIRCULAR COMPACTO + ETIQUETA ALTO CONTRASTE)
+            // CONTENIDO DEL PARADERO (AVATAR CIRCULAR COMPACTO + ETIQUETA PEGADA A LA IMAGEN)
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -201,58 +201,60 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                     child: _buildAvatarWithPulse(pinSize, borderColor),
                   ),
                 ),
-                const SizedBox(height: 2),
-                // Etiqueta con nombre del animal de ALTO CONTRASTE compacta
-                Container(
-                  constraints: const BoxConstraints(maxWidth: 78),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 5,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B), // Azul grafito oscuro de alto contraste
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black45,
-                        blurRadius: 4,
-                        offset: Offset(0, 1.5),
-                      ),
-                    ],
-                    border: Border.all(
-                      color: widget.isSelected
-                          ? const Color(0xFFFFB74D)
-                          : colorZona,
-                      width: 1.2,
+                // Letras más pegadas a la imagen y con tamaño más pequeño y legible
+                Transform.translate(
+                  offset: const Offset(0, -2.5),
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 66),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 1.0,
                     ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        widget.marcador.visitado ? '✓ ' : '🐾 ',
-                        style: TextStyle(
-                          fontSize: 8,
-                          color: widget.marcador.visitado
-                              ? const Color(0xFF81C784)
-                              : const Color(0xFFFFD54F),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E293B), // Azul grafito oscuro de alto contraste
+                      borderRadius: BorderRadius.circular(6),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black45,
+                          blurRadius: 3,
+                          offset: Offset(0, 1),
                         ),
+                      ],
+                      border: Border.all(
+                        color: widget.isSelected
+                            ? const Color(0xFFFFB74D)
+                            : colorZona,
+                        width: 1.0,
                       ),
-                      Flexible(
-                        child: Text(
-                          widget.marcador.nombre,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.urbanist(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            letterSpacing: 0.1,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          widget.marcador.visitado ? '✓ ' : '🐾 ',
+                          style: TextStyle(
+                            fontSize: 6.5,
+                            color: widget.marcador.visitado
+                                ? const Color(0xFF81C784)
+                                : const Color(0xFFFFD54F),
                           ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
                         ),
-                      ),
-                    ],
+                        Flexible(
+                          child: Text(
+                            widget.marcador.nombre,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 8.0,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 0.1,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -294,13 +296,13 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                 color: Colors.white,
                 border: Border.all(
                   color: borderColor,
-                  width: widget.isSelected ? 2.8 : 2.2,
+                  width: widget.isSelected ? 2.4 : 1.8,
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.35),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
+                    blurRadius: 5,
+                    offset: const Offset(0, 1.5),
                   ),
                 ],
               ),
@@ -335,18 +337,18 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                 bottom: 0,
                 right: 0,
                 child: Container(
-                  padding: const EdgeInsets.all(1.5),
+                  padding: const EdgeInsets.all(1.2),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(color: Colors.black38, blurRadius: 3),
+                      BoxShadow(color: Colors.black38, blurRadius: 2.5),
                     ],
                   ),
                   child: const Icon(
                     Icons.check_circle,
                     color: Color(0xFF2E7D32),
-                    size: 12,
+                    size: 10,
                   ),
                 ),
               ),
@@ -365,8 +367,8 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
       behavior: HitTestBehavior.opaque,
       onTap: _handleTap,
       child: SizedBox(
-        width: 60,
-        height: 72,
+        width: 54,
+        height: 64,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -381,8 +383,8 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                       Transform.scale(
                         scale: _pulseAnimation.value,
                         child: Container(
-                          width: 44,
-                          height: 44,
+                          width: 38,
+                          height: 38,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: pinColor.withValues(alpha: 0.25),
@@ -394,29 +396,29 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                       builder: (_, _) => Transform.scale(
                         scale: _bounceAnimation.value,
                         child: Container(
-                          width: widget.isSelected ? 36 : 28,
-                          height: widget.isSelected ? 36 : 28,
+                          width: widget.isSelected ? 32 : 24,
+                          height: widget.isSelected ? 32 : 24,
                           decoration: BoxDecoration(
                             color: pinColor,
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: Colors.white,
-                              width: widget.isSelected ? 2.5 : 2.0,
+                              width: widget.isSelected ? 2.2 : 1.8,
                             ),
                             boxShadow: [
                               BoxShadow(
                                 color: widget.isSelected
                                     ? pinColor.withValues(alpha: 0.45)
                                     : Colors.black38,
-                                blurRadius: widget.isSelected ? 8 : 4,
-                                offset: const Offset(0, 2),
+                                blurRadius: widget.isSelected ? 6 : 3,
+                                offset: const Offset(0, 1.5),
                               ),
                             ],
                           ),
                           child: Icon(
                             Icons.wc_rounded,
                             color: Colors.white,
-                            size: widget.isSelected ? 19 : 15,
+                            size: widget.isSelected ? 16 : 13,
                           ),
                         ),
                       ),
@@ -425,30 +427,32 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                 );
               },
             ),
-            const SizedBox(height: 2),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0D47A1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.2,
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black38,
-                    blurRadius: 4,
-                    offset: Offset(0, 1.5),
+            Transform.translate(
+              offset: const Offset(0, -2),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0D47A1),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 1.0,
                   ),
-                ],
-              ),
-              child: Text(
-                '🚻 Baños',
-                style: GoogleFonts.urbanist(
-                  fontSize: 8.5,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black38,
+                      blurRadius: 3,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  '🚻 Baños',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 7.5,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),

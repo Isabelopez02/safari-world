@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
+import 'package:zoologico_front/features/pantalla_principal/pantalla_detalle_show_acuatico.dart';
 
 import 'widgets/animales_carrusel.dart';
 import 'widgets/banner_mapa.dart';
@@ -32,61 +33,49 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     );
   }
 
+  void _navigateToMapConAnimal(BuildContext context, String animalId) {
+    SoundService.instance.playButtonTap();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PantallaMapa(animalIdInicial: animalId),
+      ),
+    );
+  }
+
+  void _navigateToShowAcuatico(BuildContext context) {
+    SoundService.instance.playButtonTap();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const PantallaDetalleShowAcuatico(),
+      ),
+    );
+  }
+
   void _navigateToMap(BuildContext context) {
     SoundService.instance.playButtonTap();
     Navigator.push(
       context,
       PageRouteBuilder(
-        opaque: false,
-        transitionDuration: const Duration(milliseconds: 1000),
-        reverseTransitionDuration: const Duration(milliseconds: 1000),
+        transitionDuration: const Duration(milliseconds: 380),
+        reverseTransitionDuration: const Duration(milliseconds: 300),
         pageBuilder: (context, animation, secondaryAnimation) =>
             const PantallaMapa(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return Stack(
-            children: [
-              FadeTransition(
-                opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
-                  CurvedAnimation(
-                    parent: animation,
-                    curve: const Interval(0.48, 0.52),
-                  ),
-                ),
-                child: child,
-              ),
-              AnimatedBuilder(
-                animation: animation,
-                builder: (context, _) {
-                  final t = animation.value;
-                  final size = MediaQuery.of(context).size;
-                  final dx = (1 - 2 * t) * size.width;
-                  final dy = (1 - 2 * t) * size.height;
-                  final factor = 0.5 - (t - 0.5).abs();
-                  final scale = 1.0 + (factor * 35.0);
-                  final rotation = t * 3.14159;
-
-                  return IgnorePointer(
-                    child: Transform.translate(
-                      offset: Offset(dx, dy),
-                      child: Transform.scale(
-                        scale: scale,
-                        child: Transform.rotate(
-                          angle: rotation,
-                          child: Center(
-                            child: Image.asset(
-                              'assets/images/planta_1.png',
-                              width: 140,
-                              height: 140,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
+          final curved = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
+          return FadeTransition(
+            opacity: curved,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.0, 0.05),
+                end: Offset.zero,
+              ).animate(curved),
+              child: child,
+            ),
           );
         },
       ),
@@ -175,9 +164,12 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                   children: [
                     const SizedBox(height: 12),
 
-                    // ENCABEZADO SAFARI AVENTURA
+                    // ENCABEZADO SAFARI AVENTURA CON PÍLDORAS INTERACTIVAS
                     HeroHeader(
                       onNavegarTap: () => _navigateToMap(context),
+                      onExploracionesTap: () =>
+                          _navigateToMapExploraciones(context),
+                      onShowAcuaticoTap: () => _navigateToShowAcuatico(context),
                     ),
 
                     const SizedBox(height: 20),
@@ -202,10 +194,12 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                         children: [
                           const SizedBox(height: 22),
 
-                          // --- 1. SECCIÓN: ANIMALES POR DESCUBRIR (AVATARES FOTOGRÁFICOS) ---
+                          // --- 1. SECCIÓN: ANIMALES POR DESCUBRIR (CON ENLACE DIRECTO AL MAPA) ---
                           AnimalesCarrusel(
                             onExploracionesTap: () =>
                                 _navigateToMapExploraciones(context),
+                            onSeleccionarAnimal: (animalId) =>
+                                _navigateToMapConAnimal(context, animalId),
                           ),
 
                           const SizedBox(height: 32),

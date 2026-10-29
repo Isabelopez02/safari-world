@@ -13,9 +13,9 @@ import '../utils/datos_rutas.dart';
 import '../utils/servicio_rutas_svg.dart';
 import '../widgets/barra_inferior_mapa.dart';
 import '../widgets/barra_superior_mapa.dart';
+import '../widgets/capa_trazos_mapa.dart';
 import '../widgets/marcador_animado.dart';
 import '../widgets/modal_animales_por_visitar.dart';
-import '../widgets/ruta_painter.dart';
 import '../widgets/tutorial_overlay.dart';
 
 class PantallaMapa extends StatefulWidget {
@@ -419,82 +419,25 @@ class _PantallaMapaState extends State<PantallaMapa>
                         fit: BoxFit.fill,
                       ),
                     ),
+                    // CAPA MODULAR DE TRAZOS Y RUTAS VECTORIALES SVG
                     Positioned.fill(
                       child: AnimatedBuilder(
                         animation: _routeProgressController,
                         builder: (context, child) {
-                          return CustomPaint(
-                            painter: RutaPainter(
-                              _rutaActual,
-                              _isNavigating,
-                              rutaSvg: _rutaSvgActual,
-                              progress: _routeProgressController.value,
-                            ),
+                          return CapaTrazosMapa(
+                            progreso: _routeProgressController.value,
+                            rutaSvg: _rutaSvgActual,
+                            rutaCoordenadas: _rutaActual,
+                            estaNavegando: _isNavigating,
                           );
                         },
                       ),
                     ),
-                    // MARCADOR GUÍA ANIMADO QUE VIAJA POR LA CURVA SVG
-                    if (_rutaSvgActual != null)
-                      AnimatedBuilder(
-                        animation: _routeProgressController,
-                        builder: (context, child) {
-                          if (_routeProgressController.value <= 0.0) {
-                            return const SizedBox.shrink();
-                          }
-                          final metrics = _rutaSvgActual!.computeMetrics().toList();
-                          if (metrics.isEmpty) return const SizedBox.shrink();
-
-                          final totalLength = metrics.fold(0.0, (acc, m) => acc + m.length);
-                          final targetDist = _routeProgressController.value * totalLength;
-
-                          Offset puntoGuia = Offset.zero;
-                          double distAcumulada = 0.0;
-                          for (final metric in metrics) {
-                            if (targetDist <= distAcumulada + metric.length) {
-                              final localDist = targetDist - distAcumulada;
-                              puntoGuia = metric.getTangentForOffset(localDist)?.position ?? Offset.zero;
-                              break;
-                            }
-                            distAcumulada += metric.length;
-                          }
-                          if (puntoGuia == Offset.zero && metrics.isNotEmpty) {
-                            puntoGuia = metrics.last.getTangentForOffset(metrics.last.length)?.position ?? Offset.zero;
-                          }
-
-                          return Positioned(
-                            left: puntoGuia.dx - 18,
-                            top: puntoGuia.dy - 34,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: _isNavigating
-                                    ? const Color(0xFF0E6568)
-                                    : const Color(0xFFE65100),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black38,
-                                    blurRadius: 6,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.navigation_rounded,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
                     // PARADEROS DE ANIMALES
                     ...marcadores.map((marcador) {
                       return Positioned(
-                        left: marcador.x - 52,
-                        top: marcador.y - 29,
+                        left: marcador.x - 35,
+                        top: marcador.y - 14,
                         child: MarcadorAnimado(
                           marcador: marcador,
                           isSelected: _marcadorSeleccionado?.id == marcador.id,
@@ -506,8 +449,8 @@ class _PantallaMapaState extends State<PantallaMapa>
                     if (_mostrarBanios)
                       ...banios.map((banio) {
                         return Positioned(
-                          left: banio.x - 38,
-                          top: banio.y - 22,
+                          left: banio.x - 27,
+                          top: banio.y - 12,
                           child: MarcadorAnimado(
                             marcador: banio,
                             isSelected: _marcadorSeleccionado?.id == banio.id,

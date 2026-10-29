@@ -4,25 +4,26 @@ import 'package:zoologico_front/core/services/emergency_service.dart';
 
 import 'shimmer_sweep.dart';
 
-/// Tarjeta 3D Pop-Out para Emergencia y Ayuda
+/// Tarjeta 3D Pop-Out para Emergencia y Ayuda optimizada para móvil
 class EmergenciaCard extends StatelessWidget {
   const EmergenciaCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         EmergencyService.instance.mostrarModalEmergencia(context);
       },
       child: SizedBox(
-        height: 170,
+        height: 175,
         child: Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.bottomCenter,
           children: [
             // 1. BASE DE LA TARJETA CON FONDO DE ASISTENCIA MÉDICA
             Container(
-              height: 145,
+              height: 150,
               width: double.infinity,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
@@ -36,12 +37,12 @@ class EmergenciaCard extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(26),
                 border: Border.all(
-                  color: Colors.red.shade300.withValues(alpha: 0.35),
+                  color: Colors.red.shade300.withValues(alpha: 0.45),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF8B1E1E).withValues(alpha: 0.25),
+                    color: const Color(0xFF8B1E1E).withValues(alpha: 0.32),
                     blurRadius: 18,
                     offset: const Offset(0, 8),
                   ),
@@ -78,7 +79,7 @@ class EmergenciaCard extends StatelessWidget {
                           // BADGE ASISTENCIA 24/7
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 9,
+                              horizontal: 10,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
@@ -90,14 +91,14 @@ class EmergenciaCard extends StatelessWidget {
                               children: [
                                 const Icon(
                                   Icons.health_and_safety_rounded,
-                                  size: 11,
+                                  size: 13,
                                   color: Colors.white,
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: 5),
                                 Text(
                                   'ASISTENCIA 24/7',
                                   style: GoogleFonts.urbanist(
-                                    fontSize: 9.5,
+                                    fontSize: 10.5,
                                     fontWeight: FontWeight.w900,
                                     color: Colors.white,
                                     letterSpacing: 0.4,
@@ -115,67 +116,60 @@ class EmergenciaCard extends StatelessWidget {
                               Text(
                                 'Emergencia & Ayuda',
                                 style: GoogleFonts.urbanist(
-                                  fontSize: 17,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.w900,
                                   color: Colors.white,
                                   letterSpacing: -0.2,
                                 ),
                               ),
-                              const SizedBox(height: 2),
+                              const SizedBox(height: 3),
                               Text(
                                 'Llama directo: 912 321 232\nAtención médica y rescate',
                                 style: GoogleFonts.urbanist(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white.withValues(alpha: 0.85),
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white.withValues(alpha: 0.92),
                                   height: 1.25,
                                 ),
                               ),
                             ],
                           ),
 
-                          // BOTÓN LLAMAR SOS
-                          GestureDetector(
-                            onTap: () {
-                              EmergencyService.instance.mostrarModalEmergencia(
-                                context,
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 7,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black26,
-                                    blurRadius: 6,
-                                    offset: Offset(0, 2),
+                          // BOTÓN LLAMAR SOS (TOUCH TARGET ERGONÓMICO)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.phone_in_talk_rounded,
+                                  size: 14,
+                                  color: Color(0xFF8B1E1E),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Contactar SOS',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w900,
+                                    color: const Color(0xFF8B1E1E),
                                   ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.phone_in_talk_rounded,
-                                    size: 12,
-                                    color: Color(0xFF8B1E1E),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    'Contactar SOS',
-                                    style: GoogleFonts.urbanist(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w900,
-                                      color: const Color(0xFF8B1E1E),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -194,14 +188,16 @@ class EmergenciaCard extends StatelessWidget {
               right: 12,
               top: 2,
               bottom: 8,
-              child: Image.asset(
-                'assets/images/pantalla_principal/emergencia.png',
-                height: 155,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => const Icon(
-                  Icons.health_and_safety,
-                  size: 70,
-                  color: Colors.white70,
+              child: IgnorePointer(
+                child: Image.asset(
+                  'assets/images/pantalla_principal/emergencia.png',
+                  height: 160,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.health_and_safety,
+                    size: 70,
+                    color: Colors.white70,
+                  ),
                 ),
               ),
             ),
