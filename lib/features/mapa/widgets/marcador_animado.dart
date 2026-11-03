@@ -141,7 +141,9 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
             ? _buildCalmZonePin()
             : (widget.marcador.esBanio
                 ? _buildBathroomPin()
-                : _buildAnimalParadero());
+                : (widget.marcador.tipoServicio != null
+                    ? _buildAccessPin()
+                    : _buildAnimalParadero()));
 
         // Si el filtro no coincide con este marcador o hay una ruta activa, se atenúa en segundo plano
         if (widget.isDimmed) {
@@ -669,6 +671,167 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                       Flexible(
                         child: Text(
                           'Zona Calma',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 7.5,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAccessPin() {
+    final a11y = AccesibilidadService.instance;
+    final bool a11yActivo = a11y.accesibilidadVisualActiva;
+
+    // Colores semánticos y de alto contraste por tipo de servicio
+    final Color pinColor;
+    final String labelCorta;
+    final String simbolo;
+
+    switch (widget.marcador.tipoServicio) {
+      case 'boleteria':
+        pinColor = a11yActivo ? const Color(0xFFF59E0B) : const Color(0xFFD97706);
+        labelCorta = 'Boletería';
+        simbolo = '🎟️';
+        break;
+      case 'salida':
+        pinColor = a11yActivo ? const Color(0xFFF43F5E) : const Color(0xFFE11D48);
+        labelCorta = 'Salida';
+        simbolo = '🚪';
+        break;
+      case 'estacionamiento':
+        pinColor = a11yActivo ? const Color(0xFF38BDF8) : const Color(0xFF2563EB);
+        labelCorta = 'Cochera';
+        simbolo = '🅿️';
+        break;
+      case 'juegos':
+        pinColor = a11yActivo ? const Color(0xFFC084FC) : const Color(0xFF9333EA);
+        labelCorta = 'Juegos';
+        simbolo = '🎠';
+        break;
+      default:
+        pinColor = widget.marcador.colorZona ?? AppColors.verdeAzulado;
+        labelCorta = widget.marcador.nombre.split(' ').first;
+        simbolo = '📍';
+    }
+
+    final Color borderColor = widget.isSelected
+        ? (a11yActivo ? const Color(0xFFFDE047) : const Color(0xFFFF9800))
+        : Colors.white;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _handleTap,
+      child: SizedBox(
+        width: 66,
+        height: 68,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedBuilder(
+              animation: _pulseAnimation,
+              builder: (_, _) {
+                return Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: [
+                    if (widget.isSelected)
+                      Transform.scale(
+                        scale: _pulseAnimation.value,
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: pinColor.withValues(alpha: 0.28),
+                          ),
+                        ),
+                      ),
+                    AnimatedBuilder(
+                      animation: _bounceAnimation,
+                      builder: (_, _) => Transform.scale(
+                        scale: _bounceAnimation.value,
+                        child: Container(
+                          width: widget.isSelected ? 32 : 25,
+                          height: widget.isSelected ? 32 : 25,
+                          decoration: BoxDecoration(
+                            color: pinColor,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: borderColor,
+                              width: widget.isSelected ? 2.4 : 1.8,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: widget.isSelected
+                                    ? pinColor.withValues(alpha: 0.45)
+                                    : Colors.black45,
+                                blurRadius: widget.isSelected ? 6 : 3.5,
+                                offset: const Offset(0, 1.5),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            widget.marcador.icono,
+                            color: Colors.white,
+                            size: widget.isSelected ? 16 : 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            if (!widget.isDimmed &&
+                (widget.mostrarEtiqueta ||
+                    widget.isSelected ||
+                    widget.isHighlighted))
+              Transform.translate(
+                offset: const Offset(0, -2),
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 68),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 1.5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: a11yActivo
+                        ? const Color(0xFF0F172A)
+                        : Colors.black.withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: a11yActivo ? pinColor : Colors.white60,
+                      width: a11yActivo ? 1.4 : 1.0,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black45,
+                        blurRadius: 3,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '$simbolo ',
+                        style: const TextStyle(fontSize: 7.0),
+                      ),
+                      Flexible(
+                        child: Text(
+                          labelCorta,
                           style: GoogleFonts.urbanist(
                             fontSize: 7.5,
                             fontWeight: FontWeight.w900,

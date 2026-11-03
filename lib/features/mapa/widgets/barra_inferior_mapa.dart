@@ -116,6 +116,23 @@ class BarraInferiorMapa extends StatelessWidget {
   }
 
   Widget _buildBarraExploracion(BuildContext context) {
+    final a11y = AccesibilidadService.instance;
+    final bool a11yActivo = a11y.accesibilidadVisualActiva;
+
+    final Color chevronColor =
+        a11yActivo ? const Color(0xFFFDE047) : AppColors.verdeAzulado;
+    final Color iconColor =
+        a11yActivo ? const Color(0xFFFDE047) : AppColors.verdeAzulado;
+    final Color tituloColor =
+        a11yActivo ? Colors.white : const Color(0xFF1E293B);
+    final Color subtituloColor =
+        a11yActivo ? const Color(0xFFCBD5E1) : AppColors.verdeAzulado;
+    final Color progressBarColor =
+        a11yActivo ? const Color(0xFFFDE047) : AppColors.verdeAzulado;
+    final Color progressBgColor = a11yActivo
+        ? Colors.white24
+        : AppColors.verdeAzulado.withValues(alpha: 0.15);
+
     final int visitados = marcadores.where((m) => m.visitado).length;
     final double pct =
         marcadores.isEmpty ? 0.0 : (visitados / marcadores.length);
@@ -131,9 +148,9 @@ class BarraInferiorMapa extends StatelessWidget {
             builder: (context, child) {
               return Transform.translate(
                 offset: Offset(0, -2 * bottomBarPulseController.value),
-                child: const Icon(
+                child: Icon(
                   Icons.keyboard_arrow_up_rounded,
-                  color: AppColors.verdeAzulado,
+                  color: chevronColor,
                   size: 22,
                 ),
               );
@@ -148,10 +165,10 @@ class BarraInferiorMapa extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.explore_rounded,
                           size: 18,
-                          color: AppColors.verdeAzulado,
+                          color: iconColor,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -159,7 +176,7 @@ class BarraInferiorMapa extends StatelessWidget {
                           style: GoogleFonts.urbanist(
                             fontSize: 16.5,
                             fontWeight: FontWeight.w900,
-                            color: const Color(0xFF1E293B),
+                            color: tituloColor,
                           ),
                         ),
                       ],
@@ -170,7 +187,7 @@ class BarraInferiorMapa extends StatelessWidget {
                       style: GoogleFonts.urbanist(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.verdeAzulado,
+                        color: subtituloColor,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -180,10 +197,9 @@ class BarraInferiorMapa extends StatelessWidget {
                         width: 160,
                         child: LinearProgressIndicator(
                           value: pct,
-                          backgroundColor:
-                              AppColors.verdeAzulado.withValues(alpha: 0.15),
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                            AppColors.verdeAzulado,
+                          backgroundColor: progressBgColor,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            progressBarColor,
                           ),
                           minHeight: 4.5,
                         ),
@@ -193,25 +209,29 @@ class BarraInferiorMapa extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              // BOTÓN ELEGANTE EXPLORAR (Reemplaza los 3 circulitos confusos)
+              // BOTÓN ELEGANTE EXPLORAR
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 9,
                 ),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      AppColors.verdeAzulado,
-                      AppColors.verdePrincipal,
-                    ],
+                  gradient: LinearGradient(
+                    colors: a11yActivo
+                        ? [const Color(0xFF0284C7), const Color(0xFF0369A1)]
+                        : [AppColors.verdeAzulado, AppColors.verdePrincipal],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(16),
+                  border: a11yActivo
+                      ? Border.all(color: const Color(0xFFFDE047), width: 1.5)
+                      : null,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.verdeAzulado.withValues(alpha: 0.35),
+                      color: a11yActivo
+                          ? const Color(0xFF0284C7).withValues(alpha: 0.35)
+                          : AppColors.verdeAzulado.withValues(alpha: 0.35),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
@@ -371,14 +391,14 @@ class BarraInferiorMapa extends StatelessWidget {
                       Expanded(
                         child: Text(
                           esCalma
-                              ? '${sel.nivelRuido ?? "Silencioso"} · ~$minutos min ($metros m)'
+                              ? '${sel.nivelRuido ?? "Silencioso"} · $minutos min ($metros m)'
                               : (sel.esBanio
-                                  ? 'Baños públicos · ~$minutos min ($metros m)'
-                                  : '${sel.habitat} · ~$minutos min a pie ($metros m)'),
+                                  ? 'Baños públicos · $minutos min ($metros m)'
+                                  : '${sel.habitat} · $minutos min ($metros m)'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.urbanist(
-                            fontSize: 12.5,
+                            fontSize: 12.0,
                             color: a11yActivo
                                 ? const Color(0xFFCBD5E1)
                                 : Colors.grey.shade600,
@@ -406,14 +426,22 @@ class BarraInferiorMapa extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: sel.visitado
-                        ? const Color(0xFFE8F5E9)
-                        : Colors.grey.shade100,
+                    color: a11yActivo
+                        ? (sel.visitado
+                            ? const Color(0xFF14532D)
+                            : const Color(0xFF1E293B))
+                        : (sel.visitado
+                            ? const Color(0xFFE8F5E9)
+                            : Colors.grey.shade100),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: sel.visitado
-                          ? const Color(0xFF4CAF50)
-                          : Colors.grey.shade300,
+                      color: a11yActivo
+                          ? (sel.visitado
+                              ? const Color(0xFF4ADE80)
+                              : const Color(0xFF475569))
+                          : (sel.visitado
+                              ? const Color(0xFF4CAF50)
+                              : Colors.grey.shade300),
                       width: 1.2,
                     ),
                   ),
@@ -425,9 +453,13 @@ class BarraInferiorMapa extends StatelessWidget {
                             ? Icons.check_circle_rounded
                             : Icons.add_task_rounded,
                         size: 15,
-                        color: sel.visitado
-                            ? const Color(0xFF2E7D32)
-                            : Colors.grey.shade700,
+                        color: a11yActivo
+                            ? (sel.visitado
+                                ? const Color(0xFF4ADE80)
+                                : const Color(0xFFFDE047))
+                            : (sel.visitado
+                                ? const Color(0xFF2E7D32)
+                                : Colors.grey.shade700),
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -435,9 +467,13 @@ class BarraInferiorMapa extends StatelessWidget {
                         style: GoogleFonts.urbanist(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w800,
-                          color: sel.visitado
-                              ? const Color(0xFF2E7D32)
-                              : Colors.grey.shade800,
+                          color: a11yActivo
+                              ? (sel.visitado
+                                  ? const Color(0xFF4ADE80)
+                                  : Colors.white)
+                              : (sel.visitado
+                                  ? const Color(0xFF2E7D32)
+                                  : Colors.grey.shade800),
                         ),
                       ),
                     ],
@@ -451,10 +487,16 @@ class BarraInferiorMapa extends StatelessWidget {
               icon: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.12),
+                  color: a11yActivo
+                      ? Colors.white12
+                      : Colors.grey.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.close_rounded, color: Colors.black54, size: 18),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: a11yActivo ? Colors.white70 : Colors.black54,
+                  size: 18,
+                ),
               ),
               onPressed: onCerrarSeleccion,
             ),
@@ -479,22 +521,34 @@ class BarraInferiorMapa extends StatelessWidget {
                       ),
                     );
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.menu_book_rounded,
                     size: 18,
-                    color: AppColors.verdePrincipal,
+                    color: a11yActivo
+                        ? const Color(0xFFFDE047)
+                        : AppColors.verdePrincipal,
                   ),
                   label: Text(
                     'Ver Ficha',
                     style: GoogleFonts.urbanist(
                       fontWeight: FontWeight.w900,
                       fontSize: 14,
+                      color: a11yActivo
+                          ? const Color(0xFFFDE047)
+                          : AppColors.verdePrincipal,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.verdePrincipal,
-                    side: const BorderSide(
-                      color: AppColors.verdePrincipal,
+                    backgroundColor: a11yActivo
+                        ? const Color(0xFFFDE047).withValues(alpha: 0.10)
+                        : Colors.transparent,
+                    foregroundColor: a11yActivo
+                        ? const Color(0xFFFDE047)
+                        : AppColors.verdePrincipal,
+                    side: BorderSide(
+                      color: a11yActivo
+                          ? const Color(0xFFFDE047)
+                          : AppColors.verdePrincipal,
                       width: 1.8,
                     ),
                     shape: RoundedRectangleBorder(
@@ -551,6 +605,8 @@ class BarraInferiorMapa extends StatelessWidget {
 
   Widget _buildBarraNavegando(BuildContext context) {
     final sel = marcadorSeleccionado!;
+    final a11y = AccesibilidadService.instance;
+    final bool a11yActivo = a11y.accesibilidadVisualActiva;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -560,12 +616,16 @@ class BarraInferiorMapa extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.verdePrincipal.withValues(alpha: 0.1),
+                color: a11yActivo
+                    ? const Color(0xFFFDE047).withValues(alpha: 0.15)
+                    : AppColors.verdePrincipal.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.directions_walk_rounded,
-                color: AppColors.verdePrincipal,
+                color: a11yActivo
+                    ? const Color(0xFFFDE047)
+                    : AppColors.verdePrincipal,
                 size: 26,
               ),
             ),
@@ -579,14 +639,16 @@ class BarraInferiorMapa extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 17,
                       fontWeight: FontWeight.w900,
-                      color: AppColors.textoOscuro,
+                      color: a11yActivo ? Colors.white : AppColors.textoOscuro,
                     ),
                   ),
                   Text(
-                    'Sigue la línea punteada verde en el mapa',
+                    'Sigue la línea punteada en el mapa',
                     style: GoogleFonts.urbanist(
                       fontSize: 12.5,
-                      color: Colors.grey[600],
+                      color: a11yActivo
+                          ? const Color(0xFF94A3B8)
+                          : Colors.grey[600],
                       fontWeight: FontWeight.w600,
                     ),
                   ),

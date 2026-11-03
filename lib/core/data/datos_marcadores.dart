@@ -540,8 +540,8 @@ final List<MarcadorMapa> accesosZoologico = [
   MarcadorMapa.desdePorcentaje(
     id: 'ENT_01',
     nombre: 'Boletería & Entrada Principal',
-    porcentajeX: 58.5, // En la plaza de acceso junto al estacionamiento
-    porcentajeY: 59.0,
+    porcentajeX: 62.0, // Plaza de acceso derecha
+    porcentajeY: 56.5,
     icono: Icons.confirmation_number_rounded,
     habitat: 'Entrada y Plaza Central',
     colorZona: const Color(0xFFD97706),
@@ -550,8 +550,8 @@ final List<MarcadorMapa> accesosZoologico = [
   MarcadorMapa.desdePorcentaje(
     id: 'SAL_01',
     nombre: 'Salida Principal & Retorno',
-    porcentajeX: 57.0, // Junto a la boletería y estacionamiento
-    porcentajeY: 60.5,
+    porcentajeX: 54.0, // Plaza de acceso izquierda
+    porcentajeY: 59.5,
     icono: Icons.logout_rounded,
     habitat: 'Entrada y Plaza Central',
     colorZona: const Color(0xFFE11D48),
@@ -560,8 +560,8 @@ final List<MarcadorMapa> accesosZoologico = [
   MarcadorMapa.desdePorcentaje(
     id: 'EST_01',
     nombre: 'Estacionamiento Principal',
-    porcentajeX: 58.5, // Zona de estacionamiento frontal
-    porcentajeY: 62.5,
+    porcentajeX: 58.0, // Área frontal de estacionamiento inferior
+    porcentajeY: 64.5,
     icono: Icons.local_parking_rounded,
     habitat: 'Entrada y Plaza Central',
     colorZona: const Color(0xFF2563EB),

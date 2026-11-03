@@ -766,9 +766,13 @@ class _PantallaMapaState extends State<PantallaMapa>
           ),
 
           // ISLA FLOTANTE DE CONTROL DERECHO (Buscar + Mi Ubicación con Cristal)
-          Positioned(
+          // Se eleva dinámicamente si hay un animal seleccionado para no ser invadida por la tarjeta
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOutCubic,
             right: 16,
-            bottom: 110 + MediaQuery.of(context).padding.bottom,
+            bottom: (_marcadorSeleccionado != null ? 190.0 : 105.0) +
+                MediaQuery.of(context).padding.bottom,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(22),
               child: BackdropFilter(
