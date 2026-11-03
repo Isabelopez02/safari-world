@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/services/emergency_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
@@ -18,6 +19,7 @@ import '../widgets/barra_inferior_mapa.dart';
 import '../widgets/barra_superior_mapa.dart';
 import '../widgets/capa_trazos_mapa.dart';
 import '../widgets/marcador_animado.dart';
+import '../widgets/modal_accesibilidad_mapa.dart';
 import '../widgets/modal_animales_por_visitar.dart';
 import '../widgets/tutorial_overlay.dart';
 
@@ -71,6 +73,7 @@ class _PantallaMapaState extends State<PantallaMapa>
       .obtenerTodosLosAnimales();
   final List<MarcadorMapa> banios = AnimalService.instance.obtenerBanios();
   final List<MarcadorMapa> accesos = AnimalService.instance.obtenerAccesos();
+  final List<MarcadorMapa> zonasCalma = AnimalService.instance.obtenerZonasCalma();
 
   @override
   void initState() {
@@ -104,6 +107,7 @@ class _PantallaMapaState extends State<PantallaMapa>
     });
 
     AnimalService.instance.addListener(_onAnimalServiceChanged);
+    AccesibilidadService.instance.addListener(_onAccesibilidadChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _centrarEnUbicacionInicial(false);
@@ -121,6 +125,10 @@ class _PantallaMapaState extends State<PantallaMapa>
   }
 
   void _onAnimalServiceChanged() {
+    if (mounted) setState(() {});
+  }
+
+  void _onAccesibilidadChanged() {
     if (mounted) setState(() {});
   }
 
@@ -145,6 +153,7 @@ class _PantallaMapaState extends State<PantallaMapa>
   @override
   void dispose() {
     AnimalService.instance.removeListener(_onAnimalServiceChanged);
+    AccesibilidadService.instance.removeListener(_onAccesibilidadChanged);
     _transformationController.dispose();
     _cameraAnimationController.dispose();
     _routeProgressController.dispose();
@@ -204,6 +213,8 @@ class _PantallaMapaState extends State<PantallaMapa>
     switch (_filtroServicio) {
       case FiltroServicioMapa.todos:
         return true;
+      case FiltroServicioMapa.calma:
+        return marcador.esZonaCalma || marcador.tipoServicio == 'calma';
       case FiltroServicioMapa.banio:
         return marcador.esBanio || marcador.tipoServicio == 'banio';
       case FiltroServicioMapa.estacionamiento:
@@ -229,6 +240,10 @@ class _PantallaMapaState extends State<PantallaMapa>
       MarcadorMapa? objetivo;
       if (nuevoFiltro == FiltroServicioMapa.banio) {
         objetivo = _encontrarBanioMasCercano();
+      } else if (nuevoFiltro == FiltroServicioMapa.calma) {
+        if (zonasCalma.isNotEmpty) {
+          objetivo = zonasCalma.first;
+        }
       } else {
         final matches =
             accesos.where((a) => _isMarkerMatchingFilter(a)).toList();
@@ -394,9 +409,10 @@ class _PantallaMapaState extends State<PantallaMapa>
     final double currentScale =
         _transformationController.value.getMaxScaleOnAxis();
     final bool mostrarEtiquetasAnimales = currentScale >= 1.25;
+    final a11y = AccesibilidadService.instance;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: a11y.modoAltoContraste ? const Color(0xFF020617) : Colors.white,
       extendBody: true,
       body: Stack(
         children: [
@@ -414,9 +430,24 @@ class _PantallaMapaState extends State<PantallaMapa>
                 child: Stack(
                   children: [
                     Positioned.fill(
-                      child: Image.asset(
-                        'assets/images/mapa_zoologico.png',
-                        fit: BoxFit.fill,
+                      child: ColorFiltered(
+                        colorFilter: a11y.modoAltoContraste
+                            ? const ColorFilter.matrix(<double>[
+                                0.38, 0,    0,    0, -15,
+                                0,    0.38, 0,    0, -15,
+                                0,    0,    0.38, 0, -15,
+                                0,    0,    0,    1, 0,
+                              ])
+                            : const ColorFilter.matrix(<double>[
+                                1, 0, 0, 0, 0,
+                                0, 1, 0, 0, 0,
+                                0, 0, 1, 0, 0,
+                                0, 0, 0, 1, 0,
+                              ]),
+                        child: Image.asset(
+                          'assets/images/mapa_zoologico.png',
+                          fit: BoxFit.fill,
+                        ),
                       ),
                     ),
                     // CAPA MODULAR DE TRAZOS Y RUTAS VECTORIALES SVG
@@ -504,6 +535,31 @@ class _PantallaMapaState extends State<PantallaMapa>
                         ),
                       );
                     }),
+                    // PARADEROS DE ZONAS DE CALMA Y SILENCIO (Espacios inclusivos para TEA y descanso sensorial)
+                    if (a11y.mostrarZonasCalma ||
+                        _filtroServicio == FiltroServicioMapa.calma)
+                      ...zonasCalma.map((calma) {
+                        final bool matches = _isMarkerMatchingFilter(calma);
+                        final bool isDimmed =
+                            _filtroServicio != FiltroServicioMapa.todos &&
+                            !matches;
+                        final bool isHighlighted =
+                            _filtroServicio != FiltroServicioMapa.todos &&
+                            matches;
+
+                        return Positioned(
+                          left: calma.x - 37,
+                          top: calma.y - 14,
+                          child: MarcadorAnimado(
+                            marcador: calma,
+                            isSelected: _marcadorSeleccionado?.id == calma.id,
+                            isDimmed: isDimmed,
+                            isHighlighted: isHighlighted,
+                            mostrarEtiqueta: true,
+                            onTap: () => _mostrarInfoMarcador(calma),
+                          ),
+                        );
+                      }),
                     // ONDA DE RADAR EXPANSIVA EN LA UBICACIÓN DEL USUARIO
                     if (grafoMapa.nodos.containsKey(_nodoActual)) ...[
                       Positioned(
@@ -650,16 +706,30 @@ class _PantallaMapaState extends State<PantallaMapa>
                   onSOS: () => EmergencyService.instance.mostrarModalEmergencia(context),
                   keyHelp: _keyHelp,
                   tutorialStep: _tutorialStep,
+                  altoContraste: a11y.modoAltoContraste,
                   onToggleGuia: () {
                     setState(() {
                       _tutorialStep = (_tutorialStep > 0 ? 0 : 1);
                     });
                   },
                   keyComoFunciona: _keyComoFunciona,
+                  onAccesibilidad: () {
+                    ModalAccesibilidadMapa.mostrar(
+                      context,
+                      onSeleccionarZonaCalma: (zona) {
+                        setState(() {
+                          _filtroServicio = FiltroServicioMapa.calma;
+                        });
+                        _centrarEnPunto(zona.x, zona.y);
+                        _mostrarInfoMarcador(zona);
+                      },
+                    );
+                  },
                 ),
                 BarraFiltrosMapa(
                   filtroSeleccionado: _filtroServicio,
                   onFiltroCambiado: _onFiltroCambiado,
+                  altoContraste: a11y.modoAltoContraste,
                 ),
               ],
             ),
@@ -675,15 +745,21 @@ class _PantallaMapaState extends State<PantallaMapa>
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.90),
+                    color: a11y.modoAltoContraste
+                        ? const Color(0xFF0F172A)
+                        : Colors.white.withValues(alpha: 0.90),
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(
-                      color: const Color(0xFFCBD5E1),
-                      width: 1.2,
+                      color: a11y.modoAltoContraste
+                          ? const Color(0xFFFDE047)
+                          : const Color(0xFFCBD5E1),
+                      width: a11y.modoAltoContraste ? 2.0 : 1.2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.12),
+                        color: a11y.modoAltoContraste
+                            ? const Color(0xFFFDE047).withValues(alpha: 0.25)
+                            : Colors.black.withValues(alpha: 0.12),
                         blurRadius: 14,
                         offset: const Offset(0, 4),
                       ),
@@ -695,7 +771,9 @@ class _PantallaMapaState extends State<PantallaMapa>
                       IconButton(
                         key: _keySearch,
                         icon: const Icon(Icons.search_rounded),
-                        color: AppColors.verdeAzulado,
+                        color: a11y.modoAltoContraste
+                            ? const Color(0xFFFDE047)
+                            : AppColors.verdeAzulado,
                         iconSize: 22,
                         tooltip: 'Buscar en el parque',
                         onPressed: () {
@@ -706,12 +784,16 @@ class _PantallaMapaState extends State<PantallaMapa>
                       Container(
                         width: 22,
                         height: 1,
-                        color: const Color(0xFFE2E8F0),
+                        color: a11y.modoAltoContraste
+                            ? const Color(0xFF334155)
+                            : const Color(0xFFE2E8F0),
                       ),
                       IconButton(
                         key: _keyFab,
                         icon: const Icon(Icons.my_location_rounded),
-                        color: AppColors.verdeAzulado,
+                        color: a11y.modoAltoContraste
+                            ? const Color(0xFFFDE047)
+                            : AppColors.verdeAzulado,
                         iconSize: 22,
                         tooltip: 'Mi ubicación',
                         onPressed: () {

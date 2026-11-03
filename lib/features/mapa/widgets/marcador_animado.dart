@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
+import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
@@ -132,55 +133,72 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
 
   @override
   Widget build(BuildContext context) {
-    final Widget pinWidget = widget.marcador.esBanio
-        ? _buildBathroomPin()
-        : _buildAnimalParadero();
+    return ListenableBuilder(
+      listenable: AccesibilidadService.instance,
+      builder: (context, _) {
+        final Widget pinWidget = widget.marcador.esZonaCalma
+            ? _buildCalmZonePin()
+            : (widget.marcador.esBanio
+                ? _buildBathroomPin()
+                : _buildAnimalParadero());
 
-    // Si el filtro no coincide con este marcador, se torna plomo (grayscale) con opacidad reducida
-    if (widget.isDimmed) {
-      return AnimatedOpacity(
-        duration: const Duration(milliseconds: 260),
-        opacity: 0.28,
-        child: ColorFiltered(
-          colorFilter: const ColorFilter.matrix(<double>[
-            0.2126, 0.7152, 0.0722, 0, 0,
-            0.2126, 0.7152, 0.0722, 0, 0,
-            0.2126, 0.7152, 0.0722, 0, 0,
-            0,      0,      0,      1, 0,
-          ]),
+        // Si el filtro no coincide con este marcador, se torna plomo (grayscale) con opacidad reducida
+        if (widget.isDimmed) {
+          return AnimatedOpacity(
+            duration: const Duration(milliseconds: 260),
+            opacity: 0.28,
+            child: ColorFiltered(
+              colorFilter: const ColorFilter.matrix(<double>[
+                0.2126, 0.7152, 0.0722, 0, 0,
+                0.2126, 0.7152, 0.0722, 0, 0,
+                0.2126, 0.7152, 0.0722, 0, 0,
+                0,      0,      0,      1, 0,
+              ]),
+              child: pinWidget,
+            ),
+          );
+        }
+
+        // Marcador activo o enfocado: opacidad total y colores vívidos
+        return AnimatedOpacity(
+          duration: const Duration(milliseconds: 260),
+          opacity: 1.0,
           child: pinWidget,
-        ),
-      );
-    }
-
-    // Marcador activo o enfocado: opacidad total y colores vívidos
-    return AnimatedOpacity(
-      duration: const Duration(milliseconds: 260),
-      opacity: 1.0,
-      child: pinWidget,
+        );
+      },
     );
   }
 
   Widget _buildAnimalParadero() {
+    final a11y = AccesibilidadService.instance;
+    final bool a11yActivo = a11y.accesibilidadVisualActiva;
+
     final sound = SoundService.instance.getSoundReaction(
       widget.marcador.nombre,
     );
-    final Color colorZona = widget.marcador.colorZona ?? AppColors.verdePrincipal;
+    final Color colorZonaBase = widget.marcador.colorZona ?? AppColors.verdePrincipal;
+    final Color colorZona = a11y.getColorZona(
+      habitat: widget.marcador.habitat,
+      colorPorDefecto: colorZonaBase,
+    );
+    final IconData iconoZona = a11y.getIconoZona(widget.marcador.habitat);
+    final String codigoZona = a11y.getCodigoZona(widget.marcador.habitat);
+
     final borderColor = widget.isSelected
-        ? const Color(0xFFFF9800) // Naranja dorado brillante al seleccionar
+        ? (a11yActivo ? const Color(0xFFFDE047) : const Color(0xFFFF9800))
         : (widget.marcador.visitado
-              ? const Color(0xFF2E7D32)
+              ? (a11yActivo ? const Color(0xFF4ADE80) : const Color(0xFF2E7D32))
               : colorZona);
 
     // Diámetro más compacto para que no sature el mapa ni tape zonas contiguas
-    final double pinSize = widget.isSelected ? 38.0 : 28.0;
+    final double pinSize = widget.isSelected ? 38.0 : (a11yActivo ? 30.0 : 28.0);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _handleTap,
       child: SizedBox(
-        width: 70,
-        height: 74,
+        width: a11yActivo ? 76 : 70,
+        height: 78,
         child: Stack(
           alignment: Alignment.topCenter,
           clipBehavior: Clip.none,
@@ -225,12 +243,40 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                AnimatedBuilder(
-                  animation: _bounceAnimation,
-                  builder: (_, _) => Transform.scale(
-                    scale: _bounceAnimation.value,
-                    child: _buildAvatarWithPulse(pinSize, borderColor),
-                  ),
+                Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    AnimatedBuilder(
+                      animation: _bounceAnimation,
+                      builder: (_, _) => Transform.scale(
+                        scale: _bounceAnimation.value,
+                        child: _buildAvatarWithPulse(pinSize, borderColor),
+                      ),
+                    ),
+                    // BADGE GEOMÉTRICO DE DALTONISMO EN LA ESQUINA DEL AVATAR
+                    if (a11yActivo)
+                      Positioned(
+                        top: -3,
+                        left: -3,
+                        child: Container(
+                          padding: const EdgeInsets.all(2.5),
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: colorZona, width: 1.6),
+                            boxShadow: const [
+                              BoxShadow(color: Colors.black54, blurRadius: 3),
+                            ],
+                          ),
+                          child: Icon(
+                            iconoZona,
+                            size: 11,
+                            color: colorZona,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 // Letras solo visibles si mostrarEtiqueta está activo o si el marcador está seleccionado/enfocado
                 if (widget.mostrarEtiqueta ||
@@ -239,13 +285,15 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                   Transform.translate(
                     offset: const Offset(0, -2.5),
                     child: Container(
-                      constraints: const BoxConstraints(maxWidth: 66),
+                      constraints: BoxConstraints(maxWidth: a11yActivo ? 74 : 66),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 4,
                         vertical: 1.0,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E293B), // Azul grafito oscuro de alto contraste
+                        color: a11yActivo
+                            ? Colors.black // Negro puro para alto contraste WCAG AAA
+                            : const Color(0xFF1E293B),
                         borderRadius: BorderRadius.circular(6),
                         boxShadow: const [
                           BoxShadow(
@@ -256,30 +304,42 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                         ],
                         border: Border.all(
                           color: widget.isSelected
-                              ? const Color(0xFFFFB74D)
-                              : colorZona,
-                          width: 1.0,
+                              ? (a11yActivo ? const Color(0xFFFDE047) : const Color(0xFFFFB74D))
+                              : (a11yActivo ? colorZona : colorZona),
+                          width: a11yActivo ? 1.6 : 1.0,
                         ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            widget.marcador.visitado ? '✓ ' : '🐾 ',
-                            style: TextStyle(
-                              fontSize: 6.5,
-                              color: widget.marcador.visitado
-                                  ? const Color(0xFF81C784)
-                                  : const Color(0xFFFFD54F),
+                          if (a11yActivo) ...[
+                            Text(
+                              codigoZona.split(' ').first,
+                              style: TextStyle(
+                                fontSize: 6.8,
+                                fontWeight: FontWeight.bold,
+                                color: colorZona,
+                              ),
                             ),
-                          ),
+                            const SizedBox(width: 2),
+                          ] else ...[
+                            Text(
+                              widget.marcador.visitado ? '✓ ' : '🐾 ',
+                              style: TextStyle(
+                                fontSize: 6.5,
+                                color: widget.marcador.visitado
+                                    ? const Color(0xFF81C784)
+                                    : const Color(0xFFFFD54F),
+                              ),
+                            ),
+                          ],
                           Flexible(
                             child: Text(
                               widget.marcador.nombre,
                               textAlign: TextAlign.center,
                               style: GoogleFonts.urbanist(
                                 fontSize: 8.0,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w900,
                                 color: Colors.white,
                                 letterSpacing: 0.1,
                               ),
@@ -490,6 +550,129 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
                     ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCalmZonePin() {
+    final a11y = AccesibilidadService.instance;
+    final bool a11yActivo = a11y.accesibilidadVisualActiva;
+    const Color pinColor = Color(0xFF10B981); // Verde esmeralda relajante
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _handleTap,
+      child: SizedBox(
+        width: 74,
+        height: 74,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedBuilder(
+              animation: _pulseAnimation,
+              builder: (_, _) {
+                return Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Halo relajante expansivo
+                    Transform.scale(
+                      scale: _pulseAnimation.value,
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: pinColor.withValues(alpha: 0.28),
+                        ),
+                      ),
+                    ),
+                    AnimatedBuilder(
+                      animation: _bounceAnimation,
+                      builder: (_, _) => Transform.scale(
+                        scale: _bounceAnimation.value,
+                        child: Container(
+                          width: widget.isSelected ? 32 : 26,
+                          height: widget.isSelected ? 32 : 26,
+                          decoration: BoxDecoration(
+                            color: a11yActivo ? const Color(0xFF047857) : pinColor,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: widget.isSelected ? 2.5 : 2.0,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: pinColor.withValues(alpha: 0.45),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            widget.marcador.icono,
+                            color: Colors.white,
+                            size: widget.isSelected ? 17 : 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            if (widget.mostrarEtiqueta ||
+                widget.isSelected ||
+                widget.isHighlighted)
+              Transform.translate(
+                offset: const Offset(0, -2),
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 72),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 1.5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: a11yActivo
+                        ? Colors.black
+                        : const Color(0xFF065F46),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: a11yActivo ? const Color(0xFF4ADE80) : Colors.white,
+                      width: a11yActivo ? 1.5 : 1.0,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black45,
+                        blurRadius: 3,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        '🌿 ',
+                        style: TextStyle(fontSize: 7.0),
+                      ),
+                      Flexible(
+                        child: Text(
+                          'Zona Calma',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 7.5,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

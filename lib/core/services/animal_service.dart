@@ -186,6 +186,11 @@ class AnimalService extends ChangeNotifier {
     return List.unmodifiable(accesosZoologico);
   }
 
+  /// Retorna las Zonas de Calma y Silencio para personas con hipersensibilidad sensorial (4 en total).
+  List<MarcadorMapa> obtenerZonasCalma() {
+    return List.unmodifiable(zonasCalmaZoologico);
+  }
+
   /// Busca animales por nombre o hábitat.
   List<MarcadorMapa> buscarAnimales(String query) {
     final q = query.trim().toLowerCase();

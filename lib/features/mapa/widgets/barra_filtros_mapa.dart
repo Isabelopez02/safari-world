@@ -8,6 +8,7 @@ import 'package:zoologico_front/core/theme/app_colors.dart';
 /// Tipos de filtro rápido disponibles en el mapa interactivo
 enum FiltroServicioMapa {
   todos,
+  calma,
   banio,
   estacionamiento,
   boleteria,
@@ -35,11 +36,13 @@ class _OpcionFiltro {
 class BarraFiltrosMapa extends StatelessWidget {
   final FiltroServicioMapa filtroSeleccionado;
   final ValueChanged<FiltroServicioMapa> onFiltroCambiado;
+  final bool altoContraste;
 
   const BarraFiltrosMapa({
     super.key,
     required this.filtroSeleccionado,
     required this.onFiltroCambiado,
+    this.altoContraste = false,
   });
 
   static const List<_OpcionFiltro> _opciones = [
@@ -48,6 +51,13 @@ class BarraFiltrosMapa extends StatelessWidget {
       etiqueta: 'Todos',
       icono: Icons.eco_rounded,
       colorActivo: AppColors.verdeAzulado,
+    ),
+    _OpcionFiltro(
+      tipo: FiltroServicioMapa.calma,
+      etiqueta: 'Zonas de Calma',
+      icono: Icons.spa_rounded,
+      colorActivo: Color(0xFF10B981),
+      badge: '4',
     ),
     _OpcionFiltro(
       tipo: FiltroServicioMapa.banio,
@@ -116,14 +126,18 @@ class BarraFiltrosMapa extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? opcion.colorActivo
-                        : Colors.white.withValues(alpha: 0.88),
+                        ? (altoContraste ? const Color(0xFFFDE047) : opcion.colorActivo)
+                        : (altoContraste
+                            ? const Color(0xFF0F172A)
+                            : Colors.white.withValues(alpha: 0.88)),
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(
                       color: isSelected
-                          ? opcion.colorActivo
-                          : const Color(0xFFCBD5E1),
-                      width: isSelected ? 1.6 : 1.2,
+                          ? (altoContraste ? Colors.white : opcion.colorActivo)
+                          : (altoContraste
+                              ? const Color(0xFF475569)
+                              : const Color(0xFFCBD5E1)),
+                      width: isSelected ? 2.0 : (altoContraste ? 1.5 : 1.2),
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -142,8 +156,8 @@ class BarraFiltrosMapa extends StatelessWidget {
                         opcion.icono,
                         size: 16,
                         color: isSelected
-                            ? Colors.white
-                            : const Color(0xFF334155),
+                            ? (altoContraste ? Colors.black : Colors.white)
+                            : (altoContraste ? Colors.white : const Color(0xFF334155)),
                       ),
                       const SizedBox(width: 6),
                       Text(
@@ -153,8 +167,8 @@ class BarraFiltrosMapa extends StatelessWidget {
                           fontWeight:
                               isSelected ? FontWeight.w900 : FontWeight.w700,
                           color: isSelected
-                              ? Colors.white
-                              : const Color(0xFF1E293B),
+                              ? (altoContraste ? Colors.black : Colors.white)
+                              : (altoContraste ? Colors.white : const Color(0xFF1E293B)),
                         ),
                       ),
                       if (opcion.badge != null) ...[

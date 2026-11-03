@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zoologico_front/core/models/marcador_mapa.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
+import 'package:zoologico_front/features/mapa/screens/pantalla_detalle_animal.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
 import 'package:zoologico_front/features/mapa/widgets/barra_filtros_mapa.dart';
 import 'package:zoologico_front/features/mapa/widgets/modal_animales_por_visitar.dart';
@@ -174,6 +176,67 @@ void main() {
       expect(find.text('SOS'), findsOneWidget);
       expect(find.text('Tus Exploraciones'), findsOneWidget);
       expect(find.text('Explorar'), findsOneWidget);
+    });
+
+    test('Verifica colores y temas por hábitat en Ficha de Animal', () {
+      final costa = getHabitatTheme('Zona Costa');
+      expect(costa.nombreHabitat, equals('Zona Costa'));
+      expect(costa.emoji, equals('🌊'));
+
+      final sierra = getHabitatTheme('Zona Sierra');
+      expect(sierra.nombreHabitat, equals('Zona Sierra'));
+      expect(sierra.emoji, equals('🏔️'));
+
+      final selva = getHabitatTheme('Zona Selva');
+      expect(selva.nombreHabitat, equals('Zona Selva'));
+      expect(selva.emoji, equals('🌴'));
+
+      final internacional = getHabitatTheme('Zona Internacional');
+      expect(internacional.nombreHabitat, equals('Zona Internacional'));
+      expect(internacional.emoji, equals('🦁'));
+
+      final granja = getHabitatTheme('Granja Interactiva');
+      expect(granja.nombreHabitat, equals('Granja Interactiva'));
+      expect(granja.emoji, equals('🚜'));
+    });
+
+    testWidgets('PantallaDetalleAnimal renderiza en móvil y tablet según ancho de pantalla',
+        (WidgetTester tester) async {
+      final animalTest = MarcadorMapa.desdePorcentaje(
+        id: 'C06',
+        nombre: 'Cocodrilo de Tumbes',
+        porcentajeX: 20,
+        porcentajeY: 45,
+        icono: Icons.pets,
+        habitat: 'Zona Costa',
+      );
+
+      // 1. MÓVIL (< 720px)
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PantallaDetalleAnimal(animal: animalTest),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cocodrilo de Tumbes'), findsOneWidget);
+      expect(find.textContaining('Zona Costa'), findsAtLeastNWidgets(1));
+
+      // 2. TABLET (>= 720px)
+      tester.view.physicalSize = const Size(1024, 768);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PantallaDetalleAnimal(animal: animalTest),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cocodrilo de Tumbes'), findsOneWidget);
+      expect(find.textContaining('Zona Costa'), findsAtLeastNWidgets(1));
+      tester.view.resetPhysicalSize();
     });
   });
 }

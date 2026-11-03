@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
@@ -40,63 +41,77 @@ class BarraInferiorMapa extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-        child: AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                key: keyAnimales,
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.94),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: const Color(0xFFCBD5E1),
-                    width: 1.2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.12),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
+    return ListenableBuilder(
+      listenable: AccesibilidadService.instance,
+      builder: (context, _) {
+        final a11y = AccesibilidadService.instance;
+        final bool a11yActivo = a11y.accesibilidadVisualActiva;
+
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    key: keyAnimales,
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: a11yActivo
+                          ? const Color(0xFF0F172A)
+                          : Colors.white.withValues(alpha: 0.94),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: a11yActivo
+                            ? const Color(0xFFFDE047)
+                            : const Color(0xFFCBD5E1),
+                        width: a11yActivo ? 2.0 : 1.2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: a11yActivo
+                              ? const Color(0xFFFDE047).withValues(alpha: 0.25)
+                              : Colors.black.withValues(alpha: 0.12),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  switchInCurve: Curves.easeOutBack,
-                  transitionBuilder: (child, animation) {
-                    return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, 0.12),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: FadeTransition(opacity: animation, child: child),
-                    );
-                  },
-                  child: KeyedSubtree(
-                    key: ValueKey(
-                      '${marcadorSeleccionado?.id ?? -1}_${isNavigating ? "nav" : "view"}',
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeOutBack,
+                      transitionBuilder: (child, animation) {
+                        return SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0, 0.12),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: FadeTransition(opacity: animation, child: child),
+                        );
+                      },
+                      child: KeyedSubtree(
+                        key: ValueKey(
+                          '${marcadorSeleccionado?.id ?? -1}_${isNavigating ? "nav" : "view"}',
+                        ),
+                        child: marcadorSeleccionado == null
+                            ? _buildBarraExploracion(context)
+                            : (!isNavigating
+                                  ? _buildBarraVistaPrevia(context)
+                                  : _buildBarraNavegando(context)),
+                      ),
                     ),
-                    child: marcadorSeleccionado == null
-                        ? _buildBarraExploracion(context)
-                        : (!isNavigating
-                              ? _buildBarraVistaPrevia(context)
-                              : _buildBarraNavegando(context)),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -232,6 +247,8 @@ class BarraInferiorMapa extends StatelessWidget {
 
   Widget _buildBarraVistaPrevia(BuildContext context) {
     final sel = marcadorSeleccionado!;
+    final a11y = AccesibilidadService.instance;
+    final bool a11yActivo = a11y.accesibilidadVisualActiva;
 
     // Distancia y tiempo estimado desde la ubicación actual del usuario (58%, 58% -> 1113.6, 626.4)
     const userPos = Offset(1113.6, 626.4);
@@ -239,10 +256,13 @@ class BarraInferiorMapa extends StatelessWidget {
     final int metros = (distPx * (800 / 1920)).round().clamp(25, 950);
     final int minutos = math.max(1, (metros / 65).round());
 
-    final bool esServicio = sel.esBanio || sel.tipoServicio != null;
-    final Color colorAcento = sel.esBanio
-        ? const Color(0xFF0284C7)
-        : (sel.colorZona ?? AppColors.verdeAzulado);
+    final bool esCalma = sel.esZonaCalma;
+    final bool esServicio = sel.esBanio || sel.tipoServicio != null || esCalma;
+    final Color colorAcento = esCalma
+        ? const Color(0xFF10B981)
+        : (sel.esBanio
+            ? const Color(0xFF0284C7)
+            : (sel.colorZona ?? AppColors.verdeAzulado));
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -255,7 +275,7 @@ class BarraInferiorMapa extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: a11yActivo ? Colors.grey.shade600 : Colors.grey.shade300,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -270,11 +290,11 @@ class BarraInferiorMapa extends StatelessWidget {
               width: 54,
               height: 54,
               decoration: BoxDecoration(
-                color: colorAcento.withValues(alpha: 0.12),
+                color: colorAcento.withValues(alpha: a11yActivo ? 0.30 : 0.12),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: colorAcento.withValues(alpha: 0.35),
-                  width: 1.5,
+                  color: colorAcento,
+                  width: a11yActivo ? 2.0 : 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -286,31 +306,37 @@ class BarraInferiorMapa extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(14),
-                child: sel.esBanio
+                child: esCalma
                     ? const Icon(
-                        Icons.wc_rounded,
-                        color: Color(0xFF0284C7),
+                        Icons.spa_rounded,
+                        color: Color(0xFF10B981),
                         size: 28,
                       )
-                    : (sel.imagen != null
-                        ? Image.asset(sel.imagen!, fit: BoxFit.cover)
-                        : Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  colorAcento.withValues(alpha: 0.15),
-                                  colorAcento.withValues(alpha: 0.3),
-                                ],
-                              ),
-                            ),
-                            child: Icon(
-                              sel.icono,
-                              color: colorAcento,
-                              size: 28,
-                            ),
-                          )),
+                    : (sel.esBanio
+                        ? const Icon(
+                            Icons.wc_rounded,
+                            color: Color(0xFF0284C7),
+                            size: 28,
+                          )
+                        : (sel.imagen != null
+                            ? Image.asset(sel.imagen!, fit: BoxFit.cover)
+                            : Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      colorAcento.withValues(alpha: 0.15),
+                                      colorAcento.withValues(alpha: 0.3),
+                                    ],
+                                  ),
+                                ),
+                                child: Icon(
+                                  sel.icono,
+                                  color: colorAcento,
+                                  size: 28,
+                                ),
+                              ))),
               ),
             ),
             const SizedBox(width: 12),
@@ -327,7 +353,7 @@ class BarraInferiorMapa extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 18.5,
                       fontWeight: FontWeight.w900,
-                      color: AppColors.textoOscuro,
+                      color: a11yActivo ? Colors.white : AppColors.textoOscuro,
                     ),
                   ),
                   const SizedBox(height: 3),
@@ -344,14 +370,18 @@ class BarraInferiorMapa extends StatelessWidget {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          sel.esBanio
-                              ? 'Baños públicos · ~$minutos min ($metros m)'
-                              : '${sel.habitat} · ~$minutos min a pie ($metros m)',
+                          esCalma
+                              ? '${sel.nivelRuido ?? "Silencioso"} · ~$minutos min ($metros m)'
+                              : (sel.esBanio
+                                  ? 'Baños públicos · ~$minutos min ($metros m)'
+                                  : '${sel.habitat} · ~$minutos min a pie ($metros m)'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.urbanist(
                             fontSize: 12.5,
-                            color: Colors.grey.shade600,
+                            color: a11yActivo
+                                ? const Color(0xFFCBD5E1)
+                                : Colors.grey.shade600,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -488,9 +518,11 @@ class BarraInferiorMapa extends StatelessWidget {
                   size: 18,
                 ),
                 label: Text(
-                  sel.esBanio
-                      ? 'Guiarme al Baño ($metros m)'
-                      : 'Iniciar Guía ($metros m)',
+                  esCalma
+                      ? 'Ruta de Calma ($metros m)'
+                      : (sel.esBanio
+                          ? 'Guiarme al Baño ($metros m)'
+                          : 'Iniciar Guía ($metros m)'),
                   style: GoogleFonts.urbanist(
                     color: Colors.white,
                     fontWeight: FontWeight.w900,
@@ -498,9 +530,11 @@ class BarraInferiorMapa extends StatelessWidget {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: sel.esBanio
-                      ? const Color(0xFF0284C7)
-                      : AppColors.verdeAzulado,
+                  backgroundColor: esCalma
+                      ? const Color(0xFF10B981)
+                      : (sel.esBanio
+                          ? const Color(0xFF0284C7)
+                          : (a11yActivo ? const Color(0xFF0284C7) : AppColors.verdeAzulado)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(22),
                   ),
