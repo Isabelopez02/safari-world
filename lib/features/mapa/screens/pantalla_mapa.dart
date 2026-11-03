@@ -399,6 +399,58 @@ class _PantallaMapaState extends State<PantallaMapa>
     );
   }
 
+  Widget _buildMarcadorPosicionado({
+    required MarcadorMapa marcador,
+    required bool isSelected,
+    required bool haySeleccionActiva,
+    required bool mostrarEtiquetaDefecto,
+  }) {
+    final bool matches = _isMarkerMatchingFilter(marcador);
+
+    // Si hay un marcador/recorrido seleccionado:
+    // - El seleccionado nunca se atenúa y siempre muestra su etiqueta
+    // - Los demás marcadores se atenúan (isDimmed = true) y ocultan su texto para no tapar la ruta
+    final bool isDimmed = isSelected
+        ? false
+        : (haySeleccionActiva ||
+            (_filtroServicio != FiltroServicioMapa.todos && !matches));
+
+    final bool isHighlighted = isSelected ||
+        (!haySeleccionActiva &&
+            _filtroServicio != FiltroServicioMapa.todos &&
+            matches);
+
+    final bool mostrarEtiqueta = isSelected ||
+        (!haySeleccionActiva && mostrarEtiquetaDefecto);
+
+    final double leftOffset;
+    final double topOffset;
+    if (marcador.esZonaCalma) {
+      leftOffset = marcador.x - 37;
+      topOffset = marcador.y - 14;
+    } else if (marcador.esBanio) {
+      leftOffset = marcador.x - 27;
+      topOffset = marcador.y - 12;
+    } else {
+      leftOffset = marcador.x - 35;
+      topOffset = marcador.y - 14;
+    }
+
+    return Positioned(
+      key: ValueKey('marcador_${marcador.id}'),
+      left: leftOffset,
+      top: topOffset,
+      child: MarcadorAnimado(
+        marcador: marcador,
+        isSelected: isSelected,
+        isDimmed: isDimmed,
+        isHighlighted: isHighlighted,
+        mostrarEtiqueta: mostrarEtiqueta,
+        onTap: () => _mostrarInfoMarcador(marcador),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -429,6 +481,7 @@ class _PantallaMapaState extends State<PantallaMapa>
                 height: mapaAlto,
                 child: Stack(
                   children: [
+                    // CAPA 1: MAPA BASE
                     Positioned.fill(
                       child: ColorFiltered(
                         colorFilter: a11y.modoAltoContraste
@@ -444,172 +497,138 @@ class _PantallaMapaState extends State<PantallaMapa>
                                 0, 0, 1, 0, 0,
                                 0, 0, 0, 1, 0,
                               ]),
-                        child: Image.asset(
-                          'assets/images/mapa_zoologico.png',
-                          fit: BoxFit.fill,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            if (_marcadorSeleccionado != null) {
+                              setState(() {
+                                _marcadorSeleccionado = null;
+                                _rutaActual = [];
+                                _rutaSvgActual = null;
+                              });
+                            }
+                          },
+                          child: Image.asset(
+                            'assets/images/mapa_zoologico.png',
+                            fit: BoxFit.fill,
+                          ),
                         ),
                       ),
                     ),
-                    // CAPA MODULAR DE TRAZOS Y RUTAS VECTORIALES SVG
-                    Positioned.fill(
-                      child: AnimatedBuilder(
-                        animation: _routeProgressController,
-                        builder: (context, child) {
-                          return CapaTrazosMapa(
-                            progreso: _routeProgressController.value,
-                            rutaSvg: _rutaSvgActual,
-                            rutaCoordenadas: _rutaActual,
-                            estaNavegando: _isNavigating,
-                          );
-                        },
-                      ),
-                    ),
-                    // PARADEROS DE ANIMALES
-                    ...marcadores.map((marcador) {
-                      final bool matches = _isMarkerMatchingFilter(marcador);
-                      final bool isDimmed =
-                          _filtroServicio != FiltroServicioMapa.todos &&
-                          !matches;
-                      final bool isHighlighted =
-                          _filtroServicio != FiltroServicioMapa.todos &&
-                          matches;
 
-                      return Positioned(
-                        left: marcador.x - 35,
-                        top: marcador.y - 14,
-                        child: MarcadorAnimado(
-                          marcador: marcador,
-                          isSelected: _marcadorSeleccionado?.id == marcador.id,
-                          isDimmed: isDimmed,
-                          isHighlighted: isHighlighted,
-                          mostrarEtiqueta: mostrarEtiquetasAnimales,
-                          onTap: () => _mostrarInfoMarcador(marcador),
-                        ),
-                      );
-                    }),
-                    // PARADEROS DE BAÑOS (si el filtro está activo o se filtraron baños)
+                    // CAPA 2: PINES SECUNDARIOS / NO SELECCIONADOS
+                    // (Se ubican por debajo del trazo de ruta para no tapar el recorrido)
+                    ...marcadores
+                        .where((m) => m.id != _marcadorSeleccionado?.id)
+                        .map((marcador) => _buildMarcadorPosicionado(
+                              marcador: marcador,
+                              isSelected: false,
+                              haySeleccionActiva: _marcadorSeleccionado != null,
+                              mostrarEtiquetaDefecto: mostrarEtiquetasAnimales,
+                            )),
+
                     if (_mostrarBanios ||
                         _filtroServicio == FiltroServicioMapa.banio)
-                      ...banios.map((banio) {
-                        final bool matches = _isMarkerMatchingFilter(banio);
-                        final bool isDimmed =
-                            _filtroServicio != FiltroServicioMapa.todos &&
-                            !matches;
-                        final bool isHighlighted =
-                            _filtroServicio != FiltroServicioMapa.todos &&
-                            matches;
+                      ...banios
+                          .where((b) => b.id != _marcadorSeleccionado?.id)
+                          .map((banio) => _buildMarcadorPosicionado(
+                                marcador: banio,
+                                isSelected: false,
+                                haySeleccionActiva: _marcadorSeleccionado != null,
+                                mostrarEtiquetaDefecto: true,
+                              )),
 
-                        return Positioned(
-                          left: banio.x - 27,
-                          top: banio.y - 12,
-                          child: MarcadorAnimado(
-                            marcador: banio,
-                            isSelected: _marcadorSeleccionado?.id == banio.id,
-                            isDimmed: isDimmed,
-                            isHighlighted: isHighlighted,
-                            mostrarEtiqueta: true,
-                            onTap: () => _mostrarInfoMarcador(banio),
-                          ),
-                        );
-                      }),
-                    // PARADEROS DE ACCESOS, ESTACIONAMIENTOS, SALIDAS Y JUEGOS
-                    ...accesos.map((acceso) {
-                      final bool matches = _isMarkerMatchingFilter(acceso);
-                      final bool isDimmed =
-                          _filtroServicio != FiltroServicioMapa.todos &&
-                          !matches;
-                      final bool isHighlighted =
-                          _filtroServicio != FiltroServicioMapa.todos &&
-                          matches;
+                    ...accesos
+                        .where((a) => a.id != _marcadorSeleccionado?.id)
+                        .map((acceso) => _buildMarcadorPosicionado(
+                              marcador: acceso,
+                              isSelected: false,
+                              haySeleccionActiva: _marcadorSeleccionado != null,
+                              mostrarEtiquetaDefecto: true,
+                            )),
 
-                      return Positioned(
-                        left: acceso.x - 35,
-                        top: acceso.y - 14,
-                        child: MarcadorAnimado(
-                          marcador: acceso,
-                          isSelected: _marcadorSeleccionado?.id == acceso.id,
-                          isDimmed: isDimmed,
-                          isHighlighted: isHighlighted,
-                          mostrarEtiqueta: true,
-                          onTap: () => _mostrarInfoMarcador(acceso),
-                        ),
-                      );
-                    }),
-                    // PARADEROS DE ZONAS DE CALMA Y SILENCIO (Espacios inclusivos para TEA y descanso sensorial)
                     if (a11y.mostrarZonasCalma ||
                         _filtroServicio == FiltroServicioMapa.calma)
-                      ...zonasCalma.map((calma) {
-                        final bool matches = _isMarkerMatchingFilter(calma);
-                        final bool isDimmed =
-                            _filtroServicio != FiltroServicioMapa.todos &&
-                            !matches;
-                        final bool isHighlighted =
-                            _filtroServicio != FiltroServicioMapa.todos &&
-                            matches;
+                      ...zonasCalma
+                          .where((c) => c.id != _marcadorSeleccionado?.id)
+                          .map((calma) => _buildMarcadorPosicionado(
+                                marcador: calma,
+                                isSelected: false,
+                                haySeleccionActiva: _marcadorSeleccionado != null,
+                                mostrarEtiquetaDefecto: true,
+                              )),
 
-                        return Positioned(
-                          left: calma.x - 37,
-                          top: calma.y - 14,
-                          child: MarcadorAnimado(
-                            marcador: calma,
-                            isSelected: _marcadorSeleccionado?.id == calma.id,
-                            isDimmed: isDimmed,
-                            isHighlighted: isHighlighted,
-                            mostrarEtiqueta: true,
-                            onTap: () => _mostrarInfoMarcador(calma),
-                          ),
-                        );
-                      }),
-                    // ONDA DE RADAR EXPANSIVA EN LA UBICACIÓN DEL USUARIO
+                    // CAPA 3: MODULAR DE TRAZOS Y RUTAS VECTORIALES SVG (POR ENCIMA DE LOS PINES ATENUADOS)
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: AnimatedBuilder(
+                          animation: _routeProgressController,
+                          builder: (context, child) {
+                            return CapaTrazosMapa(
+                              progreso: _routeProgressController.value,
+                              rutaSvg: _rutaSvgActual,
+                              rutaCoordenadas: _rutaActual,
+                              estaNavegando: _isNavigating,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+
+                    // CAPA 4: ONDA DE RADAR EXPANSIVA EN LA UBICACIÓN DEL USUARIO (DECORATIVA: NO BLOQUEA CLICS)
                     if (grafoMapa.nodos.containsKey(_nodoActual)) ...[
                       Positioned(
                         left: grafoMapa.nodos[_nodoActual]!.posicion.dx - 60,
                         top: grafoMapa.nodos[_nodoActual]!.posicion.dy - 60,
-                        child: AnimatedBuilder(
-                          animation: _radarPulseAnimation,
-                          builder: (context, child) {
-                            final val = _radarPulseAnimation.value;
-                            return Container(
-                              width: 120,
-                              height: 120,
-                              alignment: Alignment.center,
-                              child: Container(
-                                width: 24 + (96 * val),
-                                height: 24 + (96 * val),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.verdeAzulado.withValues(
-                                    alpha: (1.0 - val) * 0.35,
-                                  ),
-                                  border: Border.all(
+                        child: IgnorePointer(
+                          child: AnimatedBuilder(
+                            animation: _radarPulseAnimation,
+                            builder: (context, child) {
+                              final val = _radarPulseAnimation.value;
+                              return Container(
+                                width: 120,
+                                height: 120,
+                                alignment: Alignment.center,
+                                child: Container(
+                                  width: 24 + (96 * val),
+                                  height: 24 + (96 * val),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
                                     color: AppColors.verdeAzulado.withValues(
-                                      alpha: (1.0 - val) * 0.8,
+                                      alpha: (1.0 - val) * 0.35,
                                     ),
-                                    width: 2,
+                                    border: Border.all(
+                                      color: AppColors.verdeAzulado.withValues(
+                                        alpha: (1.0 - val) * 0.8,
+                                      ),
+                                      width: 2,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       ),
                       Positioned(
                         left: grafoMapa.nodos[_nodoActual]!.posicion.dx - 12,
                         top: grafoMapa.nodos[_nodoActual]!.posicion.dy - 12,
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: AppColors.verdeAzulado,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 3),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black38,
-                                blurRadius: 6,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
+                        child: IgnorePointer(
+                          child: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: AppColors.verdeAzulado,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 3),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black38,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -617,52 +636,63 @@ class _PantallaMapaState extends State<PantallaMapa>
                       Positioned(
                         left: grafoMapa.nodos[_nodoActual]!.posicion.dx - 65,
                         top: grafoMapa.nodos[_nodoActual]!.posicion.dy - 46,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF1E293B),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 1.8,
+                        child: IgnorePointer(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
                             ),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black45,
-                                blurRadius: 8,
-                                offset: Offset(0, 3),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E293B),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1.8,
                               ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF4ADE80),
-                                  shape: BoxShape.circle,
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black45,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 3),
                                 ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Tú estás aquí',
-                                style: GoogleFonts.urbanist(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                  letterSpacing: 0.2,
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF4ADE80),
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Tú estás aquí',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ],
+
+                    // CAPA 5: DESTINO SELECCIONADO (EN LA CÚSPIDE: POR ENCIMA DEL TRAZO Y DE LOS DEMÁS PINES)
+                    if (_marcadorSeleccionado != null)
+                      _buildMarcadorPosicionado(
+                        marcador: _marcadorSeleccionado!,
+                        isSelected: true,
+                        haySeleccionActiva: true,
+                        mostrarEtiquetaDefecto: true,
+                      ),
                   ],
                 ),
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/models/datos_animal.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
+import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'pantalla_detalle_animal.dart';
 
@@ -34,105 +35,115 @@ class DetalleAnimalTablet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: theme.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // BARRA SUPERIOR DE NAVEGACIÓN TABLET
-            _buildBarraSuperior(),
+    return ListenableBuilder(
+      listenable: AccesibilidadService.instance,
+      builder: (context, _) {
+        final a11y = AccesibilidadService.instance;
+        final bool oscuro = a11y.modoAltoContraste;
+        final Color fondoPantalla =
+            oscuro ? const Color(0xFF020617) : theme.background;
 
-            // CUERPO EN DOS COLUMNAS RESPONSIVAS
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // COLUMNA IZQUIERDA: FOTO GRANDE, IDENTIDAD Y PASAPORTE (45%)
-                    Expanded(
-                      flex: 5,
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            // FOTO HERO GRANDE CON MARCO TEMÁTICO
-                            _buildHeroPhoto(),
+        return Scaffold(
+          backgroundColor: fondoPantalla,
+          body: SafeArea(
+            child: Column(
+              children: [
+                // BARRA SUPERIOR DE NAVEGACIÓN TABLET
+                _buildBarraSuperior(),
 
-                            const SizedBox(height: 16),
-
-                            // TARJETA DE REPRODUCTOR DE AUDIOGUÍA
-                            _buildPanelAudioguia(),
-
-                            const SizedBox(height: 16),
-
-                            // TARJETA DEL PASAPORTE EXPLORADOR
-                            _buildTarjetaPasaporte(),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 24),
-
-                    // COLUMNA DERECHA: DASHBOARD EDUCATIVO SCROLLEABLE (55%)
-                    Expanded(
-                      flex: 6,
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // CHIPS DE ESTADO Y CONSERVACIÓN
-                            Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
+                // CUERPO EN DOS COLUMNAS RESPONSIVAS
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // COLUMNA IZQUIERDA: FOTO GRANDE, IDENTIDAD Y PASAPORTE (45%)
+                        Expanded(
+                          flex: 5,
+                          child: SingleChildScrollView(
+                            physics: const BouncingScrollPhysics(),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                _buildChip(
-                                  icon: Icons.terrain_rounded,
-                                  label: '${theme.emoji} ${theme.nombreHabitat}',
-                                  color: theme.accent,
-                                ),
-                                _buildChip(
-                                  icon: Icons.restaurant_rounded,
-                                  label: datos.dieta,
-                                  color: theme.accent,
-                                ),
-                                _buildChip(
-                                  icon: Icons.shield_rounded,
-                                  label: datos.estadoConservacion,
-                                  color: const Color(0xFFE65100),
-                                  esAlerta: true,
-                                ),
+                                // FOTO HERO GRANDE CON MARCO TEMÁTICO
+                                _buildHeroPhoto(),
+
+                                const SizedBox(height: 16),
+
+                                // TARJETA DE REPRODUCTOR DE AUDIOGUÍA
+                                _buildPanelAudioguia(),
+
+                                const SizedBox(height: 16),
+
+                                // TARJETA DEL PASAPORTE EXPLORADOR
+                                _buildTarjetaPasaporte(),
                               ],
                             ),
-
-                            const SizedBox(height: 16),
-
-                            // HORARIOS Y ALIMENTACIÓN
-                            _buildTarjetaHorariosYDieta(),
-
-                            const SizedBox(height: 16),
-
-                            // COMPORTAMIENTO EN EL HÁBITAT
-                            _buildTarjetaComportamiento(),
-
-                            const SizedBox(height: 16),
-
-                            // ¿SABÍAS QUE? (CURIOSIDAD CIENTÍFICA)
-                            _buildTarjetaCuriosidad(),
-                          ],
+                          ),
                         ),
-                      ),
+
+                        const SizedBox(width: 24),
+
+                        // COLUMNA DERECHA: DASHBOARD EDUCATIVO SCROLLEABLE (55%)
+                        Expanded(
+                          flex: 6,
+                          child: SingleChildScrollView(
+                            physics: const BouncingScrollPhysics(),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // CHIPS DE ESTADO Y CONSERVACIÓN
+                                Wrap(
+                                  spacing: 10,
+                                  runSpacing: 10,
+                                  children: [
+                                    _buildChip(
+                                      icon: Icons.terrain_rounded,
+                                      label: '${theme.emoji} ${theme.nombreHabitat}',
+                                      color: oscuro ? const Color(0xFFFDE047) : theme.accent,
+                                    ),
+                                    _buildChip(
+                                      icon: Icons.restaurant_rounded,
+                                      label: datos.dieta,
+                                      color: oscuro ? const Color(0xFFFDE047) : theme.accent,
+                                    ),
+                                    _buildChip(
+                                      icon: Icons.shield_rounded,
+                                      label: datos.estadoConservacion,
+                                      color: oscuro ? const Color(0xFFFB923C) : const Color(0xFFE65100),
+                                      esAlerta: true,
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 16),
+
+                                // HORARIOS Y ALIMENTACIÓN
+                                _buildTarjetaHorariosYDieta(),
+
+                                const SizedBox(height: 16),
+
+                                // COMPORTAMIENTO EN EL HÁBITAT
+                                _buildTarjetaComportamiento(),
+
+                                const SizedBox(height: 16),
+
+                                // ¿SABÍAS QUE? (CURIOSIDAD CIENTÍFICA)
+                                _buildTarjetaCuriosidad(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -518,13 +529,21 @@ class DetalleAnimalTablet extends StatelessWidget {
   }
 
   Widget _buildTarjetaHorariosYDieta() {
+    final a11y = AccesibilidadService.instance;
+    final bool oscuro = a11y.modoAltoContraste;
+    final Color fondoTarjeta = oscuro ? const Color(0xFF0F172A) : Colors.white;
+    final Color bordeTarjeta = oscuro ? Colors.white12 : Colors.grey.shade200;
+    final Color textoTitulo = oscuro ? Colors.white : AppColors.textoOscuro;
+    final Color textoSecundario = oscuro ? const Color(0xFF94A3B8) : Colors.grey[600]!;
+    final Color accentColor = oscuro ? const Color(0xFFFDE047) : theme.accent;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: fondoTarjeta,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: bordeTarjeta),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -541,10 +560,10 @@ class DetalleAnimalTablet extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.accent.withValues(alpha: 0.1),
+                  color: accentColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.schedule_rounded, size: 18, color: theme.accent),
+                child: Icon(Icons.schedule_rounded, size: 18, color: accentColor),
               ),
               const SizedBox(width: 10),
               Column(
@@ -555,7 +574,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: Colors.grey[600],
+                      color: textoSecundario,
                     ),
                   ),
                   Text(
@@ -563,16 +582,20 @@ class DetalleAnimalTablet extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       fontWeight: FontWeight.w900,
-                      color: AppColors.textoOscuro,
+                      color: textoTitulo,
                     ),
                   ),
                 ],
               ),
             ],
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(height: 1, thickness: 0.8),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Divider(
+              height: 1,
+              thickness: 0.8,
+              color: oscuro ? Colors.white12 : Colors.grey.shade200,
+            ),
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -580,10 +603,10 @@ class DetalleAnimalTablet extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.accent.withValues(alpha: 0.1),
+                  color: accentColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.restaurant_menu_rounded, size: 18, color: theme.accent),
+                child: Icon(Icons.restaurant_menu_rounded, size: 18, color: accentColor),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -595,7 +618,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                       style: GoogleFonts.urbanist(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: Colors.grey[600],
+                        color: textoSecundario,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -604,7 +627,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textoOscuro,
+                        color: textoTitulo,
                         height: 1.35,
                       ),
                     ),
@@ -619,13 +642,21 @@ class DetalleAnimalTablet extends StatelessWidget {
   }
 
   Widget _buildTarjetaComportamiento() {
+    final a11y = AccesibilidadService.instance;
+    final bool oscuro = a11y.modoAltoContraste;
+    final Color fondoTarjeta = oscuro ? const Color(0xFF0F172A) : Colors.white;
+    final Color bordeTarjeta = oscuro ? Colors.white12 : Colors.grey.shade200;
+    final Color textoTitulo = oscuro ? Colors.white : AppColors.textoOscuro;
+    final Color textoSecundario = oscuro ? const Color(0xFF94A3B8) : Colors.grey.shade800;
+    final Color accentColor = oscuro ? const Color(0xFFFDE047) : theme.accent;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: fondoTarjeta,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: bordeTarjeta),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -639,14 +670,14 @@ class DetalleAnimalTablet extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.psychology_rounded, size: 20, color: theme.accent),
+              Icon(Icons.psychology_rounded, size: 20, color: accentColor),
               const SizedBox(width: 8),
               Text(
                 'Comportamiento en el hábitat',
                 style: GoogleFonts.urbanist(
                   fontSize: 15,
                   fontWeight: FontWeight.w900,
-                  color: AppColors.textoOscuro,
+                  color: textoTitulo,
                 ),
               ),
             ],
@@ -656,7 +687,7 @@ class DetalleAnimalTablet extends StatelessWidget {
             datos.comportamiento,
             style: GoogleFonts.urbanist(
               fontSize: 13.5,
-              color: Colors.grey.shade800,
+              color: textoSecundario,
               height: 1.5,
               fontWeight: FontWeight.w600,
             ),
@@ -667,14 +698,25 @@ class DetalleAnimalTablet extends StatelessWidget {
   }
 
   Widget _buildTarjetaCuriosidad() {
+    final a11y = AccesibilidadService.instance;
+    final bool oscuro = a11y.modoAltoContraste;
+    final Color fondoCuriosidad = oscuro
+        ? const Color(0xFF1E293B)
+        : theme.gradientStart.withValues(alpha: 0.35);
+    final Color bordeColor = oscuro
+        ? const Color(0xFFFDE047).withValues(alpha: 0.5)
+        : theme.accent.withValues(alpha: 0.35);
+    final Color accentColor = oscuro ? const Color(0xFFFDE047) : theme.accent;
+    final Color textoBody = oscuro ? const Color(0xFFCBD5E1) : Colors.grey.shade900;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: theme.gradientStart.withValues(alpha: 0.35),
+        color: fondoCuriosidad,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: theme.accent.withValues(alpha: 0.35),
+          color: bordeColor,
           width: 1.2,
         ),
       ),
@@ -692,7 +734,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                   style: GoogleFonts.urbanist(
                     fontSize: 15,
                     fontWeight: FontWeight.w900,
-                    color: theme.accent,
+                    color: accentColor,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -700,7 +742,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                   datos.curiosidad,
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
-                    color: Colors.grey.shade900,
+                    color: textoBody,
                     height: 1.45,
                     fontWeight: FontWeight.w600,
                   ),

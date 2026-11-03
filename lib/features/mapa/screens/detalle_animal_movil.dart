@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/models/datos_animal.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
+import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'pantalla_detalle_animal.dart';
 
@@ -34,8 +35,22 @@ class DetalleAnimalMovil extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: theme.background,
+    return ListenableBuilder(
+      listenable: AccesibilidadService.instance,
+      builder: (context, _) {
+        final a11y = AccesibilidadService.instance;
+        final bool oscuro = a11y.modoAltoContraste;
+
+        // En modo alto contraste: fondo oscuro profundo, texto blanco, tarjetas dark
+        final Color fondoPantalla =
+            oscuro ? const Color(0xFF020617) : theme.background;
+        final Color textoTitulo =
+            oscuro ? Colors.white : AppColors.textoOscuro;
+        final Color accentColor =
+            oscuro ? const Color(0xFFFDE047) : theme.accent;
+
+        return Scaffold(
+      backgroundColor: fondoPantalla,
       body: Stack(
         children: [
           // CONTENIDO CON DESPLAZAMIENTO FLUIDO
@@ -237,7 +252,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                                   style: GoogleFonts.urbanist(
                                     fontSize: 25,
                                     fontWeight: FontWeight.w900,
-                                    color: AppColors.textoOscuro,
+                                    color: textoTitulo,
                                     height: 1.15,
                                     letterSpacing: -0.3,
                                   ),
@@ -248,7 +263,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                                   style: GoogleFonts.urbanist(
                                     fontSize: 13.5,
                                     fontStyle: FontStyle.italic,
-                                    color: theme.accent,
+                                    color: accentColor,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -295,12 +310,12 @@ class DetalleAnimalMovil extends StatelessWidget {
                           _buildChip(
                             icon: Icons.restaurant_rounded,
                             label: datos.dieta,
-                            color: theme.accent,
+                            color: accentColor,
                           ),
                           _buildChip(
                             icon: Icons.shield_rounded,
                             label: datos.estadoConservacion,
-                            color: const Color(0xFFE65100),
+                            color: oscuro ? const Color(0xFFFB923C) : const Color(0xFFE65100),
                             esAlerta: true,
                           ),
                         ],
@@ -380,6 +395,8 @@ class DetalleAnimalMovil extends StatelessWidget {
           ),
         ],
       ),
+    );
+      },
     );
   }
 
@@ -507,13 +524,21 @@ class DetalleAnimalMovil extends StatelessWidget {
   }
 
   Widget _buildTarjetaHorariosYDieta() {
+    final a11y = AccesibilidadService.instance;
+    final bool oscuro = a11y.modoAltoContraste;
+    final Color fondoTarjeta = oscuro ? const Color(0xFF0F172A) : Colors.white;
+    final Color bordeTarjeta = oscuro ? Colors.white12 : Colors.grey.shade200;
+    final Color textoTitulo = oscuro ? Colors.white : AppColors.textoOscuro;
+    final Color textoSecundario = oscuro ? const Color(0xFF94A3B8) : Colors.grey.shade600;
+    final Color accentColor = oscuro ? const Color(0xFFFDE047) : theme.accent;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: fondoTarjeta,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: bordeTarjeta),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -531,10 +556,10 @@ class DetalleAnimalMovil extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.accent.withValues(alpha: 0.1),
+                  color: accentColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.schedule_rounded, size: 16, color: theme.accent),
+                child: Icon(Icons.schedule_rounded, size: 16, color: accentColor),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -546,7 +571,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                       style: GoogleFonts.urbanist(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
-                        color: Colors.grey[600],
+                        color: textoSecundario,
                       ),
                     ),
                     Text(
@@ -554,7 +579,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.textoOscuro,
+                        color: textoTitulo,
                       ),
                     ),
                   ],
@@ -563,9 +588,10 @@ class DetalleAnimalMovil extends StatelessWidget {
             ],
           ),
 
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(height: 1, thickness: 0.8),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Divider(height: 1, thickness: 0.8,
+                color: oscuro ? Colors.white12 : Colors.grey.shade200),
           ),
 
           // FILA DIETA (TEXTO COMPLETO SIN RECORTES)
@@ -575,10 +601,10 @@ class DetalleAnimalMovil extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.accent.withValues(alpha: 0.1),
+                  color: accentColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.restaurant_menu_rounded, size: 16, color: theme.accent),
+                child: Icon(Icons.restaurant_menu_rounded, size: 16, color: accentColor),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -590,7 +616,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                       style: GoogleFonts.urbanist(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
-                        color: Colors.grey[600],
+                        color: textoSecundario,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -599,7 +625,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                       style: GoogleFonts.urbanist(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textoOscuro,
+                        color: textoTitulo,
                         height: 1.3,
                       ),
                     ),
@@ -614,13 +640,21 @@ class DetalleAnimalMovil extends StatelessWidget {
   }
 
   Widget _buildTarjetaComportamiento() {
+    final a11y = AccesibilidadService.instance;
+    final bool oscuro = a11y.modoAltoContraste;
+    final Color fondoTarjeta = oscuro ? const Color(0xFF0F172A) : Colors.white;
+    final Color bordeTarjeta = oscuro ? Colors.white12 : Colors.grey.shade200;
+    final Color textoTitulo = oscuro ? Colors.white : AppColors.textoOscuro;
+    final Color textoSecundario = oscuro ? const Color(0xFF94A3B8) : Colors.grey.shade800;
+    final Color accentColor = oscuro ? const Color(0xFFFDE047) : theme.accent;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: fondoTarjeta,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: bordeTarjeta),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -634,7 +668,7 @@ class DetalleAnimalMovil extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.psychology_rounded, size: 18, color: theme.accent),
+              Icon(Icons.psychology_rounded, size: 18, color: accentColor),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -642,7 +676,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
-                    color: AppColors.textoOscuro,
+                    color: textoTitulo,
                   ),
                 ),
               ),
@@ -653,7 +687,7 @@ class DetalleAnimalMovil extends StatelessWidget {
             datos.comportamiento,
             style: GoogleFonts.urbanist(
               fontSize: 13,
-              color: Colors.grey.shade800,
+              color: textoSecundario,
               height: 1.45,
               fontWeight: FontWeight.w600,
             ),
@@ -664,14 +698,25 @@ class DetalleAnimalMovil extends StatelessWidget {
   }
 
   Widget _buildTarjetaCuriosidad() {
+    final a11y = AccesibilidadService.instance;
+    final bool oscuro = a11y.modoAltoContraste;
+    final Color fondoCuriosidad = oscuro
+        ? const Color(0xFF1E293B)
+        : theme.gradientStart.withValues(alpha: 0.35);
+    final Color bordeColor = oscuro
+        ? const Color(0xFFFDE047).withValues(alpha: 0.5)
+        : theme.accent.withValues(alpha: 0.35);
+    final Color accentColor = oscuro ? const Color(0xFFFDE047) : theme.accent;
+    final Color textoBody = oscuro ? const Color(0xFFCBD5E1) : Colors.grey.shade900;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.gradientStart.withValues(alpha: 0.35),
+        color: fondoCuriosidad,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: theme.accent.withValues(alpha: 0.35),
+          color: bordeColor,
           width: 1.2,
         ),
       ),
@@ -689,7 +734,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
-                    color: theme.accent,
+                    color: accentColor,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -697,7 +742,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                   datos.curiosidad,
                   style: GoogleFonts.urbanist(
                     fontSize: 12.5,
-                    color: Colors.grey.shade900,
+                    color: textoBody,
                     height: 1.4,
                     fontWeight: FontWeight.w600,
                   ),

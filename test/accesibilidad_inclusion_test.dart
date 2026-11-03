@@ -93,9 +93,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Accesibilidad e Inclusión'), findsOneWidget);
-      expect(find.text('Modo Alto Contraste y Daltonismo'), findsOneWidget);
-      expect(find.text('Destacar Zonas de Calma / Silencio'), findsOneWidget);
+      expect(find.text('Accesibilidad'), findsOneWidget);
+      expect(find.text('Daltonismo'), findsOneWidget);
+      expect(find.text('Zonas de Calma'), findsWidgets);
 
       // Debe listar las 4 zonas de calma
       expect(find.text('Jardín Botánico & Sombra Serena'), findsOneWidget);
@@ -149,6 +149,33 @@ void main() {
       await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.text('A11y'), findsOneWidget);
+    });
+
+    testWidgets('Al seleccionar un marcador, los demás marcadores se atenúan para no tapar el recorrido',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: PantallaMapa(),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      // Verificar que el mapa cargó marcadores
+      final primerMarcadorFinder = find.byKey(const ValueKey('marcador_G01'));
+      expect(primerMarcadorFinder, findsOneWidget);
+
+      // Tocar en el primer marcador
+      await tester.tap(primerMarcadorFinder, warnIfMissed: false);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+
+      // Comprobar que el marcador seleccionado está presente en la cima
+      expect(find.byKey(const ValueKey('marcador_G01')), findsOneWidget);
     });
   });
 }

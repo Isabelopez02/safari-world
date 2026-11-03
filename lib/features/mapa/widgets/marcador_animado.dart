@@ -54,7 +54,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.25).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
-    if (!widget.marcador.visitado || widget.isSelected) {
+    if (!widget.isDimmed && (!widget.marcador.visitado || widget.isSelected)) {
       _pulseController.repeat(reverse: true);
     }
 
@@ -93,11 +93,12 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
   @override
   void didUpdateWidget(MarcadorAnimado old) {
     super.didUpdateWidget(old);
-    if ((!widget.marcador.visitado || widget.isSelected) &&
+    if (!widget.isDimmed &&
+        (!widget.marcador.visitado || widget.isSelected) &&
         !_pulseController.isAnimating) {
       _pulseController.repeat(reverse: true);
-    } else if (widget.marcador.visitado &&
-        !widget.isSelected &&
+    } else if ((widget.isDimmed ||
+            (widget.marcador.visitado && !widget.isSelected)) &&
         _pulseController.isAnimating) {
       _pulseController.stop();
       _pulseController.value = 0;
@@ -142,11 +143,11 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                 ? _buildBathroomPin()
                 : _buildAnimalParadero());
 
-        // Si el filtro no coincide con este marcador, se torna plomo (grayscale) con opacidad reducida
+        // Si el filtro no coincide con este marcador o hay una ruta activa, se atenúa en segundo plano
         if (widget.isDimmed) {
           return AnimatedOpacity(
             duration: const Duration(milliseconds: 260),
-            opacity: 0.28,
+            opacity: 0.16,
             child: ColorFiltered(
               colorFilter: const ColorFilter.matrix(<double>[
                 0.2126, 0.7152, 0.0722, 0, 0,
@@ -255,7 +256,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                       ),
                     ),
                     // BADGE GEOMÉTRICO DE DALTONISMO EN LA ESQUINA DEL AVATAR
-                    if (a11yActivo)
+                    if (a11yActivo && !widget.isDimmed)
                       Positioned(
                         top: -3,
                         left: -3,
@@ -278,10 +279,11 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                       ),
                   ],
                 ),
-                // Letras solo visibles si mostrarEtiqueta está activo o si el marcador está seleccionado/enfocado
-                if (widget.mostrarEtiqueta ||
-                    widget.isSelected ||
-                    widget.isHighlighted)
+                // Letras solo visibles si NO está atenuado y mostrarEtiqueta está activo o si el marcador está seleccionado/enfocado
+                if (!widget.isDimmed &&
+                    (widget.mostrarEtiqueta ||
+                        widget.isSelected ||
+                        widget.isHighlighted))
                   Transform.translate(
                     offset: const Offset(0, -2.5),
                     child: Container(
@@ -367,8 +369,9 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
           alignment: Alignment.center,
           clipBehavior: Clip.none,
           children: [
-            // Halo de pulso
-            if (!widget.marcador.visitado || widget.isSelected)
+            // Halo de pulso (solo activo para destino o pines activos no atenuados)
+            if (!widget.isDimmed &&
+                (!widget.marcador.visitado || widget.isSelected))
               Transform.scale(
                 scale: _pulseAnimation.value,
                 child: Container(
@@ -521,9 +524,10 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                 );
               },
             ),
-            if (widget.mostrarEtiqueta ||
-                widget.isSelected ||
-                widget.isHighlighted)
+            if (!widget.isDimmed &&
+                (widget.mostrarEtiqueta ||
+                    widget.isSelected ||
+                    widget.isHighlighted))
               Transform.translate(
                 offset: const Offset(0, -2),
                 child: Container(
@@ -626,9 +630,10 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                 );
               },
             ),
-            if (widget.mostrarEtiqueta ||
-                widget.isSelected ||
-                widget.isHighlighted)
+            if (!widget.isDimmed &&
+                (widget.mostrarEtiqueta ||
+                    widget.isSelected ||
+                    widget.isHighlighted))
               Transform.translate(
                 offset: const Offset(0, -2),
                 child: Container(

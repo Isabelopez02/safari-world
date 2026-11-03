@@ -50,10 +50,8 @@ class AccesibilidadService extends ChangeNotifier {
   Future<void> setModoAltoContraste(bool activo) async {
     await inicializar();
     _modoAltoContraste = activo;
-    // Si se activa alto contraste, por accesibilidad integral también habilitamos los símbolos de daltonismo
-    if (activo && !_modoDaltonismo) {
-      _modoDaltonismo = true;
-    }
+    // Si se activa/desactiva alto contraste, sincronizamos daltonismo
+    _modoDaltonismo = activo;
     notifyListeners();
     await _guardarPref(_prefKeyAltoContraste, activo);
     await _guardarPref(_prefKeyDaltonismo, _modoDaltonismo);
@@ -62,8 +60,12 @@ class AccesibilidadService extends ChangeNotifier {
   Future<void> setModoDaltonismo(bool activo) async {
     await inicializar();
     _modoDaltonismo = activo;
+    if (!activo) {
+      _modoAltoContraste = false;
+    }
     notifyListeners();
     await _guardarPref(_prefKeyDaltonismo, activo);
+    await _guardarPref(_prefKeyAltoContraste, _modoAltoContraste);
   }
 
   Future<void> setMostrarZonasCalma(bool activo) async {
@@ -74,12 +76,13 @@ class AccesibilidadService extends ChangeNotifier {
   }
 
   Future<void> toggleAltoContrasteYDaltonismo() async {
+    await inicializar();
     final nuevoEstado = !accesibilidadVisualActiva;
     _modoAltoContraste = nuevoEstado;
     _modoDaltonismo = nuevoEstado;
     notifyListeners();
-    _guardarPref(_prefKeyAltoContraste, nuevoEstado);
-    _guardarPref(_prefKeyDaltonismo, nuevoEstado);
+    await _guardarPref(_prefKeyAltoContraste, nuevoEstado);
+    await _guardarPref(_prefKeyDaltonismo, nuevoEstado);
   }
 
   Future<void> toggleZonasCalma() async {
