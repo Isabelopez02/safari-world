@@ -8,12 +8,16 @@ class ModalCapasMapa extends StatelessWidget {
   final String? habitatSeleccionado;
   final ValueChanged<String?> onHabitatCambiado;
   final ValueChanged<String> onServicioSeleccionado;
+  final bool mostrarZonasCalma;
+  final ValueChanged<bool> onToggleZonasCalma;
 
   const ModalCapasMapa({
     super.key,
     required this.habitatSeleccionado,
     required this.onHabitatCambiado,
     required this.onServicioSeleccionado,
+    required this.mostrarZonasCalma,
+    required this.onToggleZonasCalma,
   });
 
   static void mostrar(
@@ -21,16 +25,25 @@ class ModalCapasMapa extends StatelessWidget {
     required String? habitatSeleccionado,
     required ValueChanged<String?> onHabitatCambiado,
     required ValueChanged<String> onServicioSeleccionado,
+    required bool mostrarZonasCalma,
+    required ValueChanged<bool> onToggleZonasCalma,
   }) {
     SoundService.instance.playButtonTap();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => ModalCapasMapa(
-        habitatSeleccionado: habitatSeleccionado,
-        onHabitatCambiado: onHabitatCambiado,
-        onServicioSeleccionado: onServicioSeleccionado,
+      builder: (context) => StatefulBuilder(
+        builder: (ctx, setModalState) => ModalCapasMapa(
+          habitatSeleccionado: habitatSeleccionado,
+          onHabitatCambiado: onHabitatCambiado,
+          onServicioSeleccionado: onServicioSeleccionado,
+          mostrarZonasCalma: mostrarZonasCalma,
+          onToggleZonasCalma: (val) {
+            setModalState(() {});
+            onToggleZonasCalma(val);
+          },
+        ),
       ),
     );
   }
@@ -134,6 +147,83 @@ class ModalCapasMapa extends StatelessWidget {
 
           const SizedBox(height: 20),
 
+          // ACTIVADOR / SWITCH PARA ZONAS DE CALMA (TEA & DESCANSO)
+          Text(
+            'ZONAS ESPECIALES:',
+            style: GoogleFonts.urbanist(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textoGris,
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: mostrarZonasCalma
+                  ? const Color(0xFFF0FDF4)
+                  : Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: mostrarZonasCalma
+                    ? const Color(0xFF10B981).withValues(alpha: 0.4)
+                    : Colors.black.withValues(alpha: 0.06),
+                width: 1.2,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.spa_rounded,
+                    color: Color(0xFF10B981),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Zonas de Calma & Silencio',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textoOscuro,
+                        ),
+                      ),
+                      Text(
+                        'Espacios de descanso y reducción sensorial (TEA)',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textoGris,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch.adaptive(
+                  value: mostrarZonasCalma,
+                  activeTrackColor: const Color(0xFF10B981),
+                  onChanged: (val) {
+                    SoundService.instance.playButtonTap();
+                    onToggleZonasCalma(val);
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
           Text(
             'SERVICIOS ESENCIALES:',
             style: GoogleFonts.urbanist(
@@ -161,11 +251,11 @@ class ModalCapasMapa extends StatelessWidget {
               Expanded(
                 child: _buildServiceCard(
                   context,
-                  icono: Icons.local_parking_rounded,
-                  color: const Color(0xFF546E7A),
-                  titulo: 'Parking / Salida',
-                  subtitulo: 'Accesos',
-                  servicioId: 'estacionamiento',
+                  icono: Icons.local_cafe_rounded,
+                  color: AppColors.amarilloMostaza,
+                  titulo: 'Snacks & Café',
+                  subtitulo: 'Comida y cafetería',
+                  servicioId: 'snacks',
                 ),
               ),
             ],
@@ -176,22 +266,22 @@ class ModalCapasMapa extends StatelessWidget {
               Expanded(
                 child: _buildServiceCard(
                   context,
-                  icono: Icons.spa_rounded,
-                  color: const Color(0xFF2E7D32),
-                  titulo: 'Zonas de Calma',
-                  subtitulo: 'Silencio TEA',
-                  servicioId: 'calma',
+                  icono: Icons.local_parking_rounded,
+                  color: const Color(0xFF546E7A),
+                  titulo: 'Parking / Salida',
+                  subtitulo: 'Accesos',
+                  servicioId: 'estacionamiento',
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _buildServiceCard(
                   context,
-                  icono: Icons.storefront_rounded,
-                  color: AppColors.amarilloMostaza,
-                  titulo: 'Tiendas & Snacks',
-                  subtitulo: 'Comida y café',
-                  servicioId: 'tiendas',
+                  icono: Icons.confirmation_number_rounded,
+                  color: const Color(0xFFD97706),
+                  titulo: 'Boletería',
+                  subtitulo: 'Entrada oficial',
+                  servicioId: 'boleteria',
                 ),
               ),
             ],

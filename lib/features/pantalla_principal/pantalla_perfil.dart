@@ -6,15 +6,13 @@ import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/services/emergency_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
-import 'package:zoologico_front/features/mapa/widgets/modal_accesibilidad_mapa.dart';
 import 'package:zoologico_front/features/mapa/widgets/modal_animales_por_visitar.dart';
 
 /// Pantalla de Perfil y Ajustes con diseño y ergonomía estilo iOS / iPhone:
-/// - Secciones agrupadas con fondo gris Apple (#F2F2F7) y tarjetas blancas
-/// - Iconos con contenedores redondeados de color tipo Ajustes de iOS
-/// - Switches nativos CupertinoSwitch
-/// - Selector de tamaño de letra (Pequeño, Mediano, Grande) con vista previa en vivo
-/// - Gestión detallada de notificaciones
+/// - Secciones agrupadas con paleta safari unificada (#FBF9F6 y verdes de la app)
+/// - Selector de tamaño de letra (Normal, Medio, Grande) con vista previa en vivo
+/// - Botón activador para Modo Daltonismo con switch nativo
+/// - Alertas de shows y rutas
 class PantallaPerfil extends StatefulWidget {
   final VoidCallback? onVolverAlInicio;
 
@@ -31,13 +29,12 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
   // Estados de notificaciones estilo iOS
   bool _notificacionesShows = true;
   bool _alertasRuta = true;
-  bool _novedadesParque = false;
   bool _efectosSonoros = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F7), // Color oficial agrupado de iOS
+      backgroundColor: const Color(0xFFFBF9F6), // Paleta safari unificada con el resto de la app
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -80,19 +77,39 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
             const SizedBox(height: 22),
 
             // ==========================================
-            // 2. SECCIÓN TAMAÑO DE TEXTO (PEQUEÑO, MEDIANO, GRANDE)
+            // 2. SECCIÓN VISUALIZACIÓN & DALTONISMO
             // ==========================================
-            _buildSectionHeader('TAMAÑO DEL TEXTO'),
+            _buildSectionHeader('VISUALIZACIÓN Y DALTONISMO'),
             _buildCardGroup(
               children: [
                 _buildSelectorTamanoTexto(),
+                const Divider(height: 1, indent: 56),
+                AnimatedBuilder(
+                  animation: AccesibilidadService.instance,
+                  builder: (context, _) {
+                    final daltonismoActivo =
+                        AccesibilidadService.instance.modoDaltonismo;
+                    return _buildIosSwitchRow(
+                      icono: Icons.visibility_rounded,
+                      colorIcono: AppColors.verdeAzulado,
+                      titulo: 'Modo Daltonismo',
+                      subtitulo:
+                          'Paleta de alto contraste adaptada para visión de color',
+                      valor: daltonismoActivo,
+                      onChanged: (val) {
+                        SoundService.instance.playButtonTap();
+                        AccesibilidadService.instance.setModoDaltonismo(val);
+                      },
+                    );
+                  },
+                ),
               ],
             ),
 
             const SizedBox(height: 22),
 
             // ==========================================
-            // 3. SECCIÓN NOTIFICACIONES (ESTILO IPHONE HARMONIZADO)
+            // 3. SECCIÓN NOTIFICACIONES
             // ==========================================
             _buildSectionHeader('NOTIFICACIONES'),
             _buildCardGroup(
@@ -118,18 +135,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                   onChanged: (val) {
                     SoundService.instance.playButtonTap();
                     setState(() => _alertasRuta = val);
-                  },
-                ),
-                const Divider(height: 1, indent: 56),
-                _buildIosSwitchRow(
-                  icono: Icons.campaign_rounded,
-                  colorIcono: AppColors.amarilloMostaza,
-                  titulo: 'Novedades y Promociones',
-                  subtitulo: 'Descuentos en tiendas y nuevos animales',
-                  valor: _novedadesParque,
-                  onChanged: (val) {
-                    SoundService.instance.playButtonTap();
-                    setState(() => _novedadesParque = val);
                   },
                 ),
               ],
@@ -172,17 +177,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                   onTap: () {
                     SoundService.instance.playButtonTap();
                     _mostrarModalInsignias(context);
-                  },
-                ),
-                const Divider(height: 1, indent: 56),
-                _buildIosNavigationRow(
-                  icono: Icons.accessibility_new_rounded,
-                  colorIcono: AppColors.verdeAzulado,
-                  titulo: 'Accesibilidad & Movilidad',
-                  valorTrailing: 'Configurar',
-                  onTap: () {
-                    SoundService.instance.playButtonTap();
-                    ModalAccesibilidadMapa.mostrar(context);
                   },
                 ),
               ],
@@ -264,7 +258,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 90),
           ],
         ),
       ),
@@ -277,7 +271,8 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -294,7 +289,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
             height: 60,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF2B5142), Color(0xFF40916C)],
+                colors: [Color(0xFF1B4332), Color(0xFF2D6A4F)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -342,7 +337,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF34C759).withValues(alpha: 0.12),
+                    color: AppColors.verdePrincipal.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -350,7 +345,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                     style: GoogleFonts.urbanist(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
-                      color: const Color(0xFF248A3D),
+                      color: AppColors.verdePrincipal,
                     ),
                   ),
                 ),
@@ -374,10 +369,10 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       child: Text(
         titulo,
         style: GoogleFonts.urbanist(
-          fontSize: 12,
+          fontSize: 11.5,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.8,
-          color: Colors.grey.shade600,
+          color: AppColors.verdePrincipal.withValues(alpha: 0.75),
         ),
       ),
     );
@@ -388,7 +383,8 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -655,7 +651,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
           ),
           CupertinoSwitch(
             value: valor,
-            activeTrackColor: const Color(0xFF34C759), // Verde característico de iOS
+            activeTrackColor: AppColors.verdePrincipal, // Verde armonizado con la app
             onChanged: onChanged,
           ),
         ],

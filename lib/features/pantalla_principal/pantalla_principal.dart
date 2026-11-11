@@ -118,6 +118,12 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
             PantallaShows(
               esTabEmbedido: true,
               onIrAlInicio: () => setState(() => _tabActual = 0),
+              onVerEnMapa: (habitat) {
+                setState(() {
+                  _habitatSeleccionadoParaMapa = habitat;
+                  _tabActual = 1;
+                });
+              },
             ),
 
             // PESTAÑA 3: TU RUTA - HÁBITATS & EXPEDICIONES (FOOTER VISIBLE)

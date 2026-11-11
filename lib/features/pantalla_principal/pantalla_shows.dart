@@ -4,6 +4,13 @@ import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/pantalla_principal/pantalla_detalle_show_acuatico.dart';
 
+/// Secciones principales disponibles para los shows
+enum SeccionShows {
+  horarios,
+  reglas,
+  escenarios,
+}
+
 /// Modelo de datos para un show de la cartelera
 class ShowItemData {
   final String id;
@@ -41,11 +48,13 @@ class ShowItemData {
 class PantallaShows extends StatefulWidget {
   final bool esTabEmbedido;
   final VoidCallback? onIrAlInicio;
+  final ValueChanged<String>? onVerEnMapa;
 
   const PantallaShows({
     super.key,
     this.esTabEmbedido = false,
     this.onIrAlInicio,
+    this.onVerEnMapa,
   });
 
   @override
@@ -53,6 +62,7 @@ class PantallaShows extends StatefulWidget {
 }
 
 class _PantallaShowsState extends State<PantallaShows> {
+  SeccionShows _seccionActiva = SeccionShows.horarios;
   bool _notificacionesActivas = true;
   int _diaSeleccionadoIndex = 0;
   late final List<DateTime> _diasCalendario;
@@ -631,96 +641,766 @@ class _PantallaShowsState extends State<PantallaShows> {
           children: [
             const SizedBox(height: 6),
 
-            // 1. BARRA SUPERIOR DE ACTIVAR NOTIFICACIONES
-            _buildNotificacionesSwitch(),
-
-            const SizedBox(height: 16),
-
-            // 2. ENCABEZADO DE FECHAS
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Selecciona el día',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textoOscuro,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                  Text(
-                    '${_obtenerNombreMes(_diasCalendario[_diaSeleccionadoIndex].month)} ${_diasCalendario[_diaSeleccionadoIndex].year}',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.verdePrincipal,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // 3. CALENDARIO TIPO CINEPLANET (STRIP HORIZONTAL)
-            _buildCalendarioCineplanet(),
-
-            const SizedBox(height: 20),
-
-            // 4. LISTA DE SHOWS FORMATO CINEPLANET (IMAGEN IZQ + TÍTULO DER + FUNCIONES DEBAJO)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                children: [
-                  Text(
-                    'Shows disponibles',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textoOscuro,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.verdePrincipal.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '${_todosLosShows.length} en cartelera',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.verdePrincipal,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // 1. BANNER PRINCIPAL INDICANDO "Mira todo esto para tus shows"
+            _buildBannerShows(),
 
             const SizedBox(height: 14),
 
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: _todosLosShows.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                final show = _todosLosShows[index];
-                return _buildShowCardCineplanet(show);
-              },
-            ),
+            // 2. TRES SECCIONES TIPO CARDS INTERACTIVAS
+            _buildSeccionesCards(),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 18),
+
+            // 3. CONTENIDO SEGÚN LA SECCIÓN ACTIVA
+            if (_seccionActiva == SeccionShows.horarios) ...[
+              _buildNotificacionesSwitch(),
+              const SizedBox(height: 16),
+              _buildEncabezadoFechas(),
+              const SizedBox(height: 12),
+              _buildCalendarioCineplanet(),
+              const SizedBox(height: 20),
+              _buildEncabezadoShowsDisponibles(),
+              const SizedBox(height: 14),
+              _buildListaShows(),
+            ] else if (_seccionActiva == SeccionShows.reglas) ...[
+              _buildSeccionReglas(),
+            ] else ...[
+              _buildSeccionEscenarios(),
+            ],
+
+            // Margen inferior para que la barra de navegación no tape nada
+            const SizedBox(height: 90),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Banner llamativo superior
+  Widget _buildBannerShows() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              AppColors.verdePrincipal,
+              Color(0xFF1E3A2F),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.verdePrincipal.withValues(alpha: 0.22),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '✨ CARTELERA VIVA',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Mira todo esto para tus shows',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      height: 1.15,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Reserva horarios, consulta normas de convivencia y conoce la ubicación de cada escenario.',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withValues(alpha: 0.85),
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.25),
+                  width: 1.5,
+                ),
+              ),
+              child: const Icon(
+                Icons.theater_comedy_rounded,
+                color: Colors.white,
+                size: 32,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Las 3 secciones interactivas tipo cards debajo del banner
+  Widget _buildSeccionesCards() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Row(
+        children: [
+          _buildItemCardSeccion(
+            seccion: SeccionShows.horarios,
+            emoji: '📅',
+            titulo: 'Horarios',
+            subtitulo: '& Fechas',
+          ),
+          const SizedBox(width: 10),
+          _buildItemCardSeccion(
+            seccion: SeccionShows.reglas,
+            emoji: '📋',
+            titulo: 'Reglas',
+            subtitulo: 'del Show',
+          ),
+          const SizedBox(width: 10),
+          _buildItemCardSeccion(
+            seccion: SeccionShows.escenarios,
+            emoji: '📍',
+            titulo: 'Escenarios',
+            subtitulo: '& Info',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItemCardSeccion({
+    required SeccionShows seccion,
+    required String emoji,
+    required String titulo,
+    required String subtitulo,
+  }) {
+    final bool activa = _seccionActiva == seccion;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          SoundService.instance.playButtonTap();
+          setState(() {
+            _seccionActiva = seccion;
+          });
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+          decoration: BoxDecoration(
+            color: activa
+                ? AppColors.verdePrincipal.withValues(alpha: 0.08)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: activa
+                  ? AppColors.verdePrincipal
+                  : Colors.black.withValues(alpha: 0.08),
+              width: activa ? 1.8 : 1.0,
+            ),
+            boxShadow: activa
+                ? [
+                    BoxShadow(
+                      color: AppColors.verdePrincipal.withValues(alpha: 0.14),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                emoji,
+                style: const TextStyle(fontSize: 22),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                titulo,
+                style: GoogleFonts.urbanist(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  color: activa ? AppColors.verdePrincipal : AppColors.textoOscuro,
+                  height: 1.1,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                subtitulo,
+                style: GoogleFonts.urbanist(
+                  fontSize: 11,
+                  fontWeight: activa ? FontWeight.w800 : FontWeight.w600,
+                  color: activa ? AppColors.verdePrincipal : AppColors.textoGris,
+                  height: 1.1,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEncabezadoFechas() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Selecciona el día',
+            style: GoogleFonts.urbanist(
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+              color: AppColors.textoOscuro,
+              letterSpacing: -0.2,
+            ),
+          ),
+          Text(
+            '${_obtenerNombreMes(_diasCalendario[_diaSeleccionadoIndex].month)} ${_diasCalendario[_diaSeleccionadoIndex].year}',
+            style: GoogleFonts.urbanist(
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              color: AppColors.verdePrincipal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEncabezadoShowsDisponibles() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Row(
+        children: [
+          Text(
+            'Shows disponibles',
+            style: GoogleFonts.urbanist(
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
+              color: AppColors.textoOscuro,
+              letterSpacing: -0.2,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: AppColors.verdePrincipal.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              '${_todosLosShows.length} en cartelera',
+              style: GoogleFonts.urbanist(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: AppColors.verdePrincipal,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildListaShows() {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      itemCount: _todosLosShows.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
+      itemBuilder: (context, index) {
+        final show = _todosLosShows[index];
+        return _buildShowCardCineplanet(show);
+      },
+    );
+  }
+
+  /// Vista de la sección de Reglas del Show
+  Widget _buildSeccionReglas() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Banner de bienestar animal
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0FDF4),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: const Color(0xFF86EFAC).withValues(alpha: 0.6),
+                width: 1.2,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF22C55E).withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.pets_rounded,
+                    color: Color(0xFF16A34A),
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Bienestar Animal Primero',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: const Color(0xFF166534),
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        'Nuestros shows son educativos y respetan los ritmos biológicos de cada ejemplar.',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF15803D),
+                          height: 1.25,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          Text(
+            'Normas y Recomendaciones',
+            style: GoogleFonts.urbanist(
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
+              color: AppColors.textoOscuro,
+              letterSpacing: -0.2,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          _buildItemRegla(
+            icono: Icons.no_flash_rounded,
+            colorIcono: const Color(0xFFDC2626),
+            titulo: 'Prohibido usar flash en fotos',
+            descripcion:
+                'La luz intensa puede asustar o desorientar a lobos marinos y aves rapaces durante las maniobras.',
+          ),
+          const SizedBox(height: 10),
+          _buildItemRegla(
+            icono: Icons.no_food_rounded,
+            colorIcono: const Color(0xFFEA580C),
+            titulo: 'No arrojar comida al escenario',
+            descripcion:
+                'Los animales reciben dietas balanceadas pesadas por gramaje diario con estricto control veterinario.',
+          ),
+          const SizedBox(height: 10),
+          _buildItemRegla(
+            icono: Icons.access_time_filled_rounded,
+            colorIcono: const Color(0xFF0284C7),
+            titulo: 'Llegada 15 minutos antes',
+            descripcion:
+                'El aforo en graderías es controlado por seguridad. Se cierran accesos puntualmente al iniciar.',
+          ),
+          const SizedBox(height: 10),
+          _buildItemRegla(
+            icono: Icons.volume_off_rounded,
+            colorIcono: const Color(0xFF7C3AED),
+            titulo: 'Silencio y respeto durante el show',
+            descripcion:
+                'Evita ruidos estridentes o levantarte bruscamente durante los vuelos o ejercicios en vivo.',
+          ),
+          const SizedBox(height: 10),
+          _buildItemRegla(
+            icono: Icons.accessible_rounded,
+            colorIcono: const Color(0xFF0D9488),
+            titulo: 'Zonas de acceso preferente',
+            descripcion:
+                'Espacios reservados de fácil acceso para personas con movilidad reducida y cochecitos de bebé.',
+          ),
+          const SizedBox(height: 10),
+          _buildItemRegla(
+            icono: Icons.wb_sunny_rounded,
+            colorIcono: const Color(0xFFD97706),
+            titulo: 'Protección solar y clima',
+            descripcion:
+                'Los anfiteatros al aire libre disponen de zonas sombreadas. Se recomienda uso de gorra e hidratación.',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItemRegla({
+    required IconData icono,
+    required Color colorIcono,
+    required String titulo,
+    required String descripcion,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.black.withValues(alpha: 0.06),
+          width: 1.2,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(9),
+            decoration: BoxDecoration(
+              color: colorIcono.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icono,
+              color: colorIcono,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  titulo,
+                  style: GoogleFonts.urbanist(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.textoOscuro,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  descripcion,
+                  style: GoogleFonts.urbanist(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textoGris,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Vista de la sección de Escenarios & Info
+  Widget _buildSeccionEscenarios() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Escenarios del Parque',
+                style: GoogleFonts.urbanist(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.textoOscuro,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.verdePrincipal.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '4 locaciones',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.verdePrincipal,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          _buildCardEscenario(
+            nombre: 'Anfiteatro Acuático Marino',
+            zonaTag: 'ZONA COSTA',
+            capacidad: '450 personas (Techado)',
+            showPrincipal: 'Show Acuático de Lobos & Focas',
+            descripcion:
+                'Piscina oceánica de agua salada con graderías techadas, sonido envolvente y vista submarina.',
+            colorAcento: const Color(0xFF0077B6),
+            habitatMapa: 'costa',
+            imagenAsset: 'assets/images/animales_con_fondo/foca-card.jpg',
+          ),
+          const SizedBox(height: 14),
+          _buildCardEscenario(
+            nombre: 'Mirador Andino de Rapaces',
+            zonaTag: 'ZONA SIERRA',
+            capacidad: '300 personas (Campo abierto)',
+            showPrincipal: 'Vuelo Libre de Rapaces & Cóndores',
+            descripcion:
+                'Ubicado en la ladera alta del zoológico, aprovecha las corrientes térmicas andinas para vuelos naturales.',
+            colorAcento: const Color(0xFF8D6E63),
+            habitatMapa: 'sierra',
+            imagenAsset: 'assets/images/animales_con_fondo/aguila.jpg',
+          ),
+          const SizedBox(height: 14),
+          _buildCardEscenario(
+            nombre: 'Piscina Humboldt',
+            zonaTag: 'ZONA COSTA',
+            capacidad: '200 personas (Semi-techado)',
+            showPrincipal: 'Alimentación de Pingüinos Humboldt',
+            descripcion:
+                'Plataforma cercana de observación con cristales sumergidos y charlas biológicas interactivas.',
+            colorAcento: const Color(0xFF0E6568),
+            habitatMapa: 'costa',
+            imagenAsset: 'assets/images/animales_con_fondo/pinguino-card.jpg',
+          ),
+          const SizedBox(height: 14),
+          _buildCardEscenario(
+            nombre: 'Refugio de la Sabana & Felinos',
+            zonaTag: 'ZONA INTERNACIONAL',
+            capacidad: '350 personas (Pasarela)',
+            showPrincipal: 'Charla & Enriquecimiento con Leones',
+            descripcion:
+                'Pasarela elevada con vista a la pradera africana y ventanales de máxima seguridad para charlas guiadas.',
+            colorAcento: const Color(0xFFD97706),
+            habitatMapa: 'internacional',
+            imagenAsset: 'assets/images/animales_con_fondo/leon-card.jpg',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCardEscenario({
+    required String nombre,
+    required String zonaTag,
+    required String capacidad,
+    required String showPrincipal,
+    required String descripcion,
+    required Color colorAcento,
+    required String habitatMapa,
+    required String imagenAsset,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.black.withValues(alpha: 0.06),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Image.asset(
+                  imagenAsset,
+                  width: 68,
+                  height: 68,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    width: 68,
+                    height: 68,
+                    color: colorAcento.withValues(alpha: 0.1),
+                    child: Icon(Icons.theater_comedy_rounded, color: colorAcento),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                          decoration: BoxDecoration(
+                            color: colorAcento.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            zonaTag,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w900,
+                              color: colorAcento,
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            const Icon(Icons.people_outline_rounded, size: 13, color: AppColors.textoGris),
+                            const SizedBox(width: 3),
+                            Text(
+                              capacidad,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textoGris,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      nombre,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.textoOscuro,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Row(
+                      children: [
+                        const Icon(Icons.star_rounded, size: 14, color: Color(0xFFEAB308)),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            showPrincipal,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.verdePrincipal,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            descripcion,
+            style: GoogleFonts.urbanist(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textoGris,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            height: 38,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                SoundService.instance.playButtonTap();
+                if (widget.onVerEnMapa != null) {
+                  widget.onVerEnMapa!(habitatMapa);
+                }
+              },
+              icon: const Icon(Icons.explore_outlined, size: 16),
+              label: Text(
+                'Ver escenario en el mapa',
+                style: GoogleFonts.urbanist(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.verdePrincipal,
+                side: BorderSide(
+                  color: AppColors.verdePrincipal.withValues(alpha: 0.35),
+                  width: 1.2,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                backgroundColor: AppColors.verdePrincipal.withValues(alpha: 0.04),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

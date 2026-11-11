@@ -54,7 +54,6 @@ class _PantallaMapaState extends State<PantallaMapa>
   Animation<Matrix4>? _cameraAnimation;
 
   final GlobalKey _keyAnimales = GlobalKey();
-  final GlobalKey _keySearch = GlobalKey();
   final GlobalKey _keyHelp = GlobalKey();
   final GlobalKey _keyComoFunciona = GlobalKey();
   final GlobalKey _keyFab = GlobalKey();
@@ -74,6 +73,7 @@ class _PantallaMapaState extends State<PantallaMapa>
   FiltroServicioMapa _filtroServicio = FiltroServicioMapa.todos;
   ChipUrgenciaMapa _chipUrgencia = ChipUrgenciaMapa.ninguno;
   String? _habitatFiltro;
+  bool _mostrarZonasCalma = true;
 
   // Navegación secuencial de servicios (ej. Baños 1 de 4 con flechas)
   int _indiceServicioActual = 0;
@@ -447,7 +447,7 @@ class _PantallaMapaState extends State<PantallaMapa>
       case 1:
         return _getRect(_keyAnimales);
       case 2:
-        return _getRect(_keySearch);
+        return _getRect(_keyFab);
       case 3:
         return _getRect(_keyHelp);
       case 4:
@@ -633,7 +633,8 @@ class _PantallaMapaState extends State<PantallaMapa>
                               mostrarEtiquetaDefecto: true,
                             )),
 
-                    if (a11y.mostrarZonasCalma ||
+                    if (_mostrarZonasCalma ||
+                        a11y.mostrarZonasCalma ||
                         _filtroServicio == FiltroServicioMapa.calma)
                       ...zonasCalma
                           .where((c) => c.id != _marcadorSeleccionado?.id)
@@ -843,6 +844,10 @@ class _PantallaMapaState extends State<PantallaMapa>
                 ModalCapasMapa.mostrar(
                   context,
                   habitatSeleccionado: _habitatFiltro,
+                  mostrarZonasCalma: _mostrarZonasCalma,
+                  onToggleZonasCalma: (val) {
+                    setState(() => _mostrarZonasCalma = val);
+                  },
                   onHabitatCambiado: (nuevoHabitat) {
                     setState(() {
                       _habitatFiltro = nuevoHabitat;
@@ -879,7 +884,7 @@ class _PantallaMapaState extends State<PantallaMapa>
                         if (zonasCalma.isNotEmpty) {
                           _mostrarInfoMarcador(zonasCalma.first, sincronizarCarrusel: false);
                         }
-                      } else if (servicio == 'tiendas') {
+                      } else if (servicio == 'snacks' || servicio == 'tiendas') {
                         ModalTiendasCercanas.mostrar(context, onAbrirEnMapa: () {});
                       }
                     });
@@ -889,8 +894,7 @@ class _PantallaMapaState extends State<PantallaMapa>
             ),
           ),
 
-          // ISLA FLOTANTE DE CONTROL DERECHO (Buscar + Mi Ubicación con Cristal)
-          // Se eleva dinámicamente si hay un animal seleccionado para no ser invadida por la tarjeta
+          // BOTÓN FLOTANTE CIRCULAR DE UBICACIÓN (Buscar retirado como solicitado)
           AnimatedPositioned(
             duration: const Duration(milliseconds: 280),
             curve: Curves.easeOutCubic,
@@ -898,15 +902,17 @@ class _PantallaMapaState extends State<PantallaMapa>
             bottom: (_marcadorSeleccionado != null ? 190.0 : 105.0) +
                 MediaQuery.of(context).padding.bottom,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(25),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                 child: Container(
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     color: a11y.modoAltoContraste
                         ? const Color(0xFF0F172A)
-                        : Colors.white.withValues(alpha: 0.90),
-                    borderRadius: BorderRadius.circular(22),
+                        : Colors.white.withValues(alpha: 0.92),
+                    shape: BoxShape.circle,
                     border: Border.all(
                       color: a11y.modoAltoContraste
                           ? const Color(0xFFFDE047)
@@ -923,43 +929,18 @@ class _PantallaMapaState extends State<PantallaMapa>
                       ),
                     ],
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        key: _keySearch,
-                        icon: const Icon(Icons.search_rounded),
-                        color: a11y.modoAltoContraste
-                            ? const Color(0xFFFDE047)
-                            : AppColors.verdeAzulado,
-                        iconSize: 22,
-                        tooltip: 'Buscar en el parque',
-                        onPressed: () {
-                          HapticFeedback.lightImpact();
-                          _mostrarAnimalesPorVisitar(context);
-                        },
-                      ),
-                      Container(
-                        width: 22,
-                        height: 1,
-                        color: a11y.modoAltoContraste
-                            ? const Color(0xFF334155)
-                            : const Color(0xFFE2E8F0),
-                      ),
-                      IconButton(
-                        key: _keyFab,
-                        icon: const Icon(Icons.my_location_rounded),
-                        color: a11y.modoAltoContraste
-                            ? const Color(0xFFFDE047)
-                            : AppColors.verdeAzulado,
-                        iconSize: 22,
-                        tooltip: 'Mi ubicación',
-                        onPressed: () {
-                          HapticFeedback.lightImpact();
-                          _onMyLocationPressed();
-                        },
-                      ),
-                    ],
+                  child: IconButton(
+                    key: _keyFab,
+                    icon: const Icon(Icons.my_location_rounded),
+                    color: a11y.modoAltoContraste
+                        ? const Color(0xFFFDE047)
+                        : AppColors.verdeAzulado,
+                    iconSize: 24,
+                    tooltip: 'Mi ubicación',
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      _onMyLocationPressed();
+                    },
                   ),
                 ),
               ),
