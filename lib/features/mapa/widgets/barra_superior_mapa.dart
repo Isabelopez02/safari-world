@@ -54,7 +54,7 @@ class BarraSuperiorMapa extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.90),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: const Color(0xFFCBD5E1),
+                        color: Colors.black.withValues(alpha: 0.08),
                         width: 1.2,
                       ),
                       boxShadow: [
@@ -116,7 +116,7 @@ class BarraSuperiorMapa extends StatelessWidget {
                         border: Border.all(
                           color: altoContraste
                               ? Colors.white
-                              : const Color(0xFFCBD5E1),
+                              : Colors.black.withValues(alpha: 0.08),
                           width: altoContraste ? 1.8 : 1.2,
                         ),
                         boxShadow: [
@@ -184,7 +184,7 @@ class BarraSuperiorMapa extends StatelessWidget {
                       border: Border.all(
                         color: tutorialStep > 0
                             ? const Color(0xFFD97706)
-                            : const Color(0xFFCBD5E1),
+                            : Colors.black.withValues(alpha: 0.08),
                         width: 1.2,
                       ),
                       boxShadow: [

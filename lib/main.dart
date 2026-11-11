@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/carga_pagina/pantalla_inicio.dart';
 
@@ -25,19 +26,35 @@ class MiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'App Zoológico',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.verdePrincipal,
-          primary: AppColors.verdePrincipal,
-        ),
-        useMaterial3: true,
-        textTheme: GoogleFonts.urbanistTextTheme(),
-        fontFamily: GoogleFonts.urbanist().fontFamily,
-      ),
-      home: const PantallaInicio(),
+    return ListenableBuilder(
+      listenable: AccesibilidadService.instance,
+      builder: (context, _) {
+        final escalaTexto =
+            AccesibilidadService.instance.multiplicadorEscalaTexto;
+
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'App Zoológico',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.verdePrincipal,
+              primary: AppColors.verdePrincipal,
+            ),
+            useMaterial3: true,
+            textTheme: GoogleFonts.urbanistTextTheme(),
+            fontFamily: GoogleFonts.urbanist().fontFamily,
+          ),
+          builder: (context, child) {
+            return MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: TextScaler.linear(escalaTexto),
+              ),
+              child: child!,
+            );
+          },
+          home: const PantallaInicio(),
+        );
+      },
     );
   }
 }

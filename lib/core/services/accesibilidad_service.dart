@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Tamaño de letra disponible para la app
+enum TamanoTexto { pequeno, mediano, grande }
+
 /// Servicio centralizado de Accesibilidad e Inclusión para personas con discapacidad:
 /// - Modo Alto Contraste (Fondo oscuro profundo #000000, texto blanco puro #FFFFFF)
 /// - Modo Daltonismo para Deuteranopía / Protanopía (Símbolos geométricos y texturas tácticas)
 /// - Modo Zonas de Calma / Silencio (Regulación sensorial para TEA y sobrecarga acústica)
+/// - Ajuste de tamaño de fuente (Pequeño, Mediano, Grande)
 class AccesibilidadService extends ChangeNotifier {
   static const String _prefKeyAltoContraste = 'modo_alto_contraste_activo';
   static const String _prefKeyDaltonismo = 'modo_daltonismo_activo';
   static const String _prefKeyZonasCalma = 'mostrar_zonas_calma_activo';
+  static const String _prefKeyTamanoTexto = 'tamano_texto_preferencia';
 
   AccesibilidadService._() {
     _inicializacionFuture = _cargarPreferencias();
@@ -20,10 +25,27 @@ class AccesibilidadService extends ChangeNotifier {
   bool _modoAltoContraste = false;
   bool _modoDaltonismo = false;
   bool _mostrarZonasCalma = false;
+  TamanoTexto _tamanoTexto = TamanoTexto.pequeno;
 
   bool get modoAltoContraste => _modoAltoContraste;
   bool get modoDaltonismo => _modoDaltonismo;
   bool get mostrarZonasCalma => _mostrarZonasCalma;
+  TamanoTexto get tamanoTexto => _tamanoTexto;
+
+  /// Multiplicador de escala:
+  /// - Pequeño: 1.0 (Normal / Estándar)
+  /// - Mediano: 1.15 (Un poco más grande)
+  /// - Grande: 1.30 (Más grande)
+  double get multiplicadorEscalaTexto {
+    switch (_tamanoTexto) {
+      case TamanoTexto.pequeno:
+        return 1.0; // Normal
+      case TamanoTexto.mediano:
+        return 1.15; // Un poco más grande
+      case TamanoTexto.grande:
+        return 1.30; // Más grande
+    }
+  }
 
   /// Asegura que las preferencias almacenadas hayan terminado de cargarse
   Future<void> inicializar() async {
@@ -41,9 +63,30 @@ class AccesibilidadService extends ChangeNotifier {
       _modoAltoContraste = prefs.getBool(_prefKeyAltoContraste) ?? false;
       _modoDaltonismo = prefs.getBool(_prefKeyDaltonismo) ?? false;
       _mostrarZonasCalma = prefs.getBool(_prefKeyZonasCalma) ?? false;
+
+      final tamanoGuardado = prefs.getString(_prefKeyTamanoTexto);
+      if (tamanoGuardado != null) {
+        _tamanoTexto = TamanoTexto.values.firstWhere(
+          (t) => t.name == tamanoGuardado,
+          orElse: () => TamanoTexto.pequeno,
+        );
+      }
+
       notifyListeners();
     } catch (e) {
       debugPrint('Error al cargar preferencias de accesibilidad: $e');
+    }
+  }
+
+  Future<void> setTamanoTexto(TamanoTexto tamano) async {
+    await inicializar();
+    _tamanoTexto = tamano;
+    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefKeyTamanoTexto, tamano.name);
+    } catch (e) {
+      debugPrint('Error al guardar preferencia de tamaño de texto: $e');
     }
   }
 

@@ -39,7 +39,14 @@ class ShowItemData {
 /// - Cartelera con póster a la izquierda, título y datos a la derecha,
 ///   y pastillas de funciones/horarios interactivos debajo.
 class PantallaShows extends StatefulWidget {
-  const PantallaShows({super.key});
+  final bool esTabEmbedido;
+  final VoidCallback? onIrAlInicio;
+
+  const PantallaShows({
+    super.key,
+    this.esTabEmbedido = false,
+    this.onIrAlInicio,
+  });
 
   @override
   State<PantallaShows> createState() => _PantallaShowsState();
@@ -593,24 +600,27 @@ class _PantallaShowsState extends State<PantallaShows> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: AppColors.textoOscuro,
-            size: 20,
-          ),
-          onPressed: () {
-            SoundService.instance.playButtonTap();
-            Navigator.pop(context);
-          },
-        ),
+        automaticallyImplyLeading: !widget.esTabEmbedido,
+        leading: widget.esTabEmbedido
+            ? null
+            : IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: AppColors.textoOscuro,
+                  size: 20,
+                ),
+                onPressed: () {
+                  SoundService.instance.playButtonTap();
+                  Navigator.pop(context);
+                },
+              ),
         title: Text(
           'Cartelera de Shows',
           style: GoogleFonts.urbanist(
-            fontSize: 20,
+            fontSize: 22,
             fontWeight: FontWeight.w900,
             color: AppColors.textoOscuro,
-            letterSpacing: -0.3,
+            letterSpacing: -0.4,
           ),
         ),
       ),

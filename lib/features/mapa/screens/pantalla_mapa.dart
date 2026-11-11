@@ -8,28 +8,33 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
-import 'package:zoologico_front/core/services/emergency_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
 import '../utils/datos_rutas.dart';
 import '../utils/servicio_rutas_svg.dart';
+import '../widgets/barra_busqueda_hibrida_mapa.dart';
 import '../widgets/barra_filtros_mapa.dart';
 import '../widgets/barra_inferior_mapa.dart';
-import '../widgets/barra_superior_mapa.dart';
 import '../widgets/capa_trazos_mapa.dart';
 import '../widgets/marcador_animado.dart';
-import '../widgets/modal_accesibilidad_mapa.dart';
 import '../widgets/modal_animales_por_visitar.dart';
+import '../widgets/modal_capas_mapa.dart';
 import '../widgets/tutorial_overlay.dart';
+import '../../pantalla_principal/widgets/modal_tiendas_cercanas.dart';
 
 class PantallaMapa extends StatefulWidget {
   final bool abrirExploracionesAlCargar;
   final String? animalIdInicial;
+  final bool esTabEmbedido;
+  final String? habitatInicial;
+
   const PantallaMapa({
     super.key,
     this.abrirExploracionesAlCargar = false,
     this.animalIdInicial,
+    this.esTabEmbedido = false,
+    this.habitatInicial,
   });
 
   @override
@@ -67,6 +72,12 @@ class _PantallaMapaState extends State<PantallaMapa>
   bool _isNavigating = false;
   bool _mostrarBanios = false;
   FiltroServicioMapa _filtroServicio = FiltroServicioMapa.todos;
+  ChipUrgenciaMapa _chipUrgencia = ChipUrgenciaMapa.ninguno;
+  String? _habitatFiltro;
+
+  // Navegación secuencial de servicios (ej. Baños 1 de 4 con flechas)
+  int _indiceServicioActual = 0;
+  List<MarcadorMapa> _serviciosFiltrados = [];
 
   // Marcadores cargados desde AnimalService
   final List<MarcadorMapa> marcadores = AnimalService.instance
@@ -111,7 +122,16 @@ class _PantallaMapaState extends State<PantallaMapa>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _centrarEnUbicacionInicial(false);
-      if (widget.animalIdInicial != null) {
+      if (widget.habitatInicial != null) {
+        setState(() {
+          _habitatFiltro = widget.habitatInicial;
+        });
+        final enHabitat = marcadores.where((m) => m.habitat == widget.habitatInicial).toList();
+        if (enHabitat.isNotEmpty) {
+          _centrarEnPunto(enHabitat.first.x, enHabitat.first.y);
+          _mostrarInfoMarcador(enHabitat.first);
+        }
+      } else if (widget.animalIdInicial != null) {
         final matches = marcadores.where((m) => m.id == widget.animalIdInicial);
         if (matches.isNotEmpty) {
           _mostrarInfoMarcador(matches.first);
@@ -210,6 +230,13 @@ class _PantallaMapaState extends State<PantallaMapa>
   }
 
   bool _isMarkerMatchingFilter(MarcadorMapa marcador) {
+    if (_habitatFiltro != null &&
+        marcador.tipoServicio == null &&
+        !marcador.esBanio &&
+        !marcador.esZonaCalma) {
+      if (marcador.habitat != _habitatFiltro) return false;
+    }
+
     switch (_filtroServicio) {
       case FiltroServicioMapa.todos:
         return true;
@@ -239,12 +266,18 @@ class _PantallaMapaState extends State<PantallaMapa>
     if (nuevoFiltro != FiltroServicioMapa.todos) {
       MarcadorMapa? objetivo;
       if (nuevoFiltro == FiltroServicioMapa.banio) {
-        objetivo = _encontrarBanioMasCercano();
+        objetivo = _encontrarBanioMasCercano() ?? (banios.isNotEmpty ? banios.first : null);
+        _serviciosFiltrados = List.from(banios);
+        final idx = _serviciosFiltrados.indexWhere((b) => b.id == objetivo?.id);
+        _indiceServicioActual = idx >= 0 ? idx : 0;
       } else if (nuevoFiltro == FiltroServicioMapa.calma) {
+        _serviciosFiltrados = List.from(zonasCalma);
+        _indiceServicioActual = 0;
         if (zonasCalma.isNotEmpty) {
           objetivo = zonasCalma.first;
         }
       } else {
+        _serviciosFiltrados = [];
         final matches =
             accesos.where((a) => _isMarkerMatchingFilter(a)).toList();
         if (matches.isNotEmpty) {
@@ -253,9 +286,16 @@ class _PantallaMapaState extends State<PantallaMapa>
       }
 
       if (objetivo != null) {
-        _centrarEnPunto(objetivo.x, objetivo.y);
+        _mostrarInfoMarcador(objetivo, sincronizarCarrusel: false);
       }
     } else {
+      setState(() {
+        _serviciosFiltrados = [];
+        _marcadorSeleccionado = null;
+        _isNavigating = false;
+        _rutaActual = [];
+        _rutaSvgActual = null;
+      });
       _onMyLocationPressed();
     }
   }
@@ -328,7 +368,7 @@ class _PantallaMapaState extends State<PantallaMapa>
     }
   }
 
-  void _mostrarInfoMarcador(MarcadorMapa marcador) {
+  void _mostrarInfoMarcador(MarcadorMapa marcador, {bool sincronizarCarrusel = true}) {
     final origen =
         grafoMapa.nodos[_nodoActual]?.posicion ??
         ServicioRutasSvg.puntoEntradaOficial;
@@ -339,13 +379,57 @@ class _PantallaMapaState extends State<PantallaMapa>
     );
     setState(() {
       _marcadorSeleccionado = marcador;
-      // Si el usuario toca un baño, iniciar de inmediato la navegación activa hacia él
-      _isNavigating = marcador.esBanio;
+      // Previsualizar marcador sin bloquearlo de inmediato en navegación
+      _isNavigating = false;
       _rutaActual = nuevaRuta;
       _rutaSvgActual = rutaSvg;
+
+      if (sincronizarCarrusel) {
+        if (marcador.esBanio) {
+          _serviciosFiltrados = List.from(banios);
+          final idx = _serviciosFiltrados.indexWhere((b) => b.id == marcador.id);
+          _indiceServicioActual = idx >= 0 ? idx : 0;
+          _chipUrgencia = ChipUrgenciaMapa.banios;
+          _filtroServicio = FiltroServicioMapa.banio;
+        } else if (marcador.esZonaCalma) {
+          _serviciosFiltrados = List.from(zonasCalma);
+          final idx = _serviciosFiltrados.indexWhere((z) => z.id == marcador.id);
+          _indiceServicioActual = idx >= 0 ? idx : 0;
+          _filtroServicio = FiltroServicioMapa.calma;
+        } else {
+          _serviciosFiltrados = [];
+        }
+      }
     });
     _centrarEnPunto(marcador.x, marcador.y);
     _routeProgressController.forward(from: 0);
+  }
+
+  void _anteriorServicio() {
+    if (_serviciosFiltrados.isEmpty) return;
+    SoundService.instance.playButtonTap();
+    HapticFeedback.selectionClick();
+    final nuevoIndice =
+        (_indiceServicioActual - 1 + _serviciosFiltrados.length) %
+            _serviciosFiltrados.length;
+    setState(() {
+      _indiceServicioActual = nuevoIndice;
+    });
+    _mostrarInfoMarcador(_serviciosFiltrados[nuevoIndice],
+        sincronizarCarrusel: false);
+  }
+
+  void _siguienteServicio() {
+    if (_serviciosFiltrados.isEmpty) return;
+    SoundService.instance.playButtonTap();
+    HapticFeedback.selectionClick();
+    final nuevoIndice =
+        (_indiceServicioActual + 1) % _serviciosFiltrados.length;
+    setState(() {
+      _indiceServicioActual = nuevoIndice;
+    });
+    _mostrarInfoMarcador(_serviciosFiltrados[nuevoIndice],
+        sincronizarCarrusel: false);
   }
 
   Rect _getRect(GlobalKey key) {
@@ -448,6 +532,112 @@ class _PantallaMapaState extends State<PantallaMapa>
         mostrarEtiqueta: mostrarEtiqueta,
         onTap: () => _mostrarInfoMarcador(marcador),
       ),
+    );
+  }
+
+  void _mostrarBuscadorModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        String query = '';
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final lista = marcadores.where((m) {
+              if (query.isEmpty) return true;
+              return m.nombre.toLowerCase().contains(query.toLowerCase()) ||
+                  m.habitat.toLowerCase().contains(query.toLowerCase());
+            }).toList();
+
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.75,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+              child: Column(
+                children: [
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 4.5,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: 'Buscar animal, zona o hábitat...',
+                      hintStyle: GoogleFonts.urbanist(color: AppColors.textoGris),
+                      prefixIcon: const Icon(Icons.search_rounded, color: AppColors.verdePrincipal),
+                      filled: true,
+                      fillColor: Colors.grey.shade100,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    onChanged: (val) {
+                      setModalState(() => query = val);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: lista.length,
+                      separatorBuilder: (context, index) => const Divider(height: 1),
+                      itemBuilder: (context, index) {
+                        final animal = lista[index];
+                        return ListTile(
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.asset(
+                              animal.imagen ??
+                                  'assets/images/animales_con_fondo/leon-card.jpg',
+                              width: 44,
+                              height: 44,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.pets),
+                            ),
+                          ),
+                          title: Text(
+                            animal.nombre,
+                            style: GoogleFonts.urbanist(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 15,
+                            ),
+                          ),
+                          subtitle: Text(
+                            animal.habitat,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 12,
+                              color: AppColors.textoGris,
+                            ),
+                          ),
+                          trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            _centrarEnPunto(animal.x, animal.y);
+                            _mostrarInfoMarcador(animal);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -722,46 +912,85 @@ class _PantallaMapaState extends State<PantallaMapa>
             ),
           ),
 
-          // BARRA SUPERIOR MODULAR (Regresar, Baños y Guía) + BARRA DE FILTROS RÁPIDOS
+          // BARRA SUPERIOR HÍBRIDA (Búsqueda + Capas + Chips de Urgencias)
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                BarraSuperiorMapa(
-                  onRegresar: () => Navigator.pop(context),
-                  onSOS: () => EmergencyService.instance.mostrarModalEmergencia(context),
-                  keyHelp: _keyHelp,
-                  tutorialStep: _tutorialStep,
-                  altoContraste: a11y.modoAltoContraste,
-                  onToggleGuia: () {
+            child: BarraBusquedaHibridaMapa(
+              chipActivo: _chipUrgencia,
+              onChipSeleccionado: (chip) {
+                setState(() => _chipUrgencia = chip);
+                switch (chip) {
+                  case ChipUrgenciaMapa.banios:
+                    _onFiltroCambiado(FiltroServicioMapa.banio);
+                    break;
+                  case ChipUrgenciaMapa.salidaParking:
+                    _onFiltroCambiado(FiltroServicioMapa.estacionamiento);
+                    break;
+                  case ChipUrgenciaMapa.animales:
+                    setState(() => _habitatFiltro = null);
+                    _onFiltroCambiado(FiltroServicioMapa.todos);
+                    break;
+                  case ChipUrgenciaMapa.snacks:
+                    ModalTiendasCercanas.mostrar(
+                      context,
+                      onAbrirEnMapa: () {},
+                    );
+                    break;
+                  case ChipUrgenciaMapa.ninguno:
+                    _onFiltroCambiado(FiltroServicioMapa.todos);
+                    break;
+                }
+              },
+              onAbrirCapas: () {
+                ModalCapasMapa.mostrar(
+                  context,
+                  habitatSeleccionado: _habitatFiltro,
+                  onHabitatCambiado: (nuevoHabitat) {
                     setState(() {
-                      _tutorialStep = (_tutorialStep > 0 ? 0 : 1);
+                      _habitatFiltro = nuevoHabitat;
+                      _marcadorSeleccionado = null;
+                      if (nuevoHabitat != null) {
+                        final enZona = marcadores.where((m) => m.habitat == nuevoHabitat).toList();
+                        if (enZona.isNotEmpty) {
+                          _centrarEnPunto(enZona.first.x, enZona.first.y);
+                        }
+                      }
                     });
                   },
-                  keyComoFunciona: _keyComoFunciona,
-                  onAccesibilidad: () {
-                    ModalAccesibilidadMapa.mostrar(
-                      context,
-                      onSeleccionarZonaCalma: (zona) {
-                        setState(() {
-                          _filtroServicio = FiltroServicioMapa.calma;
-                        });
-                        _centrarEnPunto(zona.x, zona.y);
-                        _mostrarInfoMarcador(zona);
-                      },
-                    );
+                  onServicioSeleccionado: (servicio) {
+                    setState(() {
+                      if (servicio == 'banio') {
+                        _chipUrgencia = ChipUrgenciaMapa.banios;
+                        _filtroServicio = FiltroServicioMapa.banio;
+                        _serviciosFiltrados = List.from(banios);
+                        _indiceServicioActual = 0;
+                        if (banios.isNotEmpty) {
+                          _mostrarInfoMarcador(banios.first, sincronizarCarrusel: false);
+                        }
+                      } else if (servicio == 'estacionamiento') {
+                        _chipUrgencia = ChipUrgenciaMapa.salidaParking;
+                        _filtroServicio = FiltroServicioMapa.estacionamiento;
+                        _serviciosFiltrados = [];
+                        if (accesos.isNotEmpty) {
+                          _mostrarInfoMarcador(accesos.first, sincronizarCarrusel: false);
+                        }
+                      } else if (servicio == 'calma') {
+                        _filtroServicio = FiltroServicioMapa.calma;
+                        _serviciosFiltrados = List.from(zonasCalma);
+                        _indiceServicioActual = 0;
+                        if (zonasCalma.isNotEmpty) {
+                          _mostrarInfoMarcador(zonasCalma.first, sincronizarCarrusel: false);
+                        }
+                      } else if (servicio == 'tiendas') {
+                        ModalTiendasCercanas.mostrar(context, onAbrirEnMapa: () {});
+                      }
+                    });
                   },
-                ),
-                BarraFiltrosMapa(
-                  filtroSeleccionado: _filtroServicio,
-                  onFiltroCambiado: _onFiltroCambiado,
-                  altoContraste: a11y.modoAltoContraste,
-                ),
-              ],
+                );
+              },
+              onBuscarTexto: _mostrarBuscadorModal,
             ),
           ),
 
@@ -856,6 +1085,9 @@ class _PantallaMapaState extends State<PantallaMapa>
               onTapExploraciones: () => _mostrarAnimalesPorVisitar(context),
               onCerrarSeleccion: () => setState(() {
                 _marcadorSeleccionado = null;
+                _serviciosFiltrados = [];
+                _chipUrgencia = ChipUrgenciaMapa.ninguno;
+                _filtroServicio = FiltroServicioMapa.todos;
                 _rutaActual = [];
                 _rutaSvgActual = null;
               }),
@@ -867,10 +1099,17 @@ class _PantallaMapaState extends State<PantallaMapa>
                 setState(() {
                   _isNavigating = false;
                   _marcadorSeleccionado = null;
+                  _serviciosFiltrados = [];
+                  _chipUrgencia = ChipUrgenciaMapa.ninguno;
+                  _filtroServicio = FiltroServicioMapa.todos;
                   _rutaActual = [];
                   _rutaSvgActual = null;
                 });
               },
+              indiceServicio: _serviciosFiltrados.isNotEmpty ? _indiceServicioActual : null,
+              totalServicios: _serviciosFiltrados.isNotEmpty ? _serviciosFiltrados.length : null,
+              onServicioAnterior: _anteriorServicio,
+              onServicioSiguiente: _siguienteServicio,
             ),
           ),
 

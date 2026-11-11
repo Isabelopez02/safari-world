@@ -25,6 +25,10 @@ class BarraInferiorMapa extends StatelessWidget {
   final VoidCallback onCerrarSeleccion;
   final VoidCallback onIniciarNavegacion;
   final VoidCallback onCancelarNavegacion;
+  final int? indiceServicio;
+  final int? totalServicios;
+  final VoidCallback? onServicioAnterior;
+  final VoidCallback? onServicioSiguiente;
 
   const BarraInferiorMapa({
     super.key,
@@ -37,6 +41,10 @@ class BarraInferiorMapa extends StatelessWidget {
     required this.onCerrarSeleccion,
     required this.onIniciarNavegacion,
     required this.onCancelarNavegacion,
+    this.indiceServicio,
+    this.totalServicios,
+    this.onServicioAnterior,
+    this.onServicioSiguiente,
   });
 
   @override
@@ -46,6 +54,11 @@ class BarraInferiorMapa extends StatelessWidget {
       builder: (context, _) {
         final a11y = AccesibilidadService.instance;
         final bool a11yActivo = a11y.accesibilidadVisualActiva;
+
+        // Si no hay marcador seleccionado ni navegación activa, el mapa se muestra 100% limpio
+        if (marcadorSeleccionado == null && !isNavigating) {
+          return const SizedBox.shrink();
+        }
 
         return SafeArea(
           top: false,
@@ -301,6 +314,60 @@ class BarraInferiorMapa extends StatelessWidget {
           ),
         ),
 
+        // 1.1 CARRUSEL MULTIPLE SERVICIOS (Ej: Baño 1 de 4 con flechas)
+        if (totalServicios != null && totalServicios! > 1 && indiceServicio != null) ...[
+          Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            decoration: BoxDecoration(
+              color: colorAcento.withValues(alpha: a11yActivo ? 0.25 : 0.08),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: colorAcento.withValues(alpha: 0.25),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 15),
+                  color: colorAcento,
+                  visualDensity: VisualDensity.compact,
+                  onPressed: onServicioAnterior,
+                  tooltip: 'Anterior',
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      sel.esBanio ? Icons.wc_rounded : (sel.icono),
+                      size: 16,
+                      color: colorAcento,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${sel.esBanio ? "Baño " : ""}${indiceServicio! + 1} de $totalServicios',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: a11yActivo ? Colors.white : colorAcento,
+                      ),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward_ios_rounded, size: 15),
+                  color: colorAcento,
+                  visualDensity: VisualDensity.compact,
+                  onPressed: onServicioSiguiente,
+                  tooltip: 'Siguiente',
+                ),
+              ],
+            ),
+          ),
+        ],
+
         // 2. FILA DE INFORMACIÓN DEL ANIMAL / SERVICIO
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -367,11 +434,11 @@ class BarraInferiorMapa extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    sel.esBanio ? 'Servicios Higiénicos' : sel.nombre,
+                    sel.nombre,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.urbanist(
-                      fontSize: 18.5,
+                      fontSize: 18.0,
                       fontWeight: FontWeight.w900,
                       color: a11yActivo ? Colors.white : AppColors.textoOscuro,
                     ),
@@ -393,7 +460,7 @@ class BarraInferiorMapa extends StatelessWidget {
                           esCalma
                               ? '${sel.nivelRuido ?? "Silencioso"} · $minutos min ($metros m)'
                               : (sel.esBanio
-                                  ? 'Baños públicos · $minutos min ($metros m)'
+                                  ? '${sel.habitat} · $minutos min ($metros m)'
                                   : '${sel.habitat} · $minutos min ($metros m)'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

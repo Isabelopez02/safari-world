@@ -56,21 +56,21 @@ class BarraFiltrosMapa extends StatelessWidget {
       tipo: FiltroServicioMapa.calma,
       etiqueta: 'Zonas de Calma',
       icono: Icons.spa_rounded,
-      colorActivo: Color(0xFF10B981),
+      colorActivo: Color(0xFF2E7D32),
       badge: '4',
     ),
     _OpcionFiltro(
       tipo: FiltroServicioMapa.banio,
       etiqueta: 'Baños',
       icono: Icons.wc_rounded,
-      colorActivo: Color(0xFF0284C7),
+      colorActivo: AppColors.verdeAzulado,
       badge: '4',
     ),
     _OpcionFiltro(
       tipo: FiltroServicioMapa.estacionamiento,
       etiqueta: 'Estacionamiento',
       icono: Icons.local_parking_rounded,
-      colorActivo: Color(0xFF2563EB),
+      colorActivo: Color(0xFF546E7A),
     ),
     _OpcionFiltro(
       tipo: FiltroServicioMapa.boleteria,
@@ -82,13 +82,13 @@ class BarraFiltrosMapa extends StatelessWidget {
       tipo: FiltroServicioMapa.salida,
       etiqueta: 'Salida',
       icono: Icons.logout_rounded,
-      colorActivo: Color(0xFFE11D48),
+      colorActivo: Color(0xFFC62828),
     ),
     _OpcionFiltro(
       tipo: FiltroServicioMapa.juegos,
       etiqueta: 'Juegos',
       icono: Icons.attractions_rounded,
-      colorActivo: Color(0xFF9333EA),
+      colorActivo: Color(0xFFD97706),
     ),
   ];
 

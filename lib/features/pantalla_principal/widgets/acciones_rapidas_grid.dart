@@ -55,10 +55,10 @@ class AccionesRapidasGrid extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildTarjetaAccion(
-                  icono: Icons.map_rounded,
+                  icono: Icons.alt_route_rounded,
                   colorFondoIcono: AppColors.verdePrincipal,
-                  titulo: 'Ver mapa',
-                  subtitulo: 'Senderos y fauna',
+                  titulo: 'Ruta del día',
+                  subtitulo: 'Senderos y paradas',
                   onTap: onVerMapa,
                 ),
               ),
