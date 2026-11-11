@@ -634,44 +634,62 @@ class _PantallaShowsState extends State<PantallaShows> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 6),
+      body: Builder(
+        builder: (context) {
+          final bool esTablet = MediaQuery.of(context).size.width >= 720;
+          final Widget content = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 6),
 
-            // 1. BANNER PRINCIPAL INDICANDO "Mira todo esto para tus shows"
-            _buildBannerShows(),
+              // 1. BANNER PRINCIPAL INDICANDO "Mira todo esto para tus shows"
+              _buildBannerShows(),
 
-            const SizedBox(height: 14),
-
-            // 2. TRES SECCIONES TIPO CARDS INTERACTIVAS
-            _buildSeccionesCards(),
-
-            const SizedBox(height: 18),
-
-            // 3. CONTENIDO SEGÚN LA SECCIÓN ACTIVA
-            if (_seccionActiva == SeccionShows.horarios) ...[
-              _buildNotificacionesSwitch(),
-              const SizedBox(height: 16),
-              _buildEncabezadoFechas(),
-              const SizedBox(height: 12),
-              _buildCalendarioCineplanet(),
-              const SizedBox(height: 20),
-              _buildEncabezadoShowsDisponibles(),
               const SizedBox(height: 14),
-              _buildListaShows(),
-            ] else if (_seccionActiva == SeccionShows.reglas) ...[
-              _buildSeccionReglas(),
-            ] else ...[
-              _buildSeccionEscenarios(),
-            ],
 
-            // Margen inferior para que la barra de navegación no tape nada
-            const SizedBox(height: 90),
-          ],
-        ),
+              // 2. TRES SECCIONES TIPO CARDS INTERACTIVAS
+              _buildSeccionesCards(),
+
+              const SizedBox(height: 18),
+
+              // 3. CONTENIDO SEGÚN LA SECCIÓN ACTIVA
+              if (_seccionActiva == SeccionShows.horarios) ...[
+                _buildNotificacionesSwitch(),
+                const SizedBox(height: 16),
+                _buildEncabezadoFechas(),
+                const SizedBox(height: 12),
+                _buildCalendarioCineplanet(),
+                const SizedBox(height: 20),
+                _buildEncabezadoShowsDisponibles(),
+                const SizedBox(height: 14),
+                _buildListaShows(),
+              ] else if (_seccionActiva == SeccionShows.reglas) ...[
+                _buildSeccionReglas(),
+              ] else ...[
+                _buildSeccionEscenarios(),
+              ],
+
+              // Margen inferior para que la barra de navegación no tape nada
+              const SizedBox(height: 90),
+            ],
+          );
+
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: esTablet
+                ? SizedBox(
+                    width: double.infinity,
+                    child: Center(
+                      heightFactor: 1.0,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 820),
+                        child: content,
+                      ),
+                    ),
+                  )
+                : content,
+          );
+        },
       ),
     );
   }
@@ -1193,7 +1211,7 @@ class _PantallaShowsState extends State<PantallaShows> {
             descripcion:
                 'Piscina oceánica de agua salada con graderías techadas, sonido envolvente y vista submarina.',
             colorAcento: const Color(0xFF0077B6),
-            habitatMapa: 'costa',
+            habitatMapa: 'C05',
             imagenAsset: 'assets/images/animales_con_fondo/foca-card.jpg',
           ),
           const SizedBox(height: 14),
@@ -1205,7 +1223,7 @@ class _PantallaShowsState extends State<PantallaShows> {
             descripcion:
                 'Ubicado en la ladera alta del zoológico, aprovecha las corrientes térmicas andinas para vuelos naturales.',
             colorAcento: const Color(0xFF8D6E63),
-            habitatMapa: 'sierra',
+            habitatMapa: 'S03',
             imagenAsset: 'assets/images/animales_con_fondo/aguila.jpg',
           ),
           const SizedBox(height: 14),
@@ -1217,7 +1235,7 @@ class _PantallaShowsState extends State<PantallaShows> {
             descripcion:
                 'Plataforma cercana de observación con cristales sumergidos y charlas biológicas interactivas.',
             colorAcento: const Color(0xFF0E6568),
-            habitatMapa: 'costa',
+            habitatMapa: 'C08',
             imagenAsset: 'assets/images/animales_con_fondo/pinguino-card.jpg',
           ),
           const SizedBox(height: 14),
@@ -1229,7 +1247,7 @@ class _PantallaShowsState extends State<PantallaShows> {
             descripcion:
                 'Pasarela elevada con vista a la pradera africana y ventanales de máxima seguridad para charlas guiadas.',
             colorAcento: const Color(0xFFD97706),
-            habitatMapa: 'internacional',
+            habitatMapa: 'I02',
             imagenAsset: 'assets/images/animales_con_fondo/leon-card.jpg',
           ),
         ],
@@ -1372,31 +1390,29 @@ class _PantallaShowsState extends State<PantallaShows> {
           SizedBox(
             width: double.infinity,
             height: 38,
-            child: OutlinedButton.icon(
+            child: ElevatedButton.icon(
               onPressed: () {
                 SoundService.instance.playButtonTap();
                 if (widget.onVerEnMapa != null) {
                   widget.onVerEnMapa!(habitatMapa);
                 }
               },
-              icon: const Icon(Icons.explore_outlined, size: 16),
+              icon: const Icon(Icons.near_me_rounded, size: 16),
               label: Text(
-                'Ver escenario en el mapa',
+                'Trazar ruta al escenario',
                 style: GoogleFonts.urbanist(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w800,
+                  color: Colors.white,
                 ),
               ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.verdePrincipal,
-                side: BorderSide(
-                  color: AppColors.verdePrincipal.withValues(alpha: 0.35),
-                  width: 1.2,
-                ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.verdePrincipal,
+                foregroundColor: Colors.white,
+                elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                backgroundColor: AppColors.verdePrincipal.withValues(alpha: 0.04),
               ),
             ),
           ),

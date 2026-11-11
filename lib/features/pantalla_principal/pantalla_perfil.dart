@@ -63,16 +63,16 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ==========================================
-            // 1. TARJETA DE USUARIO ESTILO APPLE ID
-            // ==========================================
-            _buildAppleIdCard(),
+      body: Builder(
+        builder: (context) {
+          final bool esTablet = MediaQuery.of(context).size.width >= 720;
+          final Widget content = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ==========================================
+              // 1. TARJETA DE USUARIO ESTILO APPLE ID
+              // ==========================================
+              _buildAppleIdCard(),
 
             const SizedBox(height: 22),
 
@@ -260,10 +260,28 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
 
             const SizedBox(height: 90),
           ],
-        ),
-      ),
-    );
-  }
+        );
+
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: esTablet
+              ? SizedBox(
+                  width: double.infinity,
+                  child: Center(
+                    heightFactor: 1.0,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 720),
+                      child: content,
+                    ),
+                  ),
+                )
+              : content,
+        );
+      },
+    ),
+  );
+}
 
   /// Tarjeta de Usuario estilo Apple ID
   Widget _buildAppleIdCard() {

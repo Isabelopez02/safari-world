@@ -28,6 +28,7 @@ class PantallaMapa extends StatefulWidget {
   final String? animalIdInicial;
   final bool esTabEmbedido;
   final String? habitatInicial;
+  final int? claveNavegacion;
 
   const PantallaMapa({
     super.key,
@@ -35,6 +36,7 @@ class PantallaMapa extends StatefulWidget {
     this.animalIdInicial,
     this.esTabEmbedido = false,
     this.habitatInicial,
+    this.claveNavegacion,
   });
 
   @override
@@ -123,14 +125,7 @@ class _PantallaMapaState extends State<PantallaMapa>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _centrarEnUbicacionInicial(false);
       if (widget.habitatInicial != null) {
-        setState(() {
-          _habitatFiltro = widget.habitatInicial;
-        });
-        final enHabitat = marcadores.where((m) => m.habitat == widget.habitatInicial).toList();
-        if (enHabitat.isNotEmpty) {
-          _centrarEnPunto(enHabitat.first.x, enHabitat.first.y);
-          _mostrarInfoMarcador(enHabitat.first);
-        }
+        _enfocarYTrazarDestino(widget.habitatInicial!);
       } else if (widget.animalIdInicial != null) {
         final matches = marcadores.where((m) => m.id == widget.animalIdInicial);
         if (matches.isNotEmpty) {
@@ -142,6 +137,114 @@ class _PantallaMapaState extends State<PantallaMapa>
         _checkTutorial();
       }
     });
+  }
+
+  @override
+  void didUpdateWidget(PantallaMapa oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if ((widget.claveNavegacion != oldWidget.claveNavegacion ||
+            widget.habitatInicial != oldWidget.habitatInicial) &&
+        widget.habitatInicial != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _enfocarYTrazarDestino(widget.habitatInicial!);
+        }
+      });
+    }
+  }
+
+  /// Traza y enfoca automáticamente un destino (escenario, animal o hábitat)
+  void _enfocarYTrazarDestino(String destino) {
+    // 1. Buscar si coincide directamente con el ID de un animal / marcador (ej. 'C05', 'S03', 'I02', 'C08')
+    final porId = marcadores.where(
+      (m) => m.id.toLowerCase() == destino.trim().toLowerCase(),
+    );
+    if (porId.isNotEmpty) {
+      final marcador = porId.first;
+      setState(() {
+        _habitatFiltro = marcador.habitat;
+      });
+      _mostrarInfoMarcador(marcador);
+      setState(() {
+        _isNavigating = true;
+      });
+      _routeProgressController.forward(from: 0);
+      return;
+    }
+
+    // 2. Buscar si coincide con escenarios de shows
+    String? markerIdEscenario;
+    final destLower = destino.toLowerCase();
+    if (destLower.contains('acuatico') ||
+        destLower.contains('acuático') ||
+        destLower.contains('lobo') ||
+        destLower.contains('foca') ||
+        destLower == 'show_marino') {
+      markerIdEscenario = 'C05';
+    } else if (destLower.contains('rapaces') ||
+        destLower.contains('condor') ||
+        destLower.contains('cóndor') ||
+        destLower.contains('aguila') ||
+        destLower == 'show_aves') {
+      markerIdEscenario = 'S03';
+    } else if (destLower.contains('pinguin') ||
+        destLower.contains('pingüin') ||
+        destLower.contains('humboldt') ||
+        destLower == 'show_pinguinos') {
+      markerIdEscenario = 'C08';
+    } else if (destLower.contains('leon') ||
+        destLower.contains('león') ||
+        destLower.contains('sabana') ||
+        destLower == 'show_felinos') {
+      markerIdEscenario = 'I02';
+    }
+
+    if (markerIdEscenario != null) {
+      final porEscenario = marcadores.where((m) => m.id == markerIdEscenario);
+      if (porEscenario.isNotEmpty) {
+        final marcador = porEscenario.first;
+        setState(() {
+          _habitatFiltro = marcador.habitat;
+        });
+        _mostrarInfoMarcador(marcador);
+        setState(() {
+          _isNavigating = true;
+        });
+        _routeProgressController.forward(from: 0);
+        return;
+      }
+    }
+
+    // 3. Normalizar hábitats (soporta nombres cortos y nombres oficiales)
+    String habitatNormalizado = destino;
+    if (destLower.contains('costa')) {
+      habitatNormalizado = 'Zona Costa';
+    } else if (destLower.contains('sierra') || destLower.contains('ande')) {
+      habitatNormalizado = 'Zona Sierra';
+    } else if (destLower.contains('internacional') ||
+        destLower.contains('sabana') ||
+        destLower.contains('africa')) {
+      habitatNormalizado = 'Zona Internacional';
+    } else if (destLower.contains('selva') || destLower.contains('amaz')) {
+      habitatNormalizado = 'Zona Selva';
+    } else if (destLower.contains('granja')) {
+      habitatNormalizado = 'Granja Interactiva';
+    }
+
+    setState(() {
+      _habitatFiltro = habitatNormalizado;
+    });
+
+    final enHabitat = marcadores.where((m) => m.habitat == habitatNormalizado).toList();
+    if (enHabitat.isNotEmpty) {
+      final favoritos = enHabitat.where((m) => m.categoria == 'Favoritos').toList();
+      final destinoMarcador = favoritos.isNotEmpty ? favoritos.first : enHabitat.first;
+      _mostrarInfoMarcador(destinoMarcador);
+      setState(() {
+        _isNavigating = true;
+      });
+      _routeProgressController.forward(from: 0);
+    }
   }
 
   void _onAnimalServiceChanged() {
@@ -814,7 +917,11 @@ class _PantallaMapaState extends State<PantallaMapa>
             top: 0,
             left: 0,
             right: 0,
-            child: BarraBusquedaHibridaMapa(
+            child: Center(
+              heightFactor: 1.0,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 680),
+                child: BarraBusquedaHibridaMapa(
               chipActivo: _chipUrgencia,
               onChipSeleccionado: (chip) {
                 setState(() => _chipUrgencia = chip);
@@ -893,6 +1000,8 @@ class _PantallaMapaState extends State<PantallaMapa>
               },
             ),
           ),
+        ),
+      ),
 
           // BOTÓN FLOTANTE CIRCULAR DE UBICACIÓN (Buscar retirado como solicitado)
           AnimatedPositioned(
@@ -952,40 +1061,46 @@ class _PantallaMapaState extends State<PantallaMapa>
             bottom: 0,
             left: 0,
             right: 0,
-            child: BarraInferiorMapa(
-              keyAnimales: _keyAnimales,
-              marcadorSeleccionado: _marcadorSeleccionado,
-              isNavigating: _isNavigating,
-              marcadores: marcadores,
-              bottomBarPulseController: _bottomBarPulseController,
-              onTapExploraciones: () => _mostrarAnimalesPorVisitar(context),
-              onCerrarSeleccion: () => setState(() {
-                _marcadorSeleccionado = null;
-                _serviciosFiltrados = [];
-                _chipUrgencia = ChipUrgenciaMapa.ninguno;
-                _filtroServicio = FiltroServicioMapa.todos;
-                _rutaActual = [];
-                _rutaSvgActual = null;
-              }),
-              onIniciarNavegacion: () {
-                setState(() => _isNavigating = true);
-                _routeProgressController.forward(from: 0);
-              },
-              onCancelarNavegacion: () {
-                setState(() {
-                  _isNavigating = false;
-                  _marcadorSeleccionado = null;
-                  _serviciosFiltrados = [];
-                  _chipUrgencia = ChipUrgenciaMapa.ninguno;
-                  _filtroServicio = FiltroServicioMapa.todos;
-                  _rutaActual = [];
-                  _rutaSvgActual = null;
-                });
-              },
-              indiceServicio: _serviciosFiltrados.isNotEmpty ? _indiceServicioActual : null,
-              totalServicios: _serviciosFiltrados.isNotEmpty ? _serviciosFiltrados.length : null,
-              onServicioAnterior: _anteriorServicio,
-              onServicioSiguiente: _siguienteServicio,
+            child: Center(
+              heightFactor: 1.0,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 640),
+                child: BarraInferiorMapa(
+                  keyAnimales: _keyAnimales,
+                  marcadorSeleccionado: _marcadorSeleccionado,
+                  isNavigating: _isNavigating,
+                  marcadores: marcadores,
+                  bottomBarPulseController: _bottomBarPulseController,
+                  onTapExploraciones: () => _mostrarAnimalesPorVisitar(context),
+                  onCerrarSeleccion: () => setState(() {
+                    _marcadorSeleccionado = null;
+                    _serviciosFiltrados = [];
+                    _chipUrgencia = ChipUrgenciaMapa.ninguno;
+                    _filtroServicio = FiltroServicioMapa.todos;
+                    _rutaActual = [];
+                    _rutaSvgActual = null;
+                  }),
+                  onIniciarNavegacion: () {
+                    setState(() => _isNavigating = true);
+                    _routeProgressController.forward(from: 0);
+                  },
+                  onCancelarNavegacion: () {
+                    setState(() {
+                      _isNavigating = false;
+                      _marcadorSeleccionado = null;
+                      _serviciosFiltrados = [];
+                      _chipUrgencia = ChipUrgenciaMapa.ninguno;
+                      _filtroServicio = FiltroServicioMapa.todos;
+                      _rutaActual = [];
+                      _rutaSvgActual = null;
+                    });
+                  },
+                  indiceServicio: _serviciosFiltrados.isNotEmpty ? _indiceServicioActual : null,
+                  totalServicios: _serviciosFiltrados.isNotEmpty ? _serviciosFiltrados.length : null,
+                  onServicioAnterior: _anteriorServicio,
+                  onServicioSiguiente: _siguienteServicio,
+                ),
+              ),
             ),
           ),
 

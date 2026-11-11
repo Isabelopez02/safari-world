@@ -28,6 +28,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   DateTime? _lastBackPressTime;
   int _tabActual = 0;
   String? _habitatSeleccionadoParaMapa;
+  int _contadorNavegacionMapa = 0;
 
   @override
   void initState() {
@@ -37,14 +38,19 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     });
   }
 
+  void _irAlMapaConDestino(String destino) {
+    setState(() {
+      _habitatSeleccionadoParaMapa = destino;
+      _contadorNavegacionMapa++;
+      _tabActual = 1;
+    });
+  }
+
   void _abrirModalExploracion(BuildContext context) {
     ModalAnimalesPorVisitar.mostrar(
       context,
       onSeleccionarAnimal: (marcador) {
-        setState(() {
-          _habitatSeleccionadoParaMapa = marcador.habitat;
-          _tabActual = 1; // Cambiar a pestaña Mapa
-        });
+        _irAlMapaConDestino(marcador.id);
       },
     );
   }
@@ -112,28 +118,19 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
             PantallaMapa(
               esTabEmbedido: true,
               habitatInicial: _habitatSeleccionadoParaMapa,
+              claveNavegacion: _contadorNavegacionMapa,
             ),
 
             // PESTAÑA 2: CARTELERA DE SHOWS CINEPLANET (FOOTER VISIBLE)
             PantallaShows(
               esTabEmbedido: true,
               onIrAlInicio: () => setState(() => _tabActual = 0),
-              onVerEnMapa: (habitat) {
-                setState(() {
-                  _habitatSeleccionadoParaMapa = habitat;
-                  _tabActual = 1;
-                });
-              },
+              onVerEnMapa: (destino) => _irAlMapaConDestino(destino),
             ),
 
             // PESTAÑA 3: TU RUTA - HÁBITATS & EXPEDICIONES (FOOTER VISIBLE)
             PantallaRuta(
-              onTrazarRuta: (habitat) {
-                setState(() {
-                  _habitatSeleccionadoParaMapa = habitat;
-                  _tabActual = 1; // Lleva al mapa con la zona seleccionada
-                });
-              },
+              onTrazarRuta: (destino) => _irAlMapaConDestino(destino),
             ),
 
             // PESTAÑA 4: PERFIL DEL EXPLORADOR ESTILO IPHONE (FOOTER VISIBLE)
@@ -151,60 +148,78 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   }
 
   Widget _buildCuerpoPrincipal(BuildContext context) {
+    final bool esTablet = MediaQuery.of(context).size.width >= 720;
+
+    final Widget content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 10),
+
+        // 1. ENCABEZADO SUTIL ("TU AVENTURA EMPIEZA AQUÍ")
+        EncabezadoSutil(
+          nombreParque: 'Parque de las Leyendas',
+          onNotificacionesTap: () {
+            DialogoPermisoNotificaciones.verificarYMostrar(context);
+          },
+          onPerfilTap: () => setState(() => _tabActual = 4),
+        ),
+
+        const SizedBox(height: 14),
+
+        // 2. BANNER BONITO DESTACADO
+        BannerBonito(
+          onTap: () => setState(() => _tabActual = 2),
+        ),
+
+        const SizedBox(height: 20),
+
+        // 3. PROGRESO CIRCULAR: ANIMALES OBSERVADOS HOY
+        ProgresoCircularAnimales(
+          onVerDetalle: () => _abrirModalExploracion(context),
+        ),
+
+        const SizedBox(height: 22),
+
+        // 4. OPCIONES DE ACCIONES RÁPIDAS (¿QUÉ QUIERES HACER?)
+        AccionesRapidasGrid(
+          onVerShows: () => setState(() => _tabActual = 2),
+          onVerMapa: () => setState(() => _tabActual = 1),
+          onBuscarTiendas: () {
+            ModalTiendasCercanas.mostrar(
+              context,
+              onAbrirEnMapa: () => setState(() => _tabActual = 1),
+            );
+          },
+          onTePerdiste: () {
+            ModalTePerdiste.mostrar(
+              context,
+              onIrAlMapa: () => setState(() => _tabActual = 1),
+            );
+          },
+        ),
+
+        const SizedBox(height: 24),
+      ],
+    );
+
     return SafeArea(
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 10),
-
-            // 1. ENCABEZADO SUTIL ("TU AVENTURA EMPIEZA AQUÍ")
-            EncabezadoSutil(
-              nombreParque: 'Parque de las Leyendas',
-              onNotificacionesTap: () {
-                DialogoPermisoNotificaciones.verificarYMostrar(context);
-              },
-              onPerfilTap: () => setState(() => _tabActual = 4),
-            ),
-
-            const SizedBox(height: 14),
-
-            // 2. BANNER BONITO DESTACADO
-            BannerBonito(
-              onTap: () => setState(() => _tabActual = 2),
-            ),
-
-            const SizedBox(height: 20),
-
-            // 3. PROGRESO CIRCULAR: ANIMALES OBSERVADOS HOY
-            ProgresoCircularAnimales(
-              onVerDetalle: () => _abrirModalExploracion(context),
-            ),
-
-            const SizedBox(height: 22),
-
-            // 4. OPCIONES DE ACCIONES RÁPIDAS (¿QUÉ QUIERES HACER?)
-            AccionesRapidasGrid(
-              onVerShows: () => setState(() => _tabActual = 2),
-              onVerMapa: () => setState(() => _tabActual = 3),
-              onBuscarTiendas: () {
-                ModalTiendasCercanas.mostrar(
-                  context,
-                  onAbrirEnMapa: () => setState(() => _tabActual = 1),
-                );
-              },
-              onTePerdiste: () {
-                ModalTePerdiste.mostrar(
-                  context,
-                  onIrAlMapa: () => setState(() => _tabActual = 1),
-                );
-              },
-            ),
-
-            const SizedBox(height: 24),
-          ],
-        ),
+        child: esTablet
+            ? SizedBox(
+                width: double.infinity,
+                child: Center(
+                  heightFactor: 1.0,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 820),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: content,
+                    ),
+                  ),
+                ),
+              )
+            : content,
       ),
     );
   }

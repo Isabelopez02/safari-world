@@ -143,63 +143,88 @@ class PantallaRuta extends StatelessWidget {
               ),
             ),
           ),
-          body: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // INTRODUCCIÓN EDITORIAL MINIMALISTA
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'CONOCE LOS HÁBITATS DEL PARQUE',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                          color: AppColors.verdePrincipal.withValues(alpha: 0.8),
+          body: Builder(
+            builder: (context) {
+              final double screenWidth = MediaQuery.of(context).size.width;
+              final bool esTablet = screenWidth >= 720;
+              final int columnas = esTablet ? (screenWidth >= 1000 ? 4 : 3) : 2;
+              final double childAspect = esTablet ? 0.78 : 0.72;
+
+              final Widget content = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // INTRODUCCIÓN EDITORIAL MINIMALISTA
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'CONOCE LOS HÁBITATS DEL PARQUE',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.2,
+                            color: AppColors.verdePrincipal.withValues(alpha: 0.8),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        'Toca un hábitat para ver sus animales o trazar su sendero.',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textoGris,
+                        const SizedBox(height: 3),
+                        Text(
+                          'Toca un hábitat para explorar sus animales o traza su sendero en el mapa.',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textoGris,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-                // CUADRÍCULA MINIMALISTA DE 2 POR FILA CON COLOR POR HÁBITAT
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _habitats.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 14,
-                    childAspectRatio: 0.72,
+                  // CUADRÍCULA MINIMALISTA (2 POR FILA EN CELULAR, ADAPTABLE EN TABLET)
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _habitats.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: columnas,
+                      crossAxisSpacing: esTablet ? 16 : 12,
+                      mainAxisSpacing: esTablet ? 16 : 14,
+                      childAspectRatio: childAspect,
+                    ),
+                    itemBuilder: (context, index) {
+                      final habitat = _habitats[index];
+                      return _buildHabitatCard(context, habitat);
+                    },
                   ),
-                  itemBuilder: (context, index) {
-                    final habitat = _habitats[index];
-                    return _buildHabitatCard(context, habitat);
-                  },
-                ),
 
-                // Margen inferior para que no quede tapado por el footer persistente
-                const SizedBox(height: 90),
-              ],
-            ),
+                  // Margen inferior para que no quede tapado por el footer persistente
+                  const SizedBox(height: 90),
+                ],
+              );
+
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.symmetric(
+                  horizontal: esTablet ? 24.0 : 16.0,
+                  vertical: 4.0,
+                ),
+                child: esTablet
+                    ? SizedBox(
+                        width: double.infinity,
+                        child: Center(
+                          heightFactor: 1.0,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 1040),
+                            child: content,
+                          ),
+                        ),
+                      )
+                    : content,
+              );
+            },
           ),
         );
       },
@@ -399,18 +424,62 @@ class PantallaRuta extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(
-                          Icons.arrow_forward_rounded,
-                          size: 11.5,
-                          color: habitat.colorAcento.withValues(alpha: 0.8),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 11.5,
+                                color: habitat.colorAcento.withValues(alpha: 0.8),
+                              ),
+                              const SizedBox(width: 3),
+                              Expanded(
+                                child: Text(
+                                  'Ver animales ($totalZona)',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    color: habitat.colorAcento,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(width: 3),
-                        Text(
-                          'Ver animales ($totalZona)',
-                          style: GoogleFonts.urbanist(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: habitat.colorAcento,
+                        InkWell(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            SoundService.instance.playButtonTap();
+                            onTrazarRuta?.call(habitat.habitatFiltro);
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: habitat.colorAcento.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: habitat.colorAcento.withValues(alpha: 0.3),
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.near_me_rounded, size: 10, color: habitat.colorAcento),
+                                const SizedBox(width: 3),
+                                Text(
+                                  'Trazar',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    color: habitat.colorAcento,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -487,21 +556,25 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
           ),
-          padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Barra de arrastre superior
-              Center(
-                child: Container(
-                  width: 44,
-                  height: 4.5,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-              ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 720),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Barra de arrastre superior
+                    Center(
+                      child: Container(
+                        width: 44,
+                        height: 4.5,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ),
               const SizedBox(height: 14),
 
               // Cabecera con título del hábitat y botón de cerrar
@@ -762,20 +835,37 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                                   ),
                                 ),
                               ),
-                              trailing: IconButton(
-                                icon: Icon(
-                                  esExplorado
-                                      ? Icons.check_circle_rounded
-                                      : Icons.radio_button_unchecked_rounded,
-                                  color: esExplorado
-                                      ? const Color(0xFF16A34A)
-                                      : Colors.grey.shade400,
-                                ),
-                                tooltip: esExplorado ? 'Marcar no visitado' : 'Marcar visitado',
-                                onPressed: () {
-                                  SoundService.instance.playButtonTap();
-                                  AnimalService.instance.toggleVisitado(animal.id);
-                                },
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.near_me_rounded),
+                                    color: widget.habitat.colorAcento,
+                                    tooltip: 'Trazar ruta a este animal',
+                                    onPressed: () {
+                                      SoundService.instance.playButtonTap();
+                                      Navigator.pop(context);
+                                      if (widget.onTrazarRuta != null) {
+                                        widget.onTrazarRuta!(animal.id);
+                                      }
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      esExplorado
+                                          ? Icons.check_circle_rounded
+                                          : Icons.radio_button_unchecked_rounded,
+                                      color: esExplorado
+                                          ? const Color(0xFF16A34A)
+                                          : Colors.grey.shade400,
+                                    ),
+                                    tooltip: esExplorado ? 'Marcar no visitado' : 'Marcar visitado',
+                                    onPressed: () {
+                                      SoundService.instance.playButtonTap();
+                                      AnimalService.instance.toggleVisitado(animal.id);
+                                    },
+                                  ),
+                                ],
                               ),
                               onTap: () {
                                 SoundService.instance.playButtonTap();
@@ -793,7 +883,10 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
               ),
             ],
           ),
-        );
+        ),
+      ),
+    ),
+  );
       },
     );
   }

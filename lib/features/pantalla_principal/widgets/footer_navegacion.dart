@@ -22,6 +22,47 @@ class FooterNavegacion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool esTablet = MediaQuery.of(context).size.width >= 720;
+
+    final navContent = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(
+            index: 0,
+            iconoActivo: Icons.home_rounded,
+            iconoInactivo: Icons.home_outlined,
+            etiqueta: 'Inicio',
+          ),
+          _buildNavItem(
+            index: 1,
+            iconoActivo: Icons.map_rounded,
+            iconoInactivo: Icons.map_outlined,
+            etiqueta: 'Mapa',
+          ),
+          _buildNavItem(
+            index: 2,
+            iconoActivo: Icons.theater_comedy_rounded,
+            iconoInactivo: Icons.theater_comedy_outlined,
+            etiqueta: 'Shows',
+          ),
+          _buildNavItem(
+            index: 3,
+            iconoActivo: Icons.alt_route_rounded,
+            iconoInactivo: Icons.alt_route_outlined,
+            etiqueta: 'Tu Ruta',
+          ),
+          _buildNavItem(
+            index: 4,
+            iconoActivo: Icons.person_rounded,
+            iconoInactivo: Icons.person_outline_rounded,
+            etiqueta: 'Perfil',
+          ),
+        ],
+      ),
+    );
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -36,44 +77,18 @@ class FooterNavegacion extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(
-                index: 0,
-                iconoActivo: Icons.home_rounded,
-                iconoInactivo: Icons.home_outlined,
-                etiqueta: 'Inicio',
-              ),
-              _buildNavItem(
-                index: 1,
-                iconoActivo: Icons.map_rounded,
-                iconoInactivo: Icons.map_outlined,
-                etiqueta: 'Mapa',
-              ),
-              _buildNavItem(
-                index: 2,
-                iconoActivo: Icons.theater_comedy_rounded,
-                iconoInactivo: Icons.theater_comedy_outlined,
-                etiqueta: 'Shows',
-              ),
-              _buildNavItem(
-                index: 3,
-                iconoActivo: Icons.alt_route_rounded,
-                iconoInactivo: Icons.alt_route_outlined,
-                etiqueta: 'Tu Ruta',
-              ),
-              _buildNavItem(
-                index: 4,
-                iconoActivo: Icons.person_rounded,
-                iconoInactivo: Icons.person_outline_rounded,
-                etiqueta: 'Perfil',
-              ),
-            ],
-          ),
-        ),
+        child: esTablet
+            ? SizedBox(
+                width: double.infinity,
+                child: Center(
+                  heightFactor: 1.0,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 640),
+                    child: navContent,
+                  ),
+                ),
+              )
+            : navContent,
       ),
     );
   }
