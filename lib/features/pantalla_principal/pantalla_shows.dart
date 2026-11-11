@@ -1,0 +1,1166 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/sound_service.dart';
+import 'package:zoologico_front/core/theme/app_colors.dart';
+import 'package:zoologico_front/features/pantalla_principal/pantalla_detalle_show_acuatico.dart';
+
+/// Modelo de datos para un show de la cartelera
+class ShowItemData {
+  final String id;
+  final String titulo;
+  final String ubicacion;
+  final String duracion;
+  final String imagen;
+  final String formato; // Ej: 2D Regular / Anfiteatro Abierto
+  final String clasificacion; // Ej: APT (Apta para todos)
+  final String etiqueta;
+  final Color colorEtiqueta;
+  final List<String> horarios;
+  final bool esDestacado;
+
+  const ShowItemData({
+    required this.id,
+    required this.titulo,
+    required this.ubicacion,
+    required this.duracion,
+    required this.imagen,
+    required this.formato,
+    required this.clasificacion,
+    required this.etiqueta,
+    required this.colorEtiqueta,
+    required this.horarios,
+    this.esDestacado = false,
+  });
+}
+
+/// Pantalla de Shows estilo Cineplanet:
+/// - Selector de fecha superior (Día + Número grande)
+/// - Activación de notificaciones
+/// - Cartelera con póster a la izquierda, título y datos a la derecha,
+///   y pastillas de funciones/horarios interactivos debajo.
+class PantallaShows extends StatefulWidget {
+  const PantallaShows({super.key});
+
+  @override
+  State<PantallaShows> createState() => _PantallaShowsState();
+}
+
+class _PantallaShowsState extends State<PantallaShows> {
+  bool _notificacionesActivas = true;
+  int _diaSeleccionadoIndex = 0;
+  late final List<DateTime> _diasCalendario;
+
+  final List<ShowItemData> _todosLosShows = const [
+    ShowItemData(
+      id: 'show_marino',
+      titulo: 'Show Acuático de Lobos & Focas',
+      ubicacion: 'Anfiteatro Marino • Zona Costa',
+      duracion: '35 min',
+      imagen: 'assets/images/animales_con_fondo/foca-card.jpg',
+      formato: 'Anfiteatro Acuático',
+      clasificacion: 'APT',
+      etiqueta: '⭐ SHOW ESTELAR',
+      colorEtiqueta: Color(0xFF0077B6),
+      horarios: ['10:00 AM', '01:00 PM', '04:00 PM'],
+      esDestacado: true,
+    ),
+    ShowItemData(
+      id: 'show_aves',
+      titulo: 'Vuelo Libre de Rapaces & Cóndores',
+      ubicacion: 'Mirador Andino • Zona Sierra',
+      duracion: '25 min',
+      imagen: 'assets/images/animales_con_fondo/aguila.jpg',
+      formato: 'Campo Abierto',
+      clasificacion: 'APT',
+      etiqueta: '🦅 AL AIRE LIBRE',
+      colorEtiqueta: Color(0xFF8D6E63),
+      horarios: ['11:30 AM', '03:30 PM'],
+    ),
+    ShowItemData(
+      id: 'show_pinguinos',
+      titulo: 'Alimentación de Pingüinos Humboldt',
+      ubicacion: 'Piscina Humboldt • Zona Costa',
+      duracion: '20 min',
+      imagen: 'assets/images/animales_con_fondo/pinguino-card.jpg',
+      formato: 'Interactivo',
+      clasificacion: 'APT',
+      etiqueta: '🐟 INTERACTIVO',
+      colorEtiqueta: Color(0xFF0E6568),
+      horarios: ['12:00 PM', '02:30 PM'],
+    ),
+    ShowItemData(
+      id: 'show_felinos',
+      titulo: 'Charla & Enriquecimiento con Leones',
+      ubicacion: 'Refugio de Fieras • Zona Internacional',
+      duracion: '30 min',
+      imagen: 'assets/images/animales_con_fondo/leon-card.jpg',
+      formato: 'Charla Biológica',
+      clasificacion: 'APT',
+      etiqueta: '🦁 CHARLA CON CUIDADORES',
+      colorEtiqueta: Color(0xFFD97706),
+      horarios: ['02:00 PM', '04:30 PM'],
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    final hoy = DateTime.now();
+    _diasCalendario = List.generate(
+      14,
+      (i) => hoy.add(Duration(days: i)),
+    );
+  }
+
+  String _obtenerNombreDia(DateTime fecha, int index) {
+    if (index == 0) return 'Hoy';
+    if (index == 1) return 'Mañana';
+    const dias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    return dias[fecha.weekday - 1];
+  }
+
+  String _obtenerNombreMes(int mes) {
+    const meses = [
+      'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+      'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Dic'
+    ];
+    return meses[mes - 1];
+  }
+
+  void _seleccionarFuncion(ShowItemData show, String hora) {
+    SoundService.instance.playButtonTap();
+    final fechaSeleccionada = _diasCalendario[_diaSeleccionadoIndex];
+    final String fechaFormateada =
+        '${_obtenerNombreDia(fechaSeleccionada, _diaSeleccionadoIndex)} ${fechaSeleccionada.day} de ${_obtenerNombreMes(fechaSeleccionada.month)}';
+
+    _mostrarModalConfirmacionFuncion(show, hora, fechaFormateada);
+  }
+
+  void _mostrarModalConfirmacionFuncion(
+    ShowItemData show,
+    String hora,
+    String fechaTexto,
+  ) {
+    int cantidadEntradas = 2;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              padding: const EdgeInsets.fromLTRB(22, 16, 22, 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Barra de agarre
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 4.5,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+
+                  // RESUMEN DEL SHOW SELECCIONADO (ESTILO CINEPLANET)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          show.imagen,
+                          width: 60,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: show.colorEtiqueta.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                show.etiqueta,
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: show.colorEtiqueta,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              show.titulo,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.textoOscuro,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              show.ubicacion,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textoGris,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+                  const Divider(height: 1),
+                  const SizedBox(height: 16),
+
+                  // FUNCIÓN Y FECHA ELEGIDA
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.verdePrincipal.withValues(alpha: 0.07),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: AppColors.verdePrincipal.withValues(alpha: 0.18),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.calendar_today_rounded,
+                              size: 16,
+                              color: AppColors.verdePrincipal,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              fechaTexto,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textoOscuro,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.verdePrincipal,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.access_time_filled_rounded,
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                hora,
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // SELECTOR DE CUPOS / ENTRADAS
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Cantidad de asistentes',
+                            style: GoogleFonts.urbanist(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textoOscuro,
+                            ),
+                          ),
+                          Text(
+                            'Incluido en tu entrada general',
+                            style: GoogleFonts.urbanist(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textoGris,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: cantidadEntradas > 1
+                                ? () {
+                                    SoundService.instance.playButtonTap();
+                                    setModalState(() => cantidadEntradas--);
+                                  }
+                                : null,
+                            icon: const Icon(Icons.remove_circle_outline_rounded),
+                            color: AppColors.verdePrincipal,
+                          ),
+                          Text(
+                            '$cantidadEntradas',
+                            style: GoogleFonts.urbanist(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textoOscuro,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: cantidadEntradas < 8
+                                ? () {
+                                    SoundService.instance.playButtonTap();
+                                    setModalState(() => cantidadEntradas++);
+                                  }
+                                : null,
+                            icon: const Icon(Icons.add_circle_outline_rounded),
+                            color: AppColors.verdePrincipal,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 22),
+
+                  // BOTÓN CONFIRMAR RESERVA
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        SoundService.instance.playButtonTap();
+                        Navigator.pop(ctx);
+                        _mostrarBoletoDigital(show, hora, fechaTexto, cantidadEntradas);
+                      },
+                      icon: const Icon(Icons.confirmation_number_rounded,
+                          color: Colors.white, size: 20),
+                      label: Text(
+                        'Reservar Función ($hora)',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.verdePrincipal,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _mostrarBoletoDigital(
+    ShowItemData show,
+    String hora,
+    String fechaTexto,
+    int cantidad,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(20),
+          child: Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: AppColors.verdePrincipal.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle_rounded,
+                    color: AppColors.verdePrincipal,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '¡Función Reservada!',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.textoOscuro,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Presenta este pase en el ingreso del anfiteatro',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 12,
+                    color: AppColors.textoGris,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 18),
+
+                // TARJETA DE PASE
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF9F9F9),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.black12),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        show.titulo,
+                        style: GoogleFonts.urbanist(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textoOscuro,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$fechaTexto • $hora',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.verdePrincipal,
+                        ),
+                      ),
+                      Text(
+                        'Pases: $cantidad personas • ${show.ubicacion}',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 11.5,
+                          color: AppColors.textoGris,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      // Código de barras / QR simulado
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.black12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.qr_code_2_rounded, size: 54),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'PASE-ZOO-2026',
+                                  style: GoogleFonts.urbanist(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                Text(
+                                  'Acceso Rápido',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 11,
+                                    color: Colors.green.shade700,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: double.infinity,
+                  height: 46,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.verdePrincipal,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(
+                      'Listo, entendido',
+                      style: GoogleFonts.urbanist(
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _abrirDetalleShow(ShowItemData show) {
+    SoundService.instance.playButtonTap();
+    if (show.id == 'show_marino') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const PantallaDetalleShowAcuatico(),
+        ),
+      );
+    } else {
+      _seleccionarFuncion(show, show.horarios.first);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFFBF9F6),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: false,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.textoOscuro,
+            size: 20,
+          ),
+          onPressed: () {
+            SoundService.instance.playButtonTap();
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          'Cartelera de Shows',
+          style: GoogleFonts.urbanist(
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
+            color: AppColors.textoOscuro,
+            letterSpacing: -0.3,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 6),
+
+            // 1. BARRA SUPERIOR DE ACTIVAR NOTIFICACIONES
+            _buildNotificacionesSwitch(),
+
+            const SizedBox(height: 16),
+
+            // 2. ENCABEZADO DE FECHAS
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Selecciona el día',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textoOscuro,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  Text(
+                    '${_obtenerNombreMes(_diasCalendario[_diaSeleccionadoIndex].month)} ${_diasCalendario[_diaSeleccionadoIndex].year}',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.verdePrincipal,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // 3. CALENDARIO TIPO CINEPLANET (STRIP HORIZONTAL)
+            _buildCalendarioCineplanet(),
+
+            const SizedBox(height: 20),
+
+            // 4. LISTA DE SHOWS FORMATO CINEPLANET (IMAGEN IZQ + TÍTULO DER + FUNCIONES DEBAJO)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                children: [
+                  Text(
+                    'Shows disponibles',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textoOscuro,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.verdePrincipal.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '${_todosLosShows.length} en cartelera',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.verdePrincipal,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              itemCount: _todosLosShows.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 16),
+              itemBuilder: (context, index) {
+                final show = _todosLosShows[index];
+                return _buildShowCardCineplanet(show);
+              },
+            ),
+
+            const SizedBox(height: 32),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Barra superior de activación de notificaciones
+  Widget _buildNotificacionesSwitch() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: _notificacionesActivas
+                ? AppColors.verdePrincipal.withValues(alpha: 0.25)
+                : Colors.black.withValues(alpha: 0.06),
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: _notificacionesActivas
+                    ? AppColors.verdePrincipal.withValues(alpha: 0.12)
+                    : Colors.grey.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _notificacionesActivas
+                    ? Icons.notifications_active_rounded
+                    : Icons.notifications_off_outlined,
+                color: _notificacionesActivas
+                    ? AppColors.verdePrincipal
+                    : Colors.grey.shade500,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Activar notificaciones de shows',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textoOscuro,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Te avisamos 15 min antes de cada función',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textoGris,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Switch(
+              value: _notificacionesActivas,
+              activeThumbColor: AppColors.verdePrincipal,
+              activeTrackColor: AppColors.verdePrincipal.withValues(alpha: 0.35),
+              onChanged: (val) {
+                SoundService.instance.playButtonTap();
+                setState(() {
+                  _notificacionesActivas = val;
+                });
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: AppColors.verdePrincipal,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    content: Text(
+                      val
+                          ? '🔔 Notificaciones de shows activadas'
+                          : '🔕 Notificaciones de shows pausadas',
+                      style: GoogleFonts.urbanist(fontWeight: FontWeight.w700),
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Calendario horizontal estilo Cineplanet (Día de la semana + Fecha grande)
+  Widget _buildCalendarioCineplanet() {
+    return SizedBox(
+      height: 92,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: _diasCalendario.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          final fecha = _diasCalendario[index];
+          final bool seleccionado = _diaSeleccionadoIndex == index;
+          final String diaSemana = _obtenerNombreDia(fecha, index);
+          final String numeroDia = fecha.day.toString();
+
+          return InkWell(
+            onTap: () {
+              SoundService.instance.playButtonTap();
+              setState(() {
+                _diaSeleccionadoIndex = index;
+              });
+            },
+            borderRadius: BorderRadius.circular(18),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              width: 68,
+              decoration: BoxDecoration(
+                color: seleccionado
+                    ? AppColors.verdePrincipal
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: seleccionado
+                      ? AppColors.verdePrincipal
+                      : Colors.black.withValues(alpha: 0.07),
+                  width: seleccionado ? 1.6 : 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: seleccionado
+                        ? AppColors.verdePrincipal.withValues(alpha: 0.28)
+                        : Colors.black.withValues(alpha: 0.03),
+                    blurRadius: seleccionado ? 12 : 6,
+                    offset: Offset(0, seleccionado ? 5 : 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    diaSemana.toUpperCase(),
+                    style: GoogleFonts.urbanist(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.6,
+                      color: seleccionado
+                          ? Colors.white.withValues(alpha: 0.9)
+                          : AppColors.textoGris,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    numeroDia,
+                    style: GoogleFonts.urbanist(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      height: 1.0,
+                      color: seleccionado
+                          ? Colors.white
+                          : AppColors.textoOscuro,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Tarjeta de Show estilo Cineplanet:
+  /// - A la izquierda: Póster vertical pequeño (imagen)
+  /// - A la derecha: Título, ubicación, badge, clasificación
+  /// - Debajo: Bloque de funciones con botones horarios interactivos
+  Widget _buildShowCardCineplanet(ShowItemData show) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: show.esDestacado
+              ? AppColors.verdePrincipal.withValues(alpha: 0.25)
+              : Colors.black.withValues(alpha: 0.06),
+          width: show.esDestacado ? 1.4 : 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // FILA PRINCIPAL: IMAGEN PEQUEÑA A LA IZQUIERDA + TÍTULO Y DETALLES A LA DERECHA
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // IMAGEN PÓSTER PEQUEÑA TIPO CINEPLANET
+              GestureDetector(
+                onTap: () => _abrirDetalleShow(show),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Stack(
+                    children: [
+                      Image.asset(
+                        show.imagen,
+                        width: 88,
+                        height: 116,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 88,
+                          height: 116,
+                          color: Colors.grey.shade200,
+                          child: const Icon(Icons.theater_comedy, color: Colors.grey),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 4,
+                        right: 4,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.7),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            show.duracion,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 14),
+
+              // DATOS A LA DERECHA: BADGES, TÍTULO Y UBICACIÓN
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Badges superiores
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2.5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: show.colorEtiqueta.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            show.etiqueta,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              color: show.colorEtiqueta,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: Colors.black12),
+                          ),
+                          child: Text(
+                            show.clasificacion,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textoOscuro,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    // TÍTULO DEL SHOW
+                    GestureDetector(
+                      onTap: () => _abrirDetalleShow(show),
+                      child: Text(
+                        show.titulo,
+                        style: GoogleFonts.urbanist(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textoOscuro,
+                          height: 1.2,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    // UBICACIÓN Y FORMATO
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 13,
+                          color: AppColors.textoGris,
+                        ),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            show.ubicacion,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textoGris,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 4),
+                    Text(
+                      show.formato,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.verdePrincipal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+          const Divider(height: 1),
+          const SizedBox(height: 10),
+
+          // SECCIÓN DE FUNCIONES DEBAJO (ESTILO CINEPLANET)
+          Row(
+            children: [
+              Text(
+                'FUNCIONES:',
+                style: GoogleFonts.urbanist(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textoGris,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Toca para reservar horario',
+                style: GoogleFonts.urbanist(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textoGris.withValues(alpha: 0.7),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+
+          // CHIPS DE HORARIOS / FUNCIONES
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: show.horarios.map((hora) {
+              return InkWell(
+                onTap: () => _seleccionarFuncion(show, hora),
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 7,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.verdePrincipal.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppColors.verdePrincipal.withValues(alpha: 0.28),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.access_time_rounded,
+                        size: 13,
+                        color: AppColors.verdePrincipal,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        hora,
+                        style: GoogleFonts.urbanist(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.verdePrincipal,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}

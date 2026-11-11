@@ -4,14 +4,20 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
+import 'package:zoologico_front/features/mapa/widgets/modal_animales_por_visitar.dart';
 import 'package:zoologico_front/features/pantalla_principal/pantalla_detalle_show_acuatico.dart';
+import 'package:zoologico_front/features/pantalla_principal/pantalla_perfil.dart';
+import 'package:zoologico_front/features/pantalla_principal/pantalla_shows.dart';
 
+import 'widgets/acciones_rapidas_grid.dart';
 import 'widgets/animales_carrusel.dart';
-import 'widgets/banner_mapa.dart';
+import 'widgets/banner_bonito.dart';
 import 'widgets/dialogo_permiso_notificaciones.dart';
-import 'widgets/emergencia_card.dart';
-import 'widgets/hero_header.dart';
-import 'widgets/show_acuatico_card.dart';
+import 'widgets/encabezado_sutil.dart';
+import 'widgets/footer_navegacion.dart';
+import 'widgets/modal_te_perdiste.dart';
+import 'widgets/modal_tiendas_cercanas.dart';
+import 'widgets/progreso_circular_animales.dart';
 
 class PantallaPrincipal extends StatefulWidget {
   const PantallaPrincipal({super.key});
@@ -22,6 +28,7 @@ class PantallaPrincipal extends StatefulWidget {
 
 class _PantallaPrincipalState extends State<PantallaPrincipal> {
   DateTime? _lastBackPressTime;
+  int _tabActual = 0;
 
   @override
   void initState() {
@@ -62,6 +69,16 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     );
   }
 
+  void _navigateToShows(BuildContext context) {
+    SoundService.instance.playButtonTap();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const PantallaShows(),
+      ),
+    );
+  }
+
   void _navigateToMap(BuildContext context) {
     SoundService.instance.playButtonTap();
     Navigator.push(
@@ -91,12 +108,42 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     );
   }
 
+  void _abrirModalExploracion(BuildContext context) {
+    ModalAnimalesPorVisitar.mostrar(
+      context,
+      onSeleccionarAnimal: (marcador) {
+        _navigateToMapConAnimal(context, marcador.id);
+      },
+    );
+  }
+
+  void _onTabSeleccionado(int index) {
+    if (index == 0) {
+      setState(() => _tabActual = 0);
+    } else if (index == 1) {
+      _navigateToMap(context);
+    } else if (index == 2) {
+      _navigateToShows(context);
+    } else if (index == 3) {
+      _navigateToMapExploraciones(context);
+    } else if (index == 4) {
+      setState(() => _tabActual = 4);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
+
+        // Si estamos en perfil, volver a Inicio antes de salir
+        if (_tabActual != 0) {
+          setState(() => _tabActual = 0);
+          return;
+        }
+
         final now = DateTime.now();
         if (_lastBackPressTime == null ||
             now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
@@ -132,174 +179,88 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(
+        backgroundColor: const Color(0xFFFBF9F6),
+        body: IndexedStack(
+          index: _tabActual == 4 ? 1 : 0,
           children: [
-            // FONDO HERO SAFARI ADAPTABLE
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 380,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(
-                    'assets/images/pantalla_principal/hero_fondo.png',
-                    fit: BoxFit.cover,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 0.65),
-                          Colors.black.withValues(alpha: 0.25),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            // PESTAÑA 0: PANTALLA PRINCIPAL SUTIL Y REESTRUCTURADA
+            _buildCuerpoPrincipal(context),
+
+            // PESTAÑA 4: PERFIL DEL EXPLORADOR
+            PantallaPerfil(
+              onVolverAlInicio: () => setState(() => _tabActual = 0),
+            ),
+          ],
+        ),
+        bottomNavigationBar: FooterNavegacion(
+          indiceSeleccionado: _tabActual,
+          onTabSeleccionado: _onTabSeleccionado,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCuerpoPrincipal(BuildContext context) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 10),
+
+            // 1. ENCABEZADO SUTIL
+            EncabezadoSutil(
+              nombreParque: 'Parque de las Leyendas',
+              onNotificacionesTap: () {
+                DialogoPermisoNotificaciones.verificarYMostrar(context);
+              },
             ),
 
-            // CONTENIDO SCROLLEABLE
-            SafeArea(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 12),
+            const SizedBox(height: 14),
 
-                    // ENCABEZADO SAFARI AVENTURA CON PÍLDORAS INTERACTIVAS
-                    HeroHeader(
-                      onNavegarTap: () => _navigateToMap(context),
-                      onExploracionesTap: () =>
-                          _navigateToMapExploraciones(context),
-                      onShowAcuaticoTap: () => _navigateToShowAcuatico(context),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // CUERPO PRINCIPAL (TARJETA BLANCA SAFARI ORGÁNICA)
-                    Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(30),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 20,
-                            offset: Offset(0, -6),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 22),
-
-                          // --- 1. SECCIÓN: ANIMALES POR DESCUBRIR (CON ENLACE DIRECTO AL MAPA) ---
-                          AnimalesCarrusel(
-                            onExploracionesTap: () =>
-                                _navigateToMapExploraciones(context),
-                            onSeleccionarAnimal: (animalId) =>
-                                _navigateToMapConAnimal(context, animalId),
-                          ),
-
-                          const SizedBox(height: 32),
-
-                          // --- 2. SECCIÓN: SERVICIOS Y EXPERIENCIAS (CARDS 3D POP-OUT) ---
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 24.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Experiencias y servicios',
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w900,
-                                    color: AppColors.textoOscuro,
-                                    letterSpacing: -0.3,
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 9,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.verdePrincipal.withValues(
-                                      alpha: 0.1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(
-                                        Icons.verified_rounded,
-                                        size: 13,
-                                        color: AppColors.verdePrincipal,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'Zoo Guide',
-                                        style: GoogleFonts.urbanist(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w800,
-                                          color: AppColors.verdePrincipal,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          // TARJETAS 3D POP-OUT VERTICALES (FONDOS TEMÁTICOS MARINO Y MÉDICO)
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20.0),
-                            child: Column(
-                              children: [
-                                ShowAcuaticoCard(),
-                                SizedBox(height: 22),
-                                EmergenciaCard(),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 34),
-
-                          // --- 3. SECCIÓN: BANNER DEL MAPA INTERACTIVO ---
-                          BannerMapa(
-                            onTap: () => _navigateToMap(context),
-                          ),
-
-                          const SizedBox(height: 30),
-
-                          // FOOTER BOTÁNICO
-                          Image.asset(
-                            'assets/images/pantalla_principal/footer.png',
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            // 2. BANNER BONITO DESTACADO
+            BannerBonito(
+              onTap: () => _navigateToShowAcuatico(context),
             ),
+
+            const SizedBox(height: 20),
+
+            // 3. PROGRESO CIRCULAR: ANIMALES OBSERVADOS HOY
+            ProgresoCircularAnimales(
+              onVerDetalle: () => _abrirModalExploracion(context),
+            ),
+
+            const SizedBox(height: 22),
+
+            // 4. OPCIONES DE ACCIONES RÁPIDAS (¿QUÉ QUIERES HACER?)
+            AccionesRapidasGrid(
+              onVerShows: () => _navigateToShows(context),
+              onVerMapa: () => _navigateToMap(context),
+              onBuscarTiendas: () {
+                ModalTiendasCercanas.mostrar(
+                  context,
+                  onAbrirEnMapa: () => _navigateToMap(context),
+                );
+              },
+              onTePerdiste: () {
+                ModalTePerdiste.mostrar(
+                  context,
+                  onIrAlMapa: () => _navigateToMap(context),
+                );
+              },
+            ),
+
+            const SizedBox(height: 26),
+
+            // 5. CARRUSEL DE ANIMALES POR DESCUBRIR
+            AnimalesCarrusel(
+              onExploracionesTap: () => _navigateToMapExploraciones(context),
+              onSeleccionarAnimal: (animalId) =>
+                  _navigateToMapConAnimal(context, animalId),
+            ),
+
+            const SizedBox(height: 28),
           ],
         ),
       ),
