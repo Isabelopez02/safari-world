@@ -535,111 +535,7 @@ class _PantallaMapaState extends State<PantallaMapa>
     );
   }
 
-  void _mostrarBuscadorModal() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        String query = '';
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            final lista = marcadores.where((m) {
-              if (query.isEmpty) return true;
-              return m.nombre.toLowerCase().contains(query.toLowerCase()) ||
-                  m.habitat.toLowerCase().contains(query.toLowerCase());
-            }).toList();
 
-            return Container(
-              height: MediaQuery.of(context).size.height * 0.75,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-              ),
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-              child: Column(
-                children: [
-                  Center(
-                    child: Container(
-                      width: 44,
-                      height: 4.5,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      hintText: 'Buscar animal, zona o hábitat...',
-                      hintStyle: GoogleFonts.urbanist(color: AppColors.textoGris),
-                      prefixIcon: const Icon(Icons.search_rounded, color: AppColors.verdePrincipal),
-                      filled: true,
-                      fillColor: Colors.grey.shade100,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    onChanged: (val) {
-                      setModalState(() => query = val);
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: ListView.separated(
-                      itemCount: lista.length,
-                      separatorBuilder: (context, index) => const Divider(height: 1),
-                      itemBuilder: (context, index) {
-                        final animal = lista[index];
-                        return ListTile(
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(
-                              animal.imagen ??
-                                  'assets/images/animales_con_fondo/leon-card.jpg',
-                              width: 44,
-                              height: 44,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.pets),
-                            ),
-                          ),
-                          title: Text(
-                            animal.nombre,
-                            style: GoogleFonts.urbanist(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 15,
-                            ),
-                          ),
-                          subtitle: Text(
-                            animal.habitat,
-                            style: GoogleFonts.urbanist(
-                              fontSize: 12,
-                              color: AppColors.textoGris,
-                            ),
-                          ),
-                          trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
-                          onTap: () {
-                            Navigator.pop(ctx);
-                            _centrarEnPunto(animal.x, animal.y);
-                            _mostrarInfoMarcador(animal);
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -990,7 +886,6 @@ class _PantallaMapaState extends State<PantallaMapa>
                   },
                 );
               },
-              onBuscarTexto: _mostrarBuscadorModal,
             ),
           ),
 

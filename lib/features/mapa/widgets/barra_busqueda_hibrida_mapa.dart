@@ -14,20 +14,18 @@ enum ChipUrgenciaMapa {
 }
 
 /// Barra superior híbrida del mapa estilo Google Maps / Disney Parks:
-/// - Barra de búsqueda limpia con acceso al selector de capas
+/// - Selector de capas compacto
 /// - 4 chips de urgencia y servicios vitales (Baños, Animales, Snacks, Salida/Parking)
 class BarraBusquedaHibridaMapa extends StatelessWidget {
   final ChipUrgenciaMapa chipActivo;
   final ValueChanged<ChipUrgenciaMapa> onChipSeleccionado;
   final VoidCallback onAbrirCapas;
-  final VoidCallback onBuscarTexto;
 
   const BarraBusquedaHibridaMapa({
     super.key,
     required this.chipActivo,
     required this.onChipSeleccionado,
     required this.onAbrirCapas,
-    required this.onBuscarTexto,
   });
 
   @override
@@ -36,119 +34,48 @@ class BarraBusquedaHibridaMapa extends StatelessWidget {
       bottom: false,
       child: Padding(
         padding: const EdgeInsets.only(top: 14.0, left: 16.0, right: 16.0, bottom: 8.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // FILA 1: BARRA DE BÚSQUEDA + BOTÓN CAPAS
-            Row(
-              children: [
-                // CAJA DE BÚSQUEDA CRISTALINA
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: InkWell(
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          SoundService.instance.playButtonTap();
-                          onBuscarTexto();
-                        },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.92),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.black.withValues(alpha: 0.08),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.06),
-                                blurRadius: 10,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.search_rounded,
-                                color: AppColors.verdePrincipal,
-                                size: 21,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  '¿A dónde deseas ir en el parque?',
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.textoGris,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(width: 8),
-
-                // BOTÓN CAPAS / FILTROS (🎛️)
-                _buildCircleActionButton(
-                  icono: Icons.layers_rounded,
-                  colorFondo: Colors.white.withValues(alpha: 0.92),
-                  colorIcono: AppColors.verdePrincipal,
-                  onTap: onAbrirCapas,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-
-            // FILA 2: LOS 4 CHIPS DE URGENCIAS Y SERVICIOS INMEDIATOS
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              child: Row(
-                children: [
-                  _buildQuickPill(
-                    tipo: ChipUrgenciaMapa.banios,
-                    icono: Icons.wc_rounded,
-                    etiqueta: 'Baños',
-                    colorTema: AppColors.verdeAzulado,
-                  ),
-                  const SizedBox(width: 8),
-                  _buildQuickPill(
-                    tipo: ChipUrgenciaMapa.animales,
-                    icono: Icons.pets_rounded,
-                    etiqueta: 'Animales',
-                    colorTema: AppColors.verdePrincipal,
-                  ),
-                  const SizedBox(width: 8),
-                  _buildQuickPill(
-                    tipo: ChipUrgenciaMapa.snacks,
-                    icono: Icons.storefront_rounded,
-                    etiqueta: 'Snacks & Café',
-                    colorTema: AppColors.amarilloMostaza,
-                  ),
-                  const SizedBox(width: 8),
-                  _buildQuickPill(
-                    tipo: ChipUrgenciaMapa.salidaParking,
-                    icono: Icons.local_parking_rounded,
-                    etiqueta: 'Salida & Parking',
-                    colorTema: const Color(0xFF546E7A),
-                  ),
-                ],
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            children: [
+              // BOTÓN CAPAS / FILTROS (🎛️)
+              _buildCircleActionButton(
+                icono: Icons.layers_rounded,
+                colorFondo: Colors.white.withValues(alpha: 0.94),
+                colorIcono: AppColors.verdePrincipal,
+                onTap: onAbrirCapas,
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              _buildQuickPill(
+                tipo: ChipUrgenciaMapa.banios,
+                icono: Icons.wc_rounded,
+                etiqueta: 'Baños',
+                colorTema: AppColors.verdeAzulado,
+              ),
+              const SizedBox(width: 8),
+              _buildQuickPill(
+                tipo: ChipUrgenciaMapa.animales,
+                icono: Icons.pets_rounded,
+                etiqueta: 'Animales',
+                colorTema: AppColors.verdePrincipal,
+              ),
+              const SizedBox(width: 8),
+              _buildQuickPill(
+                tipo: ChipUrgenciaMapa.snacks,
+                icono: Icons.storefront_rounded,
+                etiqueta: 'Snacks & Café',
+                colorTema: AppColors.amarilloMostaza,
+              ),
+              const SizedBox(width: 8),
+              _buildQuickPill(
+                tipo: ChipUrgenciaMapa.salidaParking,
+                icono: Icons.local_parking_rounded,
+                etiqueta: 'Salida & Parking',
+                colorTema: const Color(0xFF546E7A),
+              ),
+            ],
+          ),
         ),
       ),
     );
