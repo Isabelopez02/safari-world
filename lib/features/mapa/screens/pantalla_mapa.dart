@@ -19,10 +19,10 @@ import '../widgets/barra_filtros_mapa.dart';
 import '../widgets/barra_inferior_mapa.dart';
 import '../widgets/capa_trazos_mapa.dart';
 import '../widgets/marcador_animado.dart';
-import '../widgets/modal_animales_por_visitar.dart';
+import 'package:zoologico_front/core/widgets/modal_animales_por_visitar.dart';
 import '../widgets/modal_capas_mapa.dart';
 import '../widgets/tutorial_overlay.dart';
-import '../../pantalla_principal/widgets/modal_tiendas_cercanas.dart';
+import 'package:zoologico_front/core/widgets/modal_tiendas_cercanas.dart';
 
 class PantallaMapa extends StatefulWidget {
   final bool abrirExploracionesAlCargar;

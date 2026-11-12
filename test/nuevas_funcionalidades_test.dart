@@ -6,7 +6,7 @@ import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_detalle_animal.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
 import 'package:zoologico_front/features/mapa/widgets/barra_filtros_mapa.dart';
-import 'package:zoologico_front/features/mapa/widgets/modal_animales_por_visitar.dart';
+import 'package:zoologico_front/core/widgets/modal_animales_por_visitar.dart';
 import 'package:zoologico_front/features/pantalla_principal/widgets/dialogo_permiso_notificaciones.dart';
 
 void main() {

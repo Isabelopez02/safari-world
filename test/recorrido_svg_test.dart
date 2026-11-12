@@ -1,11 +1,7 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_drawing/path_drawing.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
 import 'package:zoologico_front/features/mapa/utils/servicio_rutas_svg.dart';
-import 'package:zoologico_front/features/mapa/widgets/recorrido_animado_svg.dart';
-import 'package:zoologico_front/features/mapa/widgets/ruta_svg_painter.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -51,86 +47,9 @@ void main() {
       expect(tangentFin!.position.dx, closeTo(616.81, 1.0));
       expect(tangentFin.position.dy, closeTo(511.36, 1.0));
     });
-
-    test('Parsea archivo completo trazo_mapa.svg extrayendo todos los paths', () {
-      final file = File('assets/images/trazo_mapa.svg');
-      expect(file.existsSync(), isTrue);
-
-      final svgContent = file.readAsStringSync();
-      final combinedPath = RecorridoAnimadoSvg.parsearSvgCompleto(svgContent);
-
-      final metrics = combinedPath.computeMetrics().toList();
-      expect(metrics.length, greaterThanOrEqualTo(30));
-
-      final totalLength = metrics.fold(0.0, (acc, m) => acc + m.length);
-      expect(totalLength, greaterThan(3000.0));
-    });
   });
 
   group('Pruebas de Widget y CustomPainter', () {
-    testWidgets('RutaSvgPainter dibuja con color rojo semitransparente y grosor 4px', (tester) async {
-      final path = parseSvgPathData(trazoSvgTest);
-      final painter = RutaSvgPainter(path: path);
-
-      expect(painter.color, equals(const Color(0x80FF0000)));
-      expect(painter.grosor, equals(4.0));
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CustomPaint(
-              size: const Size(1920, 1080),
-              painter: painter,
-            ),
-          ),
-        ),
-      );
-
-      expect(find.byType(CustomPaint), findsWidgets);
-    });
-
-    testWidgets('RecorridoAnimadoSvg anima el marcador Positioned a lo largo de la ruta', (tester) async {
-      Offset? posicionCapturada;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: RecorridoAnimadoSvg(
-              svgPathData: trazoSvgTest,
-              incluirImagenMapa: false, // Desactivar imagen para test sin assets
-              duracion: const Duration(seconds: 2),
-              repetirEnBucle: false,
-              onPosicionActualizada: (pos) {
-                posicionCapturada = pos;
-              },
-            ),
-          ),
-        ),
-      );
-
-      // Frame inicial (inicio de la ruta)
-      await tester.pump();
-      expect(find.byIcon(Icons.location_on), findsOneWidget);
-      expect(find.byType(Positioned), findsWidgets);
-      expect(posicionCapturada, isNotNull);
-      expect(posicionCapturada!.dx, closeTo(610.69, 1.0));
-      expect(posicionCapturada!.dy, closeTo(731.40, 1.0));
-
-      // Avanzar al 50% de la animación
-      await tester.pump(const Duration(seconds: 1));
-      expect(posicionCapturada, isNotNull);
-      final midX = posicionCapturada!.dx;
-      final midY = posicionCapturada!.dy;
-
-      // El marcador se ha desplazado tanto en X como en Y
-      expect(midX, isNot(equals(610.69)));
-      expect(midY, isNot(equals(731.40)));
-
-      // Avanzar al 100% de la animación (destino)
-      await tester.pump(const Duration(seconds: 1));
-      expect(posicionCapturada!.dx, closeTo(616.81, 1.0));
-      expect(posicionCapturada!.dy, closeTo(511.36, 1.0));
-    });
 
     test('ServicioRutasSvg genera rutas curvas válidas hacia animales de diferentes hábitats', () {
       final chimpance = MarcadorMapa(

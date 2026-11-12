@@ -5,20 +5,20 @@ import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
-import 'package:zoologico_front/features/mapa/widgets/modal_animales_por_visitar.dart';
+import 'package:zoologico_front/core/widgets/modal_animales_por_visitar.dart';
 import 'package:zoologico_front/features/modo_facil/pantalla_modo_facil.dart';
-import 'package:zoologico_front/features/pantalla_principal/pantalla_perfil.dart';
-import 'package:zoologico_front/features/pantalla_principal/pantalla_ruta.dart';
-import 'package:zoologico_front/features/pantalla_principal/pantalla_shows.dart';
+import 'package:zoologico_front/features/perfil/pantalla_perfil.dart';
+import 'package:zoologico_front/features/rutas/pantalla_ruta.dart';
+import 'package:zoologico_front/features/shows/pantalla_shows.dart';
 
-import 'widgets/acciones_rapidas_grid.dart';
-import 'widgets/banner_bonito.dart';
-import 'widgets/dialogo_permiso_notificaciones.dart';
-import 'widgets/encabezado_sutil.dart';
-import 'widgets/footer_navegacion.dart';
-import 'widgets/modal_te_perdiste.dart';
-import 'widgets/modal_tiendas_cercanas.dart';
-import 'widgets/progreso_circular_animales.dart';
+import '../widgets/acciones_rapidas_grid.dart';
+import '../widgets/banner_bonito.dart';
+import '../widgets/dialogo_permiso_notificaciones.dart';
+import '../widgets/encabezado_sutil.dart';
+import '../widgets/footer_navegacion.dart';
+import '../widgets/modal_te_perdiste.dart';
+import 'package:zoologico_front/core/widgets/modal_tiendas_cercanas.dart';
+import '../widgets/progreso_circular_animales.dart';
 
 class PantallaPrincipal extends StatefulWidget {
   const PantallaPrincipal({super.key});

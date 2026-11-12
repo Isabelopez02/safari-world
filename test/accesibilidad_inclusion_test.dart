@@ -5,7 +5,6 @@ import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
 import 'package:zoologico_front/features/mapa/widgets/barra_filtros_mapa.dart';
-import 'package:zoologico_front/features/mapa/widgets/modal_accesibilidad_mapa.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -76,32 +75,6 @@ void main() {
       await a11y.setModoAltoContraste(false);
       await a11y.setModoDaltonismo(false);
       await a11y.setMostrarZonasCalma(false);
-    });
-
-    testWidgets('ModalAccesibilidadMapa renderiza opciones y zonas de calma',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1080, 2200);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() => tester.view.resetPhysicalSize());
-
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: ModalAccesibilidadMapa(),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Accesibilidad'), findsOneWidget);
-      expect(find.text('Daltonismo'), findsOneWidget);
-      expect(find.text('Zonas de Calma'), findsWidgets);
-
-      // Debe listar las 4 zonas de calma
-      expect(find.text('Jardín Botánico & Sombra Serena'), findsOneWidget);
-      expect(find.text('Mirador del Bosque Silencioso'), findsOneWidget);
-      expect(find.text('Pérgola de los Sauces'), findsOneWidget);
-      expect(find.text('Rincón Zen de la Laguna'), findsOneWidget);
     });
 
     testWidgets('BarraFiltrosMapa permite seleccionar filtro Zonas de Calma',

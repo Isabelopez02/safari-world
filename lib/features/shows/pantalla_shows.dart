@@ -5,7 +5,7 @@ import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/notification_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
-import 'package:zoologico_front/features/pantalla_principal/pantalla_detalle_show_acuatico.dart';
+import 'pantalla_detalle_show_acuatico.dart';
 
 /// Secciones principales disponibles para los shows
 enum SeccionShows {

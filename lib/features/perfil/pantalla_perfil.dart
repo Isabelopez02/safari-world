@@ -8,7 +8,7 @@ import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/notification_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
-import 'package:zoologico_front/features/mapa/widgets/modal_animales_por_visitar.dart';
+import 'package:zoologico_front/core/widgets/modal_animales_por_visitar.dart';
 
 /// Pantalla de Perfil y Ajustes con diseño y ergonomía estilo iOS / iPhone:
 /// - Secciones agrupadas con paleta safari unificada (#FBF9F6 y verdes de la app)
