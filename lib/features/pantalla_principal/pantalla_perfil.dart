@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/services/emergency_service.dart';
+import 'package:zoologico_front/core/services/notification_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/widgets/modal_animales_por_visitar.dart';
@@ -123,6 +124,13 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                   onChanged: (val) {
                     SoundService.instance.playButtonTap();
                     setState(() => _notificacionesShows = val);
+                    if (val) {
+                      NotificationService.instance.mostrarNotificacion(
+                        id: 102,
+                        titulo: '🔔 Parque de las Leyendas',
+                        cuerpo: 'Las notificaciones han sido activadas',
+                      );
+                    }
                   },
                 ),
                 const Divider(height: 1, indent: 56),

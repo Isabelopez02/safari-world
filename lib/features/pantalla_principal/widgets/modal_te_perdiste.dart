@@ -7,19 +7,28 @@ import 'package:zoologico_front/core/theme/app_colors.dart';
 /// Modal sutil y tranquilizador de orientación y auxilio para visitantes desorientados.
 class ModalTePerdiste extends StatelessWidget {
   final VoidCallback onIrAlMapa;
+  final ValueChanged<String>? onIrAlMapaConDestino;
 
   const ModalTePerdiste({
     super.key,
     required this.onIrAlMapa,
+    this.onIrAlMapaConDestino,
   });
 
-  static void mostrar(BuildContext context, {required VoidCallback onIrAlMapa}) {
+  static void mostrar(
+    BuildContext context, {
+    required VoidCallback onIrAlMapa,
+    ValueChanged<String>? onIrAlMapaConDestino,
+  }) {
     SoundService.instance.playButtonTap();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => ModalTePerdiste(onIrAlMapa: onIrAlMapa),
+      builder: (context) => ModalTePerdiste(
+        onIrAlMapa: onIrAlMapa,
+        onIrAlMapaConDestino: onIrAlMapaConDestino,
+      ),
     );
   }
 
@@ -114,10 +123,14 @@ class ModalTePerdiste extends StatelessWidget {
             icono: Icons.signpost_rounded,
             colorIcono: const Color(0xFF0288D1),
             titulo: 'Puntos de encuentro y guías',
-            subtitulo: 'Hay módulos de guardaparques en cada entrada y plaza principal',
+            subtitulo: 'Ver en el mapa módulos de auxilio, guardaparques y puestos médicos',
             onTap: () {
               Navigator.pop(context);
-              onIrAlMapa();
+              if (onIrAlMapaConDestino != null) {
+                onIrAlMapaConDestino!('puntos_encuentro');
+              } else {
+                onIrAlMapa();
+              }
             },
           ),
 

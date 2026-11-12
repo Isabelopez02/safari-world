@@ -194,6 +194,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
             ModalTePerdiste.mostrar(
               context,
               onIrAlMapa: () => setState(() => _tabActual = 1),
+              onIrAlMapaConDestino: (destino) => _irAlMapaConDestino(destino),
             );
           },
         ),

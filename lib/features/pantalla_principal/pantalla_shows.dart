@@ -1,5 +1,7 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/notification_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/pantalla_principal/pantalla_detalle_show_acuatico.dart';
@@ -9,6 +11,37 @@ enum SeccionShows {
   horarios,
   reglas,
   escenarios,
+}
+
+/// Modelo de datos para las entradas reservadas de shows
+class EntradaShow {
+  final String id;
+  final String showId;
+  final String titulo;
+  final String ubicacion;
+  final String imagen;
+  final String fechaTexto; // Ej: "Hoy, 11 Nov"
+  final DateTime fecha;
+  final String hora;
+  final int cantidad;
+  final String codigoBoleto;
+  final Color colorTema;
+  final bool esVigente;
+
+  const EntradaShow({
+    required this.id,
+    required this.showId,
+    required this.titulo,
+    required this.ubicacion,
+    required this.imagen,
+    required this.fechaTexto,
+    required this.fecha,
+    required this.hora,
+    required this.cantidad,
+    required this.codigoBoleto,
+    this.colorTema = AppColors.verdePrincipal,
+    this.esVigente = true,
+  });
 }
 
 /// Modelo de datos para un show de la cartelera
@@ -66,6 +99,7 @@ class _PantallaShowsState extends State<PantallaShows> {
   bool _notificacionesActivas = true;
   int _diaSeleccionadoIndex = 0;
   late final List<DateTime> _diasCalendario;
+  late final List<EntradaShow> _misEntradas;
 
   final List<ShowItemData> _todosLosShows = const [
     ShowItemData(
@@ -127,6 +161,36 @@ class _PantallaShowsState extends State<PantallaShows> {
       14,
       (i) => hoy.add(Duration(days: i)),
     );
+
+    _misEntradas = [
+      EntradaShow(
+        id: 'entrada_1',
+        showId: 'show_marino',
+        titulo: 'Show Acuático de Lobos & Focas',
+        ubicacion: 'Anfiteatro Marino • Zona Costa',
+        imagen: 'assets/images/animales_con_fondo/foca-card.jpg',
+        fechaTexto: 'Hoy, ${hoy.day} de ${_obtenerNombreMes(hoy.month)}',
+        fecha: hoy,
+        hora: '10:00 AM',
+        cantidad: 2,
+        codigoBoleto: 'TKT-MAR-1049',
+        colorTema: const Color(0xFF0077B6),
+      ),
+      EntradaShow(
+        id: 'entrada_2',
+        showId: 'show_aves',
+        titulo: 'Vuelo Libre de Rapaces & Cóndores',
+        ubicacion: 'Mirador Andino • Zona Sierra',
+        imagen: 'assets/images/animales_con_fondo/aguila.jpg',
+        fechaTexto:
+            'Mañana, ${hoy.add(const Duration(days: 1)).day} de ${_obtenerNombreMes(hoy.add(const Duration(days: 1)).month)}',
+        fecha: hoy.add(const Duration(days: 1)),
+        hora: '11:30 AM',
+        cantidad: 3,
+        codigoBoleto: 'TKT-AVE-8214',
+        colorTema: const Color(0xFF8D6E63),
+      ),
+    ];
   }
 
   String _obtenerNombreDia(DateTime fecha, int index) {
@@ -388,6 +452,23 @@ class _PantallaShowsState extends State<PantallaShows> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         SoundService.instance.playButtonTap();
+                        final nuevaEntrada = EntradaShow(
+                          id: DateTime.now().millisecondsSinceEpoch.toString(),
+                          showId: show.id,
+                          titulo: show.titulo,
+                          ubicacion: show.ubicacion,
+                          imagen: show.imagen,
+                          fechaTexto: fechaTexto,
+                          fecha: _diasCalendario[_diaSeleccionadoIndex],
+                          hora: hora,
+                          cantidad: cantidadEntradas,
+                          codigoBoleto:
+                              'TKT-${show.id.replaceAll('show_', '').toUpperCase()}-${1000 + Random().nextInt(9000)}',
+                          colorTema: show.colorEtiqueta,
+                        );
+                        setState(() {
+                          _misEntradas.insert(0, nuevaEntrada);
+                        });
                         Navigator.pop(ctx);
                         _mostrarBoletoDigital(show, hora, fechaTexto, cantidadEntradas);
                       },
@@ -425,6 +506,13 @@ class _PantallaShowsState extends State<PantallaShows> {
     String fechaTexto,
     int cantidad,
   ) {
+    if (_notificacionesActivas) {
+      NotificationService.instance.mostrarNotificacion(
+        id: show.id.hashCode,
+        titulo: '🎟️ Boleto Confirmado: ${show.titulo}',
+        cuerpo: 'Función $hora ($fechaTexto). ¡Te esperamos en ${show.ubicacion}!',
+      );
+    }
     showDialog(
       context: context,
       builder: (ctx) {
@@ -560,25 +648,58 @@ class _PantallaShowsState extends State<PantallaShows> {
                 ),
 
                 const SizedBox(height: 18),
-                SizedBox(
-                  width: double.infinity,
-                  height: 46,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.verdePrincipal,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          SoundService.instance.playButtonTap();
+                          Navigator.pop(ctx);
+                          _mostrarModalMisEntradas();
+                        },
+                        icon: const Icon(
+                          Icons.confirmation_number_outlined,
+                          size: 16,
+                          color: AppColors.verdePrincipal,
+                        ),
+                        label: Text(
+                          'Ver mis entradas',
+                          style: GoogleFonts.urbanist(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12,
+                            color: AppColors.verdePrincipal,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppColors.verdePrincipal),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
                       ),
                     ),
-                    child: Text(
-                      'Listo, entendido',
-                      style: GoogleFonts.urbanist(
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.verdePrincipal,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: Text(
+                          'Listo',
+                          style: GoogleFonts.urbanist(
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),
@@ -600,6 +721,596 @@ class _PantallaShowsState extends State<PantallaShows> {
     } else {
       _seleccionarFuncion(show, show.horarios.first);
     }
+  }
+
+  /// Modal que despliega las entradas reservadas indicando el día y detalles
+  void _mostrarModalMisEntradas({DateTime? diaFiltro}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        DateTime? diaSeleccionado = diaFiltro;
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            // Filtrar entradas según el día seleccionado si aplica
+            final entradasAMostrar = diaSeleccionado == null
+                ? _misEntradas
+                : _misEntradas.where((e) {
+                    return e.fecha.year == diaSeleccionado!.year &&
+                        e.fecha.month == diaSeleccionado!.month &&
+                        e.fecha.day == diaSeleccionado!.day;
+                  }).toList();
+
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.88,
+              ),
+              decoration: const BoxDecoration(
+                color: Color(0xFFFBF9F6),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Tirador superior (Handle)
+                  const SizedBox(height: 12),
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // ENCABEZADO MODAL
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppColors.verdePrincipal.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: const Icon(
+                                Icons.confirmation_number_rounded,
+                                color: AppColors.verdePrincipal,
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Mis Entradas de Shows',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.textoOscuro,
+                                  ),
+                                ),
+                                Text(
+                                  'Pases activos para ingresar a funciones',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textoGris,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          icon: const Icon(Icons.close_rounded),
+                          color: AppColors.textoGris,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // SELECTOR HORIZONTAL DE DÍAS (FILTRO)
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        _buildChipFiltroDia(
+                          etiqueta: 'Todas (${_misEntradas.length})',
+                          seleccionado: diaSeleccionado == null,
+                          onTap: () {
+                            SoundService.instance.playButtonTap();
+                            setModalState(() => diaSeleccionado = null);
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        ...List.generate(7, (i) {
+                          final fecha = _diasCalendario[i];
+                          final bool sel = diaSeleccionado != null &&
+                              diaSeleccionado!.year == fecha.year &&
+                              diaSeleccionado!.month == fecha.month &&
+                              diaSeleccionado!.day == fecha.day;
+                          final String nombreDia = _obtenerNombreDia(fecha, i);
+                          final String label = '$nombreDia ${fecha.day}';
+
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: _buildChipFiltroDia(
+                              etiqueta: label,
+                              seleccionado: sel,
+                              onTap: () {
+                                SoundService.instance.playButtonTap();
+                                setModalState(() => diaSeleccionado = fecha);
+                              },
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+                  const Divider(height: 1),
+
+                  // LISTA DE ENTRADAS
+                  Flexible(
+                    child: entradasAMostrar.isEmpty
+                        ? _buildEstadoSinEntradas(diaSeleccionado, ctx)
+                        : ListView.separated(
+                            padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+                            itemCount: entradasAMostrar.length,
+                            separatorBuilder: (_, _) => const SizedBox(height: 16),
+                            itemBuilder: (context, index) {
+                              final entrada = entradasAMostrar[index];
+                              return _buildTarjetaBoletoShow(entrada, ctx);
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildChipFiltroDia({
+    required String etiqueta,
+    required bool seleccionado,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: seleccionado ? AppColors.verdePrincipal : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: seleccionado ? AppColors.verdePrincipal : Colors.black12,
+          ),
+          boxShadow: seleccionado
+              ? [
+                  BoxShadow(
+                    color: AppColors.verdePrincipal.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          etiqueta,
+          style: GoogleFonts.urbanist(
+            fontSize: 12,
+            fontWeight: seleccionado ? FontWeight.w900 : FontWeight.w700,
+            color: seleccionado ? Colors.white : AppColors.textoOscuro,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTarjetaBoletoShow(EntradaShow entrada, BuildContext modalCtx) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: entrada.colorTema.withValues(alpha: 0.25),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // CABECERA DEL BOLETO CON FECHA Y ESTADO
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: entrada.colorTema.withValues(alpha: 0.1),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_rounded,
+                      size: 14,
+                      color: entrada.colorTema,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      entrada.fechaTexto,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w900,
+                        color: entrada.colorTema,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.green.shade300),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: const BoxDecoration(
+                          color: Colors.green,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'PASE VÁLIDO',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.green.shade800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // CUERPO DEL SHOW
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    entrada.imagen,
+                    width: 64,
+                    height: 78,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        entrada.titulo,
+                        style: GoogleFonts.urbanist(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textoOscuro,
+                          height: 1.15,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on_rounded,
+                            size: 13,
+                            color: AppColors.textoGris,
+                          ),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(
+                              entrada.ubicacion,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textoGris,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: entrada.colorTema,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.access_time_filled_rounded,
+                                  size: 12,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  entrada.hora,
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.grey.shade300),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.people_alt_rounded,
+                                  size: 12,
+                                  color: AppColors.textoOscuro,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${entrada.cantidad} pases',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.textoOscuro,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // LÍNEA PERFORADA DE BOLETO
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              children: [
+                Container(
+                  width: 14,
+                  height: 14,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFBF9F6),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final boxWidth = constraints.constrainWidth();
+                      const dashWidth = 5.0;
+                      const dashSpace = 4.0;
+                      final dashCount = (boxWidth / (dashWidth + dashSpace)).floor();
+                      return Flex(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        direction: Axis.horizontal,
+                        children: List.generate(dashCount, (_) {
+                          return SizedBox(
+                            width: dashWidth,
+                            height: 1.2,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(color: Colors.grey.shade300),
+                            ),
+                          );
+                        }),
+                      );
+                    },
+                  ),
+                ),
+                Container(
+                  width: 14,
+                  height: 14,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFBF9F6),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // PARTE INFERIOR: CÓDIGO Y BOTÓN MAPA
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'CÓDIGO DE INGRESO',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.8,
+                        color: AppColors.textoGris,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.qr_code_rounded,
+                          size: 16,
+                          color: AppColors.textoOscuro,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          entrada.codigoBoleto,
+                          style: GoogleFonts.urbanist(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.5,
+                            color: AppColors.textoOscuro,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    SoundService.instance.playButtonTap();
+                    Navigator.pop(modalCtx);
+                    widget.onVerEnMapa?.call(entrada.ubicacion);
+                  },
+                  icon: const Icon(Icons.near_me_rounded, size: 14, color: Colors.white),
+                  label: Text(
+                    'Ir al Escenario',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.verdePrincipal,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEstadoSinEntradas(DateTime? diaSeleccionado, BuildContext modalCtx) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(28.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.confirmation_number_outlined,
+                size: 40,
+                color: Colors.orange.shade700,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              diaSeleccionado == null
+                  ? 'No tienes entradas reservadas'
+                  : 'Sin entradas para este día',
+              style: GoogleFonts.urbanist(
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+                color: AppColors.textoOscuro,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Selecciona un show en la cartelera y reserva tus asientos de forma gratuita.',
+              style: GoogleFonts.urbanist(
+                fontSize: 12.5,
+                color: AppColors.textoGris,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 18),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(modalCtx),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.verdePrincipal,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                'Explorar Cartelera',
+                style: GoogleFonts.urbanist(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -633,6 +1344,47 @@ class _PantallaShowsState extends State<PantallaShows> {
             letterSpacing: -0.4,
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: InkWell(
+              onTap: () {
+                SoundService.instance.playButtonTap();
+                _mostrarModalMisEntradas();
+              },
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.verdePrincipal.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.verdePrincipal.withValues(alpha: 0.25),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.confirmation_number_rounded,
+                      size: 15,
+                      color: AppColors.verdePrincipal,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      'Mis Entradas (${_misEntradas.length})',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.verdePrincipal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Builder(
         builder: (context) {
@@ -759,6 +1511,56 @@ class _PantallaShowsState extends State<PantallaShows> {
                       fontWeight: FontWeight.w500,
                       color: Colors.white.withValues(alpha: 0.85),
                       height: 1.3,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  InkWell(
+                    onTap: () {
+                      SoundService.instance.playButtonTap();
+                      _mostrarModalMisEntradas();
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.confirmation_number_rounded,
+                            size: 14,
+                            color: AppColors.verdePrincipal,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Ver mis entradas (${_misEntradas.length})',
+                            style: GoogleFonts.urbanist(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.verdePrincipal,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 10,
+                            color: AppColors.verdePrincipal,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -1498,6 +2300,13 @@ class _PantallaShowsState extends State<PantallaShows> {
                 setState(() {
                   _notificacionesActivas = val;
                 });
+                if (val) {
+                  NotificationService.instance.mostrarNotificacion(
+                    id: 101,
+                    titulo: '🔔 Parque de las Leyendas',
+                    cuerpo: 'Las notificaciones han sido activadas',
+                  );
+                }
                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -1508,9 +2317,12 @@ class _PantallaShowsState extends State<PantallaShows> {
                     ),
                     content: Text(
                       val
-                          ? '🔔 Notificaciones de shows activadas'
-                          : '🔕 Notificaciones de shows pausadas',
-                      style: GoogleFonts.urbanist(fontWeight: FontWeight.w700),
+                          ? '🔔 Las notificaciones han sido activadas'
+                          : '🔕 Notificaciones de shows desactivadas',
+                      style: GoogleFonts.urbanist(
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
                     ),
                     duration: const Duration(seconds: 2),
                   ),

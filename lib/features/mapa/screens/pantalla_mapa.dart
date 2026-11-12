@@ -155,6 +155,31 @@ class _PantallaMapaState extends State<PantallaMapa>
 
   /// Traza y enfoca automáticamente un destino (escenario, animal o hábitat)
   void _enfocarYTrazarDestino(String destino) {
+    final destLower = destino.toLowerCase();
+
+    // 0. Puntos de encuentro y auxilio (desde ¿Te perdiste?)
+    if (destLower.contains('encuentro') ||
+        destLower.contains('ayuda') ||
+        destLower.contains('perdiste') ||
+        destLower.contains('auxilio')) {
+      final puntosAyuda = accesos.where((a) => a.tipoServicio == 'ayuda').toList();
+      if (puntosAyuda.isNotEmpty) {
+        setState(() {
+          _serviciosFiltrados = List.from(puntosAyuda);
+          _indiceServicioActual = 0;
+          _habitatFiltro = null;
+          _chipUrgencia = ChipUrgenciaMapa.ninguno;
+          _filtroServicio = FiltroServicioMapa.todos;
+        });
+        _mostrarInfoMarcador(puntosAyuda.first, sincronizarCarrusel: false);
+        setState(() {
+          _isNavigating = true;
+        });
+        _routeProgressController.forward(from: 0);
+        return;
+      }
+    }
+
     // 1. Buscar si coincide directamente con el ID de un animal / marcador (ej. 'C05', 'S03', 'I02', 'C08')
     final porId = marcadores.where(
       (m) => m.id.toLowerCase() == destino.trim().toLowerCase(),
@@ -172,9 +197,22 @@ class _PantallaMapaState extends State<PantallaMapa>
       return;
     }
 
+    // 1.1 Buscar en accesos y paradas clave
+    final porAcceso = accesos.where(
+      (a) => a.id.toLowerCase() == destino.trim().toLowerCase(),
+    );
+    if (porAcceso.isNotEmpty) {
+      final marcador = porAcceso.first;
+      _mostrarInfoMarcador(marcador);
+      setState(() {
+        _isNavigating = true;
+      });
+      _routeProgressController.forward(from: 0);
+      return;
+    }
+
     // 2. Buscar si coincide con escenarios de shows
     String? markerIdEscenario;
-    final destLower = destino.toLowerCase();
     if (destLower.contains('acuatico') ||
         destLower.contains('acuático') ||
         destLower.contains('lobo') ||
@@ -586,6 +624,116 @@ class _PantallaMapaState extends State<PantallaMapa>
     );
   }
 
+  void _abrirModalCapas() {
+    ModalCapasMapa.mostrar(
+      context,
+      habitatSeleccionado: _habitatFiltro,
+      mostrarZonasCalma: _mostrarZonasCalma,
+      onToggleZonasCalma: (val) {
+        setState(() {
+          _mostrarZonasCalma = val;
+          if (!val && _marcadorSeleccionado?.esZonaCalma == true) {
+            _marcadorSeleccionado = null;
+            _rutaActual = [];
+            _rutaSvgActual = null;
+            _isNavigating = false;
+          }
+        });
+        AccesibilidadService.instance.setMostrarZonasCalma(val);
+      },
+      onHabitatCambiado: (nuevoHabitat) {
+        setState(() {
+          _habitatFiltro = nuevoHabitat;
+          _marcadorSeleccionado = null;
+          if (nuevoHabitat != null) {
+            final enZona = marcadores.where((m) => m.habitat == nuevoHabitat).toList();
+            if (enZona.isNotEmpty) {
+              _centrarEnPunto(enZona.first.x, enZona.first.y);
+            }
+          }
+        });
+      },
+      onServicioSeleccionado: (servicio) {
+        setState(() {
+          if (servicio == 'banio') {
+            _chipUrgencia = ChipUrgenciaMapa.banios;
+            _filtroServicio = FiltroServicioMapa.banio;
+            _serviciosFiltrados = List.from(banios);
+            _indiceServicioActual = 0;
+            if (banios.isNotEmpty) {
+              _mostrarInfoMarcador(banios.first, sincronizarCarrusel: false);
+            }
+          } else if (servicio == 'estacionamiento') {
+            _chipUrgencia = ChipUrgenciaMapa.salidaParking;
+            _filtroServicio = FiltroServicioMapa.estacionamiento;
+            _serviciosFiltrados = [];
+            if (accesos.isNotEmpty) {
+              _mostrarInfoMarcador(accesos.first, sincronizarCarrusel: false);
+            }
+          } else if (servicio == 'calma') {
+            _filtroServicio = FiltroServicioMapa.calma;
+            _serviciosFiltrados = List.from(zonasCalma);
+            _indiceServicioActual = 0;
+            if (zonasCalma.isNotEmpty) {
+              _mostrarInfoMarcador(zonasCalma.first, sincronizarCarrusel: false);
+            }
+          } else if (servicio == 'snacks' || servicio == 'tiendas') {
+            ModalTiendasCercanas.mostrar(context, onAbrirEnMapa: () {});
+          }
+        });
+      },
+    );
+  }
+
+  Widget _buildBotonFlotanteCircular({
+    Key? key,
+    required IconData icono,
+    required String tooltip,
+    required Color colorIcono,
+    required VoidCallback onPressed,
+  }) {
+    final a11y = AccesibilidadService.instance;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(25),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: a11y.modoAltoContraste
+                ? const Color(0xFF0F172A)
+                : Colors.white.withValues(alpha: 0.94),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: a11y.modoAltoContraste
+                  ? const Color(0xFFFDE047)
+                  : const Color(0xFFCBD5E1),
+              width: a11y.modoAltoContraste ? 2.0 : 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: a11y.modoAltoContraste
+                    ? const Color(0xFFFDE047).withValues(alpha: 0.25)
+                    : Colors.black.withValues(alpha: 0.12),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: IconButton(
+            key: key,
+            icon: Icon(icono),
+            color: colorIcono,
+            iconSize: 24,
+            tooltip: tooltip,
+            onPressed: onPressed,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildMarcadorPosicionado({
     required MarcadorMapa marcador,
     required bool isSelected,
@@ -736,9 +884,7 @@ class _PantallaMapaState extends State<PantallaMapa>
                               mostrarEtiquetaDefecto: true,
                             )),
 
-                    if (_mostrarZonasCalma ||
-                        a11y.mostrarZonasCalma ||
-                        _filtroServicio == FiltroServicioMapa.calma)
+                    if (_mostrarZonasCalma)
                       ...zonasCalma
                           .where((c) => c.id != _marcadorSeleccionado?.id)
                           .map((calma) => _buildMarcadorPosicionado(
@@ -876,7 +1022,8 @@ class _PantallaMapaState extends State<PantallaMapa>
                     ],
 
                     // CAPA 5: DESTINO SELECCIONADO (EN LA CÚSPIDE: POR ENCIMA DEL TRAZO Y DE LOS DEMÁS PINES)
-                    if (_marcadorSeleccionado != null)
+                    if (_marcadorSeleccionado != null &&
+                        (!_marcadorSeleccionado!.esZonaCalma || _mostrarZonasCalma))
                       _buildMarcadorPosicionado(
                         marcador: _marcadorSeleccionado!,
                         isSelected: true,
@@ -947,112 +1094,48 @@ class _PantallaMapaState extends State<PantallaMapa>
                     break;
                 }
               },
-              onAbrirCapas: () {
-                ModalCapasMapa.mostrar(
-                  context,
-                  habitatSeleccionado: _habitatFiltro,
-                  mostrarZonasCalma: _mostrarZonasCalma,
-                  onToggleZonasCalma: (val) {
-                    setState(() => _mostrarZonasCalma = val);
-                  },
-                  onHabitatCambiado: (nuevoHabitat) {
-                    setState(() {
-                      _habitatFiltro = nuevoHabitat;
-                      _marcadorSeleccionado = null;
-                      if (nuevoHabitat != null) {
-                        final enZona = marcadores.where((m) => m.habitat == nuevoHabitat).toList();
-                        if (enZona.isNotEmpty) {
-                          _centrarEnPunto(enZona.first.x, enZona.first.y);
-                        }
-                      }
-                    });
-                  },
-                  onServicioSeleccionado: (servicio) {
-                    setState(() {
-                      if (servicio == 'banio') {
-                        _chipUrgencia = ChipUrgenciaMapa.banios;
-                        _filtroServicio = FiltroServicioMapa.banio;
-                        _serviciosFiltrados = List.from(banios);
-                        _indiceServicioActual = 0;
-                        if (banios.isNotEmpty) {
-                          _mostrarInfoMarcador(banios.first, sincronizarCarrusel: false);
-                        }
-                      } else if (servicio == 'estacionamiento') {
-                        _chipUrgencia = ChipUrgenciaMapa.salidaParking;
-                        _filtroServicio = FiltroServicioMapa.estacionamiento;
-                        _serviciosFiltrados = [];
-                        if (accesos.isNotEmpty) {
-                          _mostrarInfoMarcador(accesos.first, sincronizarCarrusel: false);
-                        }
-                      } else if (servicio == 'calma') {
-                        _filtroServicio = FiltroServicioMapa.calma;
-                        _serviciosFiltrados = List.from(zonasCalma);
-                        _indiceServicioActual = 0;
-                        if (zonasCalma.isNotEmpty) {
-                          _mostrarInfoMarcador(zonasCalma.first, sincronizarCarrusel: false);
-                        }
-                      } else if (servicio == 'snacks' || servicio == 'tiendas') {
-                        ModalTiendasCercanas.mostrar(context, onAbrirEnMapa: () {});
-                      }
-                    });
-                  },
-                );
-              },
+              onAbrirCapas: _abrirModalCapas,
             ),
           ),
         ),
       ),
 
-          // BOTÓN FLOTANTE CIRCULAR DE UBICACIÓN (Buscar retirado como solicitado)
+          // BOTONES FLOTANTES AL LADO INFERIOR DERECHO (UBICACIÓN ARRIBA Y CAPAS DEBAJO)
           AnimatedPositioned(
             duration: const Duration(milliseconds: 280),
             curve: Curves.easeOutCubic,
             right: 16,
             bottom: (_marcadorSeleccionado != null ? 190.0 : 105.0) +
                 MediaQuery.of(context).padding.bottom,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: a11y.modoAltoContraste
-                        ? const Color(0xFF0F172A)
-                        : Colors.white.withValues(alpha: 0.92),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: a11y.modoAltoContraste
-                          ? const Color(0xFFFDE047)
-                          : const Color(0xFFCBD5E1),
-                      width: a11y.modoAltoContraste ? 2.0 : 1.2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: a11y.modoAltoContraste
-                            ? const Color(0xFFFDE047).withValues(alpha: 0.25)
-                            : Colors.black.withValues(alpha: 0.12),
-                        blurRadius: 14,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    key: _keyFab,
-                    icon: const Icon(Icons.my_location_rounded),
-                    color: a11y.modoAltoContraste
-                        ? const Color(0xFFFDE047)
-                        : AppColors.verdeAzulado,
-                    iconSize: 24,
-                    tooltip: 'Mi ubicación',
-                    onPressed: () {
-                      HapticFeedback.lightImpact();
-                      _onMyLocationPressed();
-                    },
-                  ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 1. BOTÓN MI UBICACIÓN
+                _buildBotonFlotanteCircular(
+                  key: _keyFab,
+                  icono: Icons.my_location_rounded,
+                  tooltip: 'Mi ubicación',
+                  colorIcono: a11y.modoAltoContraste
+                      ? const Color(0xFFFDE047)
+                      : AppColors.verdeAzulado,
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    _onMyLocationPressed();
+                  },
                 ),
-              ),
+                const SizedBox(height: 10),
+                // 2. BOTÓN CAPAS DEL MAPA (DEBAJO DE LA UBICACIÓN)
+                _buildBotonFlotanteCircular(
+                  icono: Icons.layers_rounded,
+                  tooltip: 'Capas y Filtros',
+                  colorIcono: AppColors.verdePrincipal,
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    SoundService.instance.playButtonTap();
+                    _abrirModalCapas();
+                  },
+                ),
+              ],
             ),
           ),
 

@@ -29,6 +29,7 @@ class ModalCapasMapa extends StatelessWidget {
     required ValueChanged<bool> onToggleZonasCalma,
   }) {
     SoundService.instance.playButtonTap();
+    bool estadoCalma = mostrarZonasCalma;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -38,9 +39,11 @@ class ModalCapasMapa extends StatelessWidget {
           habitatSeleccionado: habitatSeleccionado,
           onHabitatCambiado: onHabitatCambiado,
           onServicioSeleccionado: onServicioSeleccionado,
-          mostrarZonasCalma: mostrarZonasCalma,
+          mostrarZonasCalma: estadoCalma,
           onToggleZonasCalma: (val) {
-            setModalState(() {});
+            setModalState(() {
+              estadoCalma = val;
+            });
             onToggleZonasCalma(val);
           },
         ),

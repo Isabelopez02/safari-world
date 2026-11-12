@@ -587,6 +587,36 @@ final List<MarcadorMapa> accesosZoologico = [
     colorZona: const Color(0xFF9333EA),
     tipoServicio: 'juegos',
   ),
+  MarcadorMapa.desdePorcentaje(
+    id: 'AYUDA_01',
+    nombre: 'Punto de Encuentro 1 - Plaza Central & Guardaparques',
+    porcentajeX: 58.0,
+    porcentajeY: 53.0,
+    icono: Icons.flag_circle_rounded,
+    habitat: 'Entrada y Plaza Central',
+    colorZona: const Color(0xFF0284C7),
+    tipoServicio: 'ayuda',
+  ),
+  MarcadorMapa.desdePorcentaje(
+    id: 'AYUDA_02',
+    nombre: 'Punto de Encuentro 2 - Tópico & Puesto Médico',
+    porcentajeX: 66.0,
+    porcentajeY: 28.0,
+    icono: Icons.medical_services_rounded,
+    habitat: 'Zona Internacional',
+    colorZona: const Color(0xFFE11D48),
+    tipoServicio: 'ayuda',
+  ),
+  MarcadorMapa.desdePorcentaje(
+    id: 'AYUDA_03',
+    nombre: 'Punto de Encuentro 3 - Módulo Guías Costa',
+    porcentajeX: 46.0,
+    porcentajeY: 43.0,
+    icono: Icons.shield_rounded,
+    habitat: 'Zona Costa',
+    colorZona: const Color(0xFF0D9488),
+    tipoServicio: 'ayuda',
+  ),
 ];
 
 /// Lista de Zonas de Calma y Silencio (Espacios para autorregulación sensorial y descanso inclusivo)

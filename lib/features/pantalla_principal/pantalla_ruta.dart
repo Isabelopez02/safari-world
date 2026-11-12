@@ -720,14 +720,14 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                           return Container(
                             decoration: BoxDecoration(
                               color: esExplorado
-                                  ? const Color(0xFFF1F5F9)
+                                  ? const Color(0xFFF8FAFC)
                                   : Colors.white,
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(18),
                               border: Border.all(
                                 color: esExplorado
                                     ? Colors.grey.shade300
                                     : Colors.black.withValues(alpha: 0.08),
-                                width: 1,
+                                width: 1.2,
                               ),
                               boxShadow: esExplorado
                                   ? []
@@ -739,143 +739,192 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                                       ),
                                     ],
                             ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                              leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: SizedBox(
-                                  width: 52,
-                                  height: 52,
-                                  child: esExplorado
-                                      ? ColorFiltered(
-                                          colorFilter: const ColorFilter.mode(
-                                            Colors.grey,
-                                            BlendMode.saturation,
-                                          ),
-                                          child: Opacity(
-                                            opacity: 0.70,
-                                            child: Image.asset(
-                                              animal.imagen ?? 'assets/images/animales_con_fondo/leon-card.jpg',
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (ctx, err, stack) => const Icon(Icons.pets),
+                            child: Material(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(18),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(18),
+                                onTap: () {
+                                  SoundService.instance.playButtonTap();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PantallaDetalleAnimal(animal: animal),
+                                    ),
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Row(
+                                    children: [
+                                      // FOTO MUCHO MÁS GRANDE (88x88)
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: SizedBox(
+                                          width: 88,
+                                          height: 88,
+                                          child: esExplorado
+                                              ? ColorFiltered(
+                                                  colorFilter: const ColorFilter.mode(
+                                                    Colors.grey,
+                                                    BlendMode.saturation,
+                                                  ),
+                                                  child: Opacity(
+                                                    opacity: 0.70,
+                                                    child: Image.asset(
+                                                      animal.imagen ?? 'assets/images/animales_con_fondo/leon-card.jpg',
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder: (ctx, err, stack) => const Icon(Icons.pets, size: 36),
+                                                    ),
+                                                  ),
+                                                )
+                                              : Image.asset(
+                                                  animal.imagen ?? 'assets/images/animales_con_fondo/leon-card.jpg',
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (ctx, err, stack) => const Icon(Icons.pets, size: 36),
+                                                ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 14),
+
+                                      // INFORMACIÓN Y BOTONES DE ACCIÓN
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              animal.nombre,
+                                              style: GoogleFonts.urbanist(
+                                                fontSize: 15.5,
+                                                fontWeight: FontWeight.w900,
+                                                color: esExplorado
+                                                    ? const Color(0xFF64748B)
+                                                    : AppColors.textoOscuro,
+                                                height: 1.15,
+                                              ),
                                             ),
-                                          ),
-                                        )
-                                      : Image.asset(
-                                          animal.imagen ?? 'assets/images/animales_con_fondo/leon-card.jpg',
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (ctx, err, stack) => const Icon(Icons.pets),
+                                            const SizedBox(height: 3),
+                                            Text(
+                                              animal.categoria,
+                                              style: GoogleFonts.urbanist(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                color: esExplorado
+                                                    ? Colors.grey.shade500
+                                                    : AppColors.textoGris,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+
+                                            Row(
+                                              children: [
+                                                // Badge Explorado / Por descubrir
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                                  decoration: BoxDecoration(
+                                                    color: esExplorado
+                                                        ? const Color(0xFFE2E8F0)
+                                                        : widget.habitat.colorFondo,
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    border: Border.all(
+                                                      color: esExplorado
+                                                          ? Colors.grey.shade400
+                                                          : widget.habitat.colorBorde,
+                                                    ),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        esExplorado ? Icons.check_circle_rounded : Icons.pending_rounded,
+                                                        size: 11,
+                                                        color: esExplorado
+                                                            ? const Color(0xFF16A34A)
+                                                            : widget.habitat.colorAcento,
+                                                      ),
+                                                      const SizedBox(width: 3.5),
+                                                      Text(
+                                                        esExplorado ? 'Explorado' : 'Por descubrir',
+                                                        style: GoogleFonts.urbanist(
+                                                          fontSize: 10,
+                                                          fontWeight: FontWeight.w800,
+                                                          color: esExplorado
+                                                              ? const Color(0xFF16A34A)
+                                                              : widget.habitat.colorAcento,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const Spacer(),
+
+                                                // Botón Trazar ruta rápida
+                                                InkWell(
+                                                  onTap: () {
+                                                    SoundService.instance.playButtonTap();
+                                                    Navigator.pop(context);
+                                                    if (widget.onTrazarRuta != null) {
+                                                      widget.onTrazarRuta!(animal.id);
+                                                    }
+                                                  },
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  child: Container(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                                                    decoration: BoxDecoration(
+                                                      color: widget.habitat.colorAcento.withValues(alpha: 0.1),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      border: Border.all(
+                                                        color: widget.habitat.colorAcento.withValues(alpha: 0.28),
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Icon(Icons.near_me_rounded, size: 11, color: widget.habitat.colorAcento),
+                                                        const SizedBox(width: 3),
+                                                        Text(
+                                                          'Trazar',
+                                                          style: GoogleFonts.urbanist(
+                                                            fontSize: 10.5,
+                                                            fontWeight: FontWeight.w900,
+                                                            color: widget.habitat.colorAcento,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 6),
+
+                                                // Botón marcar visitado
+                                                InkWell(
+                                                  onTap: () {
+                                                    SoundService.instance.playButtonTap();
+                                                    AnimalService.instance.toggleVisitado(animal.id);
+                                                  },
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.all(3.0),
+                                                    child: Icon(
+                                                      esExplorado
+                                                          ? Icons.check_circle_rounded
+                                                          : Icons.radio_button_unchecked_rounded,
+                                                      color: esExplorado
+                                                          ? const Color(0xFF16A34A)
+                                                          : Colors.grey.shade400,
+                                                      size: 22,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                              title: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      animal.nombre,
-                                      style: GoogleFonts.urbanist(
-                                        fontSize: 14.5,
-                                        fontWeight: FontWeight.w800,
-                                        color: esExplorado
-                                            ? const Color(0xFF64748B)
-                                            : AppColors.textoOscuro,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                    decoration: BoxDecoration(
-                                      color: esExplorado
-                                          ? const Color(0xFFE2E8F0)
-                                          : widget.habitat.colorFondo,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                        color: esExplorado
-                                            ? Colors.grey.shade400
-                                            : widget.habitat.colorBorde,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          esExplorado
-                                              ? Icons.check_circle_rounded
-                                              : Icons.pending_rounded,
-                                          size: 11,
-                                          color: esExplorado
-                                              ? const Color(0xFF16A34A)
-                                              : widget.habitat.colorAcento,
-                                        ),
-                                        const SizedBox(width: 3),
-                                        Text(
-                                          esExplorado ? 'Explorado' : 'Por descubrir',
-                                          style: GoogleFonts.urbanist(
-                                            fontSize: 10.5,
-                                            fontWeight: FontWeight.w800,
-                                            color: esExplorado
-                                                ? const Color(0xFF16A34A)
-                                                : widget.habitat.colorAcento,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 2),
-                                child: Text(
-                                  animal.categoria,
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 12,
-                                    color: esExplorado
-                                        ? Colors.grey.shade500
-                                        : AppColors.textoGris,
-                                  ),
-                                ),
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.near_me_rounded),
-                                    color: widget.habitat.colorAcento,
-                                    tooltip: 'Trazar ruta a este animal',
-                                    onPressed: () {
-                                      SoundService.instance.playButtonTap();
-                                      Navigator.pop(context);
-                                      if (widget.onTrazarRuta != null) {
-                                        widget.onTrazarRuta!(animal.id);
-                                      }
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: Icon(
-                                      esExplorado
-                                          ? Icons.check_circle_rounded
-                                          : Icons.radio_button_unchecked_rounded,
-                                      color: esExplorado
-                                          ? const Color(0xFF16A34A)
-                                          : Colors.grey.shade400,
-                                    ),
-                                    tooltip: esExplorado ? 'Marcar no visitado' : 'Marcar visitado',
-                                    onPressed: () {
-                                      SoundService.instance.playButtonTap();
-                                      AnimalService.instance.toggleVisitado(animal.id);
-                                    },
-                                  ),
-                                ],
-                              ),
-                              onTap: () {
-                                SoundService.instance.playButtonTap();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PantallaDetalleAnimal(animal: animal),
-                                  ),
-                                );
-                              },
                             ),
                           );
                         },

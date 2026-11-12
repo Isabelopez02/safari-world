@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/accesibilidad_service.dart';
+import 'package:zoologico_front/core/services/notification_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/carga_pagina/pantalla_inicio.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService.instance.init();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,

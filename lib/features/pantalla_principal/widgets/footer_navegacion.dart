@@ -63,20 +63,27 @@ class FooterNavegacion extends StatelessWidget {
       ),
     );
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.07),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.only(bottom: 12),
+      child: Container(
+        margin: EdgeInsets.fromLTRB(
+          esTablet ? 32 : 14,
+          2,
+          esTablet ? 32 : 14,
+          esTablet ? 8 : 4,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(26),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 18,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: esTablet
             ? SizedBox(
                 width: double.infinity,
