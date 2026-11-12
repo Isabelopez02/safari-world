@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/notification_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
@@ -100,6 +101,22 @@ class _PantallaShowsState extends State<PantallaShows> {
   int _diaSeleccionadoIndex = 0;
   late final List<DateTime> _diasCalendario;
   late final List<EntradaShow> _misEntradas;
+
+  final Map<String, int> _cuposPorFuncion = {
+    'show_marino_10:00 AM': 32,
+    'show_marino_01:00 PM': 18,
+    'show_marino_04:00 PM': 4,
+    'show_aves_11:30 AM': 40,
+    'show_aves_03:30 PM': 12,
+    'show_pinguinos_12:00 PM': 22,
+    'show_pinguinos_02:30 PM': 6,
+    'show_felinos_02:00 PM': 25,
+    'show_felinos_04:30 PM': 3,
+  };
+
+  int _obtenerCupos(String showId, String hora) {
+    return _cuposPorFuncion['${showId}_$hora'] ?? 20;
+  }
 
   final List<ShowItemData> _todosLosShows = const [
     ShowItemData(
@@ -252,7 +269,66 @@ class _PantallaShowsState extends State<PantallaShows> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 16),
+
+                  // DISPONIBILIDAD DE CUPOS EN VIVO
+                  Builder(
+                    builder: (context) {
+                      final cupos = _obtenerCupos(show.id, hora);
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: cupos <= 5
+                              ? Colors.red.shade50
+                              : (cupos <= 15 ? Colors.orange.shade50 : Colors.green.shade50),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: cupos <= 5
+                                ? Colors.red.shade200
+                                : (cupos <= 15 ? Colors.orange.shade200 : Colors.green.shade200),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  cupos <= 5 ? Icons.warning_amber_rounded : Icons.people_alt_rounded,
+                                  size: 16,
+                                  color: cupos <= 5
+                                      ? Colors.red.shade700
+                                      : (cupos <= 15 ? Colors.orange.shade800 : Colors.green.shade800),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  cupos <= 5
+                                      ? '¡Solo quedan $cupos cupos disponibles!'
+                                      : '$cupos cupos disponibles para esta función',
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: cupos <= 5
+                                        ? Colors.red.shade900
+                                        : (cupos <= 15 ? Colors.orange.shade900 : Colors.green.shade900),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: cupos <= 5 ? Colors.red : Colors.green,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
 
                   // RESUMEN DEL SHOW SELECCIONADO (ESTILO CINEPLANET)
                   Row(
@@ -429,7 +505,7 @@ class _PantallaShowsState extends State<PantallaShows> {
                             ),
                           ),
                           IconButton(
-                            onPressed: cantidadEntradas < 8
+                            onPressed: cantidadEntradas < min(8, _obtenerCupos(show.id, hora))
                                 ? () {
                                     SoundService.instance.playButtonTap();
                                     setModalState(() => cantidadEntradas++);
@@ -450,32 +526,47 @@ class _PantallaShowsState extends State<PantallaShows> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        SoundService.instance.playButtonTap();
-                        final nuevaEntrada = EntradaShow(
-                          id: DateTime.now().millisecondsSinceEpoch.toString(),
-                          showId: show.id,
-                          titulo: show.titulo,
-                          ubicacion: show.ubicacion,
-                          imagen: show.imagen,
-                          fechaTexto: fechaTexto,
-                          fecha: _diasCalendario[_diaSeleccionadoIndex],
-                          hora: hora,
-                          cantidad: cantidadEntradas,
-                          codigoBoleto:
-                              'TKT-${show.id.replaceAll('show_', '').toUpperCase()}-${1000 + Random().nextInt(9000)}',
-                          colorTema: show.colorEtiqueta,
-                        );
-                        setState(() {
-                          _misEntradas.insert(0, nuevaEntrada);
-                        });
-                        Navigator.pop(ctx);
-                        _mostrarBoletoDigital(show, hora, fechaTexto, cantidadEntradas);
-                      },
+                      onPressed: _obtenerCupos(show.id, hora) > 0
+                          ? () {
+                              SoundService.instance.playButtonTap();
+                              final nuevaEntrada = EntradaShow(
+                                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                                showId: show.id,
+                                titulo: show.titulo,
+                                ubicacion: show.ubicacion,
+                                imagen: show.imagen,
+                                fechaTexto: fechaTexto,
+                                fecha: _diasCalendario[_diaSeleccionadoIndex],
+                                hora: hora,
+                                cantidad: cantidadEntradas,
+                                codigoBoleto:
+                                    'TKT-${show.id.replaceAll('show_', '').toUpperCase()}-${1000 + Random().nextInt(9000)}',
+                                colorTema: show.colorEtiqueta,
+                              );
+                              setState(() {
+                                _misEntradas.insert(0, nuevaEntrada);
+                                final key = '${show.id}_$hora';
+                                final actual = _cuposPorFuncion[key] ?? 20;
+                                _cuposPorFuncion[key] = max(0, actual - cantidadEntradas);
+                              });
+
+                              // Notificación nativa con el texto exacto pedido
+                              NotificationService.instance.mostrarNotificacion(
+                                id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+                                titulo: '🎟️ Parque de las Leyendas',
+                                cuerpo: 'Te registraste a un show a las $hora',
+                              );
+
+                              Navigator.pop(ctx);
+                              _mostrarBoletoDigital(show, hora, fechaTexto, cantidadEntradas);
+                            }
+                          : null,
                       icon: const Icon(Icons.confirmation_number_rounded,
                           color: Colors.white, size: 20),
                       label: Text(
-                        'Reservar Función ($hora)',
+                        _obtenerCupos(show.id, hora) > 0
+                            ? 'Reservar Función ($hora)'
+                            : 'Función Agotada',
                         style: GoogleFonts.urbanist(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
@@ -483,7 +574,9 @@ class _PantallaShowsState extends State<PantallaShows> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.verdePrincipal,
+                        backgroundColor: _obtenerCupos(show.id, hora) > 0
+                            ? AppColors.verdePrincipal
+                            : Colors.grey,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -928,324 +1021,510 @@ class _PantallaShowsState extends State<PantallaShows> {
     );
   }
 
-  Widget _buildTarjetaBoletoShow(EntradaShow entrada, BuildContext modalCtx) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: entrada.colorTema.withValues(alpha: 0.25),
-          width: 1.2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 14,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // CABECERA DEL BOLETO CON FECHA Y ESTADO
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+  /// Abre el visor con el código QR en grande para escaneo en puerta
+  void _mostrarModalDetalleQR(EntradaShow entrada) {
+    SoundService.instance.playButtonTap();
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
+          child: Container(
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: entrada.colorTema.withValues(alpha: 0.1),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 24,
+                  offset: Offset(0, 10),
+                ),
+              ],
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(
-                      Icons.calendar_today_rounded,
-                      size: 14,
-                      color: entrada.colorTema,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      entrada.fechaTexto,
-                      style: GoogleFonts.urbanist(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w900,
-                        color: entrada.colorTema,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: entrada.colorTema.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
+                      child: Text(
+                        'BOLETO DIGITAL',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w900,
+                          color: entrada.colorTema,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () => Navigator.pop(ctx),
+                      icon: const Icon(Icons.close_rounded),
                     ),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.green.shade300),
+                const SizedBox(height: 10),
+                Text(
+                  entrada.titulo,
+                  style: GoogleFonts.urbanist(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.textoOscuro,
                   ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                          color: Colors.green,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'PASE VÁLIDO',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.green.shade800,
-                        ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${entrada.fechaTexto} • ${entrada.hora}',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: entrada.colorTema,
+                  ),
+                ),
+                Text(
+                  '${entrada.cantidad} pases • ${entrada.ubicacion}',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textoGris,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // CÓDIGO QR EN GRANDE
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.black12, width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          // CUERPO DEL SHOW
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    entrada.imagen,
-                    width: 64,
-                    height: 78,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const Icon(
+                        Icons.qr_code_2_rounded,
+                        size: 190,
+                        color: Colors.black87,
+                      ),
+                      const SizedBox(height: 6),
                       Text(
-                        entrada.titulo,
+                        entrada.codigoBoleto,
                         style: GoogleFonts.urbanist(
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
                           color: AppColors.textoOscuro,
-                          height: 1.15,
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.location_on_rounded,
-                            size: 13,
-                            color: AppColors.textoGris,
-                          ),
-                          const SizedBox(width: 3),
-                          Expanded(
-                            child: Text(
-                              entrada.ubicacion,
-                              style: GoogleFonts.urbanist(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textoGris,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3.5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: entrada.colorTema,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.access_time_filled_rounded,
-                                  size: 12,
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  entrada.hora,
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3.5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.people_alt_rounded,
-                                  size: 12,
-                                  color: AppColors.textoOscuro,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${entrada.cantidad} pases',
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.textoOscuro,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
 
-          // LÍNEA PERFORADA DE BOLETO
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              children: [
+                const SizedBox(height: 16),
                 Container(
-                  width: 14,
-                  height: 14,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFBF9F6),
-                    shape: BoxShape.circle,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFBF9F6),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.brightness_high_rounded,
+                          size: 16, color: Colors.amber),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Presenta este código en la entrada del show',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textoOscuro,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final boxWidth = constraints.constrainWidth();
-                      const dashWidth = 5.0;
-                      const dashSpace = 4.0;
-                      final dashCount = (boxWidth / (dashWidth + dashSpace)).floor();
-                      return Flex(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        direction: Axis.horizontal,
-                        children: List.generate(dashCount, (_) {
-                          return SizedBox(
-                            width: dashWidth,
-                            height: 1.2,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(color: Colors.grey.shade300),
-                            ),
-                          );
-                        }),
-                      );
-                    },
-                  ),
-                ),
-                Container(
-                  width: 14,
-                  height: 14,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFBF9F6),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ],
-            ),
-          ),
+                const SizedBox(height: 20),
 
-          // PARTE INFERIOR: CÓDIGO Y BOTÓN MAPA
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'CÓDIGO DE INGRESO',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.8,
-                        color: AppColors.textoGris,
+                // BOTÓN CERRAR / ENTENDIDO
+                SizedBox(
+                  width: double.infinity,
+                  height: 46,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.verdePrincipal,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Row(
+                    child: Text(
+                      'Listo, cerrar',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTarjetaBoletoShow(EntradaShow entrada, BuildContext modalCtx) {
+    return InkWell(
+      onTap: () => _mostrarModalDetalleQR(entrada),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: entrada.colorTema.withValues(alpha: 0.25),
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // CABECERA DEL BOLETO CON FECHA Y ESTADO
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: entrada.colorTema.withValues(alpha: 0.1),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today_rounded,
+                        size: 14,
+                        color: entrada.colorTema,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        entrada.fechaTexto,
+                        style: GoogleFonts.urbanist(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w900,
+                          color: entrada.colorTema,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.green.shade300),
+                    ),
+                    child: Row(
                       children: [
-                        const Icon(
-                          Icons.qr_code_rounded,
-                          size: 16,
-                          color: AppColors.textoOscuro,
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: Colors.green,
+                            shape: BoxShape.circle,
+                          ),
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          entrada.codigoBoleto,
+                          'PASE VÁLIDO',
                           style: GoogleFonts.urbanist(
-                            fontSize: 13,
+                            fontSize: 10,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 0.5,
-                            color: AppColors.textoOscuro,
+                            color: Colors.green.shade800,
                           ),
                         ),
                       ],
                     ),
-                  ],
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    SoundService.instance.playButtonTap();
-                    Navigator.pop(modalCtx);
-                    widget.onVerEnMapa?.call(entrada.ubicacion);
-                  },
-                  icon: const Icon(Icons.near_me_rounded, size: 14, color: Colors.white),
-                  label: Text(
-                    'Ir al Escenario',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.verdePrincipal,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+
+            // CUERPO DEL SHOW
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      entrada.imagen,
+                      width: 64,
+                      height: 78,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          entrada.titulo,
+                          style: GoogleFonts.urbanist(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.textoOscuro,
+                            height: 1.15,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on_rounded,
+                              size: 13,
+                              color: AppColors.textoGris,
+                            ),
+                            const SizedBox(width: 3),
+                            Expanded(
+                              child: Text(
+                                entrada.ubicacion,
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textoGris,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3.5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: entrada.colorTema,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.access_time_filled_rounded,
+                                    size: 12,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    entrada.hora,
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3.5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.people_alt_rounded,
+                                    size: 12,
+                                    color: AppColors.textoOscuro,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${entrada.cantidad} pases',
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.textoOscuro,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // LÍNEA PERFORADA DE BOLETO
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                children: [
+                  Container(
+                    width: 14,
+                    height: 14,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFBF9F6),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final boxWidth = constraints.constrainWidth();
+                        const dashWidth = 5.0;
+                        const dashSpace = 4.0;
+                        final dashCount = (boxWidth / (dashWidth + dashSpace)).floor();
+                        return Flex(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          direction: Axis.horizontal,
+                          children: List.generate(dashCount, (_) {
+                            return SizedBox(
+                              width: dashWidth,
+                              height: 1.2,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(color: Colors.grey.shade300),
+                              ),
+                            );
+                          }),
+                        );
+                      },
+                    ),
+                  ),
+                  Container(
+                    width: 14,
+                    height: 14,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFBF9F6),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // PARTE INFERIOR: CÓDIGO, QR Y BOTÓN MAPA
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    onTap: () => _mostrarModalDetalleQR(entrada),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.black12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.qr_code_2_rounded,
+                            size: 26,
+                            color: AppColors.textoOscuro,
+                          ),
+                          const SizedBox(width: 6),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                entrada.codigoBoleto,
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.5,
+                                  color: AppColors.textoOscuro,
+                                ),
+                              ),
+                              Text(
+                                'Toca para ver QR 🔍',
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.verdePrincipal,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      SoundService.instance.playButtonTap();
+                      Navigator.pop(modalCtx);
+                      widget.onVerEnMapa?.call(entrada.ubicacion);
+                    },
+                    icon: const Icon(Icons.near_me_rounded, size: 14, color: Colors.white),
+                    label: Text(
+                      'Ir al Escenario',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.verdePrincipal,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1336,7 +1615,7 @@ class _PantallaShowsState extends State<PantallaShows> {
                 },
               ),
         title: Text(
-          'Cartelera de Shows',
+          'cartelera_shows'.tr,
           style: GoogleFonts.urbanist(
             fontSize: 22,
             fontWeight: FontWeight.w900,
@@ -1372,7 +1651,7 @@ class _PantallaShowsState extends State<PantallaShows> {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      'Mis Entradas (${_misEntradas.length})',
+                      '${'ver_mis_entradas'.tr} (${_misEntradas.length})',
                       style: GoogleFonts.urbanist(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
@@ -1495,7 +1774,7 @@ class _PantallaShowsState extends State<PantallaShows> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Mira todo esto para tus shows',
+                    'mira_todo_shows'.tr,
                     style: GoogleFonts.urbanist(
                       fontSize: 19,
                       fontWeight: FontWeight.w900,
@@ -1505,7 +1784,7 @@ class _PantallaShowsState extends State<PantallaShows> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Reserva horarios, consulta normas de convivencia y conoce la ubicación de cada escenario.',
+                    'banner_shows_sub'.tr,
                     style: GoogleFonts.urbanist(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -1546,7 +1825,7 @@ class _PantallaShowsState extends State<PantallaShows> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            'Ver mis entradas (${_misEntradas.length})',
+                            '${'ver_entradas_btn'.tr} (${_misEntradas.length})',
                             style: GoogleFonts.urbanist(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w900,
@@ -2638,37 +2917,79 @@ class _PantallaShowsState extends State<PantallaShows> {
             spacing: 8,
             runSpacing: 8,
             children: show.horarios.map((hora) {
+              final cupos = _obtenerCupos(show.id, hora);
+              final bool pocosCupos = cupos <= 5;
+              final bool agotado = cupos == 0;
+
               return InkWell(
-                onTap: () => _seleccionarFuncion(show, hora),
-                borderRadius: BorderRadius.circular(10),
+                onTap: agotado ? null : () => _seleccionarFuncion(show, hora),
+                borderRadius: BorderRadius.circular(12),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
+                    horizontal: 12,
                     vertical: 7,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.verdePrincipal.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(10),
+                    color: agotado
+                        ? Colors.grey.shade100
+                        : (pocosCupos
+                            ? Colors.red.shade50
+                            : AppColors.verdePrincipal.withValues(alpha: 0.08)),
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.verdePrincipal.withValues(alpha: 0.28),
+                      color: agotado
+                          ? Colors.grey.shade300
+                          : (pocosCupos
+                              ? Colors.red.shade300
+                              : AppColors.verdePrincipal.withValues(alpha: 0.28)),
                       width: 1.2,
                     ),
                   ),
-                  child: Row(
+                  child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Icons.access_time_rounded,
-                        size: 13,
-                        color: AppColors.verdePrincipal,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.access_time_rounded,
+                            size: 13,
+                            color: agotado
+                                ? Colors.grey
+                                : (pocosCupos
+                                    ? Colors.red.shade700
+                                    : AppColors.verdePrincipal),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            hora,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w900,
+                              color: agotado
+                                  ? Colors.grey
+                                  : (pocosCupos
+                                      ? Colors.red.shade900
+                                      : AppColors.verdePrincipal),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(height: 2),
                       Text(
-                        hora,
+                        agotado
+                            ? 'Agotado'
+                            : (pocosCupos
+                                ? '¡$cupos cupos!'
+                                : '$cupos cupos'),
                         style: GoogleFonts.urbanist(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.verdePrincipal,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: agotado
+                              ? Colors.grey
+                              : (pocosCupos
+                                  ? Colors.red.shade700
+                                  : Colors.green.shade800),
                         ),
                       ),
                     ],

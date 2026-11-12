@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_detalle_animal.dart';
@@ -134,7 +135,7 @@ class PantallaRuta extends StatelessWidget {
             centerTitle: false,
             automaticallyImplyLeading: false,
             title: Text(
-              'Rutas & Hábitats',
+              'rutas_habitats'.tr,
               style: GoogleFonts.urbanist(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
@@ -160,7 +161,7 @@ class PantallaRuta extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'CONOCE LOS HÁBITATS DEL PARQUE',
+                          'conoce_habitats'.tr,
                           style: GoogleFonts.urbanist(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
@@ -170,7 +171,7 @@ class PantallaRuta extends StatelessWidget {
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          'Toca un hábitat para explorar sus animales o traza su sendero en el mapa.',
+                          'conoce_habitats_sub'.tr,
                           style: GoogleFonts.urbanist(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w600,
