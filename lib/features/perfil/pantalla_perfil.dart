@@ -10,11 +10,17 @@ import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/core/widgets/modal_animales_por_visitar.dart';
 
+import 'widgets/modal_insignias_perfil.dart';
+import 'widgets/seccion_card_grupo.dart';
+import 'widgets/selector_idioma_perfil.dart';
+import 'widgets/selector_tamano_letra.dart';
+
 /// Pantalla de Perfil y Ajustes con diseño y ergonomía estilo iOS / iPhone:
 /// - Secciones agrupadas con paleta safari unificada (#FBF9F6 y verdes de la app)
-/// - Selector de tamaño de letra (Normal, Medio, Grande) con vista previa en vivo
-/// - Botón activador para Modo Daltonismo con switch nativo
-/// - Alertas de shows y rutas
+/// - Selector de tamaño de letra con vista previa en vivo
+/// - Selector de idioma (Español, English, Quechua)
+/// - Insignias y medallas en modal
+/// - Ajustes de accesibilidad, notificaciones y sonido
 class PantallaPerfil extends StatefulWidget {
   final VoidCallback? onVolverAlInicio;
 
@@ -39,7 +45,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       listenable: IdiomaService.instance,
       builder: (context, _) {
         return Scaffold(
-          backgroundColor: const Color(0xFFFBF9F6), // Paleta safari unificada con el resto de la app
+          backgroundColor: const Color(0xFFFBF9F6),
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -68,261 +74,248 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               ),
             ),
           ),
-      body: Builder(
-        builder: (context) {
-          final bool esTablet = MediaQuery.of(context).size.width >= 720;
-          final Widget content = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ==========================================
-              // 1. TARJETA DE USUARIO ESTILO APPLE ID
-              // ==========================================
-              _buildAppleIdCard(),
+          body: Builder(
+            builder: (context) {
+              final bool esTablet = MediaQuery.of(context).size.width >= 720;
+              final Widget content = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 1. TARJETA DE USUARIO ESTILO APPLE ID
+                  _buildAppleIdCard(),
 
-            const SizedBox(height: 22),
+                  const SizedBox(height: 22),
 
-            // ==========================================
-            // SECCIÓN IDIOMA GLOBAL
-            // ==========================================
-            _buildSectionHeader('idioma_titulo'.tr),
-            _buildCardGroup(
-              children: [
-                _buildSelectorIdioma(),
-              ],
-            ),
+                  // 2. SECCIÓN IDIOMA GLOBAL
+                  SeccionCardGrupo(
+                    titulo: 'idioma_titulo'.tr,
+                    children: const [
+                      SelectorIdiomaPerfil(),
+                    ],
+                  ),
 
-            const SizedBox(height: 22),
+                  const SizedBox(height: 22),
 
-            // ==========================================
-            // 2. SECCIÓN VISUALIZACIÓN & DALTONISMO
-            // ==========================================
-            _buildSectionHeader('tamano_texto'.tr),
-            _buildCardGroup(
-              children: [
-                _buildSelectorTamanoTexto(),
-                const Divider(height: 1, indent: 56),
-                AnimatedBuilder(
-                  animation: AccesibilidadService.instance,
-                  builder: (context, _) {
-                    final daltonismoActivo =
-                        AccesibilidadService.instance.modoDaltonismo;
-                    return _buildIosSwitchRow(
-                      icono: Icons.visibility_rounded,
-                      colorIcono: AppColors.verdeAzulado,
-                      titulo: 'modo_daltonismo_tit'.tr,
-                      subtitulo: 'modo_daltonismo_sub'.tr,
-                      valor: daltonismoActivo,
-                      onChanged: (val) {
+                  // 3. SECCIÓN VISUALIZACIÓN & DALTONISMO
+                  SeccionCardGrupo(
+                    titulo: 'tamano_texto'.tr,
+                    children: [
+                      const SelectorTamanoLetra(),
+                      const Divider(height: 1, indent: 56),
+                      AnimatedBuilder(
+                        animation: AccesibilidadService.instance,
+                        builder: (context, _) {
+                          final daltonismoActivo =
+                              AccesibilidadService.instance.modoDaltonismo;
+                          return _buildIosSwitchRow(
+                            icono: Icons.visibility_rounded,
+                            colorIcono: AppColors.verdeAzulado,
+                            titulo: 'modo_daltonismo_tit'.tr,
+                            subtitulo: 'modo_daltonismo_sub'.tr,
+                            valor: daltonismoActivo,
+                            onChanged: (val) {
+                              SoundService.instance.playButtonTap();
+                              AccesibilidadService.instance.setModoDaltonismo(val);
+                            },
+                          );
+                        },
+                      ),
+                      const Divider(height: 1, indent: 56),
+                      AnimatedBuilder(
+                        animation: AccesibilidadService.instance,
+                        builder: (context, _) {
+                          final modoFacilActivo =
+                              AccesibilidadService.instance.modoFacil;
+                          return _buildIosSwitchRow(
+                            icono: Icons.elderly_rounded,
+                            colorIcono: const Color(0xFFC2185B),
+                            titulo: 'modo_facil_tit'.tr,
+                            subtitulo: 'modo_facil_sub'.tr,
+                            valor: modoFacilActivo,
+                            onChanged: (val) {
+                              SoundService.instance.playButtonTap();
+                              AccesibilidadService.instance.setModoFacil(val);
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 22),
+
+                  // 4. SECCIÓN NOTIFICACIONES
+                  SeccionCardGrupo(
+                    titulo: 'notificaciones_titulo'.tr,
+                    children: [
+                      _buildIosSwitchRow(
+                        icono: Icons.theater_comedy_rounded,
+                        colorIcono: AppColors.verdePrincipal,
+                        titulo: 'alertas_shows'.tr,
+                        subtitulo: 'alertas_shows_sub'.tr,
+                        valor: _notificacionesShows,
+                        onChanged: (val) {
+                          SoundService.instance.playButtonTap();
+                          setState(() => _notificacionesShows = val);
+                          if (val) {
+                            NotificationService.instance.mostrarNotificacion(
+                              id: 102,
+                              titulo: '🔔 Parque de las Leyendas',
+                              cuerpo: 'Las notificaciones han sido activadas',
+                            );
+                          }
+                        },
+                      ),
+                      const Divider(height: 1, indent: 56),
+                      _buildIosSwitchRow(
+                        icono: Icons.navigation_rounded,
+                        colorIcono: const Color(0xFF2E7D32),
+                        titulo: 'Guía de Ruta & Senderos',
+                        subtitulo: 'Sugerencias del camino mientras caminas',
+                        valor: _alertasRuta,
+                        onChanged: (val) {
+                          SoundService.instance.playButtonTap();
+                          setState(() => _alertasRuta = val);
+                        },
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 22),
+
+                  // 5. SECCIÓN EXPEDICIÓN Y PROGRESO
+                  SeccionCardGrupo(
+                    titulo: 'EXPEDICIÓN DEL DÍA',
+                    children: [
+                      AnimatedBuilder(
+                        animation: AnimalService.instance,
+                        builder: (context, _) {
+                          final visitados = AnimalService.instance.totalVisitados;
+                          final total = AnimalService.instance.totalAnimales;
+                          return _buildIosNavigationRow(
+                            icono: Icons.pets_rounded,
+                            colorIcono: const Color(0xFF40916C),
+                            titulo: 'Animales Observados',
+                            valorTrailing: '$visitados de $total vistos',
+                            onTap: () {
+                              SoundService.instance.playButtonTap();
+                              ModalAnimalesPorVisitar.mostrar(
+                                context,
+                                onSeleccionarAnimal: (_) {},
+                              );
+                            },
+                          );
+                        },
+                      ),
+                      const Divider(height: 1, indent: 56),
+                      _buildIosNavigationRow(
+                        icono: Icons.emoji_events_rounded,
+                        colorIcono: const Color(0xFFDF9F1D),
+                        titulo: 'Insignias y Medallas',
+                        valorTrailing: '3 obtenidas',
+                        onTap: () {
+                          ModalInsigniasPerfil.mostrar(context);
+                        },
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 22),
+
+                  // 6. SECCIÓN SONIDO Y ASISTENCIA
+                  SeccionCardGrupo(
+                    titulo: 'PREFERENCIAS DEL PARQUE',
+                    children: [
+                      _buildIosSwitchRow(
+                        icono: Icons.volume_up_rounded,
+                        colorIcono: const Color(0xFF8D6E63),
+                        titulo: 'Efectos de Sonido',
+                        subtitulo: 'Respuesta sonora al interactuar con botones',
+                        valor: _efectosSonoros,
+                        onChanged: (val) {
+                          SoundService.instance.playButtonTap();
+                          setState(() => _efectosSonoros = val);
+                        },
+                      ),
+                      const Divider(height: 1, indent: 56),
+                      _buildIosNavigationRow(
+                        icono: Icons.sos_rounded,
+                        colorIcono: AppColors.rojoEmergencia,
+                        titulo: 'Emergencias y Primeros Auxilios',
+                        valorTrailing: 'Llamar',
+                        onTap: () {
+                          EmergencyService.instance.mostrarModalEmergencia(context);
+                        },
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 26),
+
+                  // BOTÓN RESTABLECER / SALIR
+                  Center(
+                    child: TextButton(
+                      onPressed: () {
                         SoundService.instance.playButtonTap();
-                        AccesibilidadService.instance.setModoDaltonismo(val);
-                      },
-                    );
-                  },
-                ),
-                const Divider(height: 1, indent: 56),
-                AnimatedBuilder(
-                  animation: AccesibilidadService.instance,
-                  builder: (context, _) {
-                    final modoFacilActivo =
-                        AccesibilidadService.instance.modoFacil;
-                    return _buildIosSwitchRow(
-                      icono: Icons.elderly_rounded,
-                      colorIcono: const Color(0xFFC2185B),
-                      titulo: 'modo_facil_tit'.tr,
-                      subtitulo: 'modo_facil_sub'.tr,
-                      valor: modoFacilActivo,
-                      onChanged: (val) {
-                        SoundService.instance.playButtonTap();
-                        AccesibilidadService.instance.setModoFacil(val);
-                      },
-                    );
-                  },
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 22),
-
-            // ==========================================
-            // 3. SECCIÓN NOTIFICACIONES
-            // ==========================================
-            _buildSectionHeader('notificaciones_titulo'.tr),
-            _buildCardGroup(
-              children: [
-                _buildIosSwitchRow(
-                  icono: Icons.theater_comedy_rounded,
-                  colorIcono: AppColors.verdePrincipal,
-                  titulo: 'alertas_shows'.tr,
-                  subtitulo: 'alertas_shows_sub'.tr,
-                  valor: _notificacionesShows,
-                  onChanged: (val) {
-                    SoundService.instance.playButtonTap();
-                    setState(() => _notificacionesShows = val);
-                    if (val) {
-                      NotificationService.instance.mostrarNotificacion(
-                        id: 102,
-                        titulo: '🔔 Parque de las Leyendas',
-                        cuerpo: 'Las notificaciones han sido activadas',
-                      );
-                    }
-                  },
-                ),
-                const Divider(height: 1, indent: 56),
-                _buildIosSwitchRow(
-                  icono: Icons.navigation_rounded,
-                  colorIcono: const Color(0xFF2E7D32),
-                  titulo: 'Guía de Ruta & Senderos',
-                  subtitulo: 'Sugerencias del camino mientras caminas',
-                  valor: _alertasRuta,
-                  onChanged: (val) {
-                    SoundService.instance.playButtonTap();
-                    setState(() => _alertasRuta = val);
-                  },
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 22),
-
-            // ==========================================
-            // 4. SECCIÓN EXPEDICIÓN Y PROGRESO
-            // ==========================================
-            _buildSectionHeader('EXPEDICIÓN DEL DÍA'),
-            _buildCardGroup(
-              children: [
-                AnimatedBuilder(
-                  animation: AnimalService.instance,
-                  builder: (context, _) {
-                    final visitados = AnimalService.instance.totalVisitados;
-                    final total = AnimalService.instance.totalAnimales;
-                    return _buildIosNavigationRow(
-                      icono: Icons.pets_rounded,
-                      colorIcono: const Color(0xFF40916C),
-                      titulo: 'Animales Observados',
-                      valorTrailing: '$visitados de $total vistos',
-                      onTap: () {
-                        SoundService.instance.playButtonTap();
-                        ModalAnimalesPorVisitar.mostrar(
-                          context,
-                          onSeleccionarAnimal: (_) {},
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: AppColors.verdePrincipal,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            content: const Text(
+                              'Datos de sesión y recorrido sincronizados correctamente',
+                            ),
+                          ),
                         );
                       },
-                    );
-                  },
-                ),
-                const Divider(height: 1, indent: 56),
-                _buildIosNavigationRow(
-                  icono: Icons.emoji_events_rounded,
-                  colorIcono: const Color(0xFFDF9F1D),
-                  titulo: 'Insignias y Medallas',
-                  valorTrailing: '3 obtenidas',
-                  onTap: () {
-                    SoundService.instance.playButtonTap();
-                    _mostrarModalInsignias(context);
-                  },
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 22),
-
-            // ==========================================
-            // 5. SECCIÓN SONIDO Y ASISTENCIA
-            // ==========================================
-            _buildSectionHeader('PREFERENCIAS DEL PARQUE'),
-            _buildCardGroup(
-              children: [
-                _buildIosSwitchRow(
-                  icono: Icons.volume_up_rounded,
-                  colorIcono: const Color(0xFF8D6E63),
-                  titulo: 'Efectos de Sonido',
-                  subtitulo: 'Respuesta sonora al interactuar con botones',
-                  valor: _efectosSonoros,
-                  onChanged: (val) {
-                    SoundService.instance.playButtonTap();
-                    setState(() => _efectosSonoros = val);
-                  },
-                ),
-                const Divider(height: 1, indent: 56),
-                _buildIosNavigationRow(
-                  icono: Icons.sos_rounded,
-                  colorIcono: AppColors.rojoEmergencia,
-                  titulo: 'Emergencias y Primeros Auxilios',
-                  valorTrailing: 'Llamar',
-                  onTap: () {
-                    EmergencyService.instance.mostrarModalEmergencia(context);
-                  },
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 26),
-
-            // BOTÓN RESTABLECER / SALIR
-            Center(
-              child: TextButton(
-                onPressed: () {
-                  SoundService.instance.playButtonTap();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: AppColors.verdePrincipal,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      content: const Text(
-                        'Datos de sesión y recorrido sincronizados correctamente',
+                      child: Text(
+                        'Cerrar Sesión de Explorador',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFFFF3B30),
+                        ),
                       ),
                     ),
-                  );
-                },
-                child: Text(
-                  'Cerrar Sesión de Explorador',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFFFF3B30),
                   ),
-                ),
-              ),
-            ),
 
-            const SizedBox(height: 6),
-            Center(
-              child: Text(
-                'Versión 2.4.0 • Safari Edition\nParque Zoológico de las Leyendas',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.urbanist(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey.shade500,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 90),
-          ],
-        );
-
-        return SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: esTablet
-              ? SizedBox(
-                  width: double.infinity,
-                  child: Center(
-                    heightFactor: 1.0,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 720),
-                      child: content,
+                  const SizedBox(height: 6),
+                  Center(
+                    child: Text(
+                      'Versión 2.4.0 • Safari Edition\nParque Zoológico de las Leyendas',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade500,
+                      ),
                     ),
                   ),
-                )
-              : content,
+
+                  const SizedBox(height: 90),
+                ],
+              );
+
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: esTablet
+                    ? SizedBox(
+                        width: double.infinity,
+                        child: Center(
+                          heightFactor: 1.0,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 720),
+                            child: content,
+                          ),
+                        ),
+                      )
+                    : content,
+              );
+            },
+          ),
         );
-      },
-    ),
-  );
       },
     );
   }
@@ -345,7 +338,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       ),
       child: Row(
         children: [
-          // Avatar Circular iOS con iniciales/icono
           Container(
             width: 60,
             height: 60,
@@ -424,246 +416,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
     );
   }
 
-  /// Encabezado en mayúsculas sutiles estilo iOS
-  Widget _buildSectionHeader(String titulo) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 14.0, bottom: 8.0),
-      child: Text(
-        titulo,
-        style: GoogleFonts.urbanist(
-          fontSize: 11.5,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0.8,
-          color: AppColors.verdePrincipal.withValues(alpha: 0.75),
-        ),
-      ),
-    );
-  }
-
-  /// Contenedor redondeado blanco para agrupar celdas estilo iOS
-  Widget _buildCardGroup({required List<Widget> children}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: children,
-      ),
-    );
-  }
-
-  /// Selector de tamaño de letra estilo Cupertino con 3 opciones: Pequeño, Mediano, Grande
-  Widget _buildSelectorTamanoTexto() {
-    return AnimatedBuilder(
-      animation: AccesibilidadService.instance,
-      builder: (context, _) {
-        final tamanoActual = AccesibilidadService.instance.tamanoTexto;
-
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: AppColors.verdePrincipal,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.format_size_rounded,
-                      color: Colors.white,
-                      size: 19,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Tamaño de Letra de la App',
-                          style: GoogleFonts.urbanist(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textoOscuro,
-                          ),
-                        ),
-                        Text(
-                          'Ajusta la legibilidad para toda la aplicación',
-                          style: GoogleFonts.urbanist(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textoGris,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // SELECTOR SEGMENTADO ESTILO IPHONE (NORMAL | MEDIO | GRANDE)
-              SizedBox(
-                width: double.infinity,
-                child: CupertinoSlidingSegmentedControl<TamanoTexto>(
-                  groupValue: tamanoActual,
-                  backgroundColor: const Color(0xFFE5E5EA), // Gris Cupertino
-                  thumbColor: Colors.white,
-                  children: {
-                    TamanoTexto.pequeno: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'A',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Normal',
-                            style: GoogleFonts.urbanist(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    TamanoTexto.mediano: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'A',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Medio',
-                            style: GoogleFonts.urbanist(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    TamanoTexto.grande: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'A',
-                            style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Grande',
-                            style: GoogleFonts.urbanist(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  },
-                  onValueChanged: (TamanoTexto? nuevoTamano) {
-                    if (nuevoTamano != null) {
-                      SoundService.instance.playButtonTap();
-                      AccesibilidadService.instance.setTamanoTexto(nuevoTamano);
-                    }
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
-              // CAJA DE VISTA PREVIA DEL TAMAÑO DE TEXTO
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF9F9FB),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.black12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'VISTA PREVIA EN VIVO:',
-                          style: GoogleFonts.urbanist(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.6,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.verdePrincipal.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            tamanoActual == TamanoTexto.pequeno
-                                ? 'Escala 1.0x (Estándar)'
-                                : tamanoActual == TamanoTexto.mediano
-                                    ? 'Escala 1.15x (+15%)'
-                                    : 'Escala 1.30x (+30%)',
-                            style: GoogleFonts.urbanist(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.verdePrincipal,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '«¡Bienvenido al zoológico! Explora los animales, consulta los shows y disfruta de tu expedición.»',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 13.0 *
-                            AccesibilidadService
-                                .instance.multiplicadorEscalaTexto,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textoOscuro,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   /// Fila con Switch nativo Cupertino (iOS style)
   Widget _buildIosSwitchRow({
     required IconData icono,
@@ -713,7 +465,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
           ),
           CupertinoSwitch(
             value: valor,
-            activeTrackColor: AppColors.verdePrincipal, // Verde armonizado con la app
+            activeTrackColor: AppColors.verdePrincipal,
             onChanged: onChanged,
           ),
         ],
@@ -770,161 +522,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               size: 14,
               color: Colors.grey.shade400,
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _mostrarModalInsignias(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        return Container(
-          padding: const EdgeInsets.all(22),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 44,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Text(
-                'Tus Insignias Safari',
-                style: GoogleFonts.urbanist(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textoOscuro,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: const [
-                  Text('🦁 Rey León', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                  Text('🐬 Acróbata', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                  Text('🚜 Granjero', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildSelectorIdioma() {
-    return ListenableBuilder(
-      listenable: IdiomaService.instance,
-      builder: (context, _) {
-        final idiomaActual = IdiomaService.instance.idioma;
-        return Column(
-          children: [
-            _buildOpcionIdioma(
-              titulo: 'Español',
-              subtitulo: 'Predeterminado (Perú)',
-              bandera: '🇵🇪',
-              seleccionado: idiomaActual == AppIdioma.es,
-              onTap: () {
-                SoundService.instance.playButtonTap();
-                IdiomaService.instance.cambiarIdioma(AppIdioma.es);
-              },
-            ),
-            const Divider(height: 1, indent: 56),
-            _buildOpcionIdioma(
-              titulo: 'English',
-              subtitulo: 'International tourists',
-              bandera: '🇺🇸',
-              seleccionado: idiomaActual == AppIdioma.en,
-              onTap: () {
-                SoundService.instance.playButtonTap();
-                IdiomaService.instance.cambiarIdioma(AppIdioma.en);
-              },
-            ),
-            const Divider(height: 1, indent: 56),
-            _buildOpcionIdioma(
-              titulo: 'Runasimi / Quechua',
-              subtitulo: 'Piruwpa paqarisqa simin',
-              bandera: '🏔️',
-              seleccionado: idiomaActual == AppIdioma.qu,
-              onTap: () {
-                SoundService.instance.playButtonTap();
-                IdiomaService.instance.cambiarIdioma(AppIdioma.qu);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildOpcionIdioma({
-    required String titulo,
-    required String subtitulo,
-    required String bandera,
-    required bool seleccionado,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: seleccionado
-                    ? AppColors.verdePrincipal.withValues(alpha: 0.12)
-                    : Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              alignment: Alignment.center,
-              child: Text(bandera, style: const TextStyle(fontSize: 18)),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    titulo,
-                    style: GoogleFonts.urbanist(
-                      fontSize: 15,
-                      fontWeight:
-                          seleccionado ? FontWeight.w900 : FontWeight.w700,
-                      color: AppColors.textoOscuro,
-                    ),
-                  ),
-                  Text(
-                    subtitulo,
-                    style: GoogleFonts.urbanist(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textoGris,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (seleccionado)
-              const Icon(
-                Icons.check_circle_rounded,
-                color: AppColors.verdePrincipal,
-                size: 22,
-              ),
           ],
         ),
       ),
