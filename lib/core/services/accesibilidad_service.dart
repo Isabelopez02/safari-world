@@ -14,6 +14,7 @@ class AccesibilidadService extends ChangeNotifier {
   static const String _prefKeyDaltonismo = 'modo_daltonismo_activo';
   static const String _prefKeyZonasCalma = 'mostrar_zonas_calma_activo';
   static const String _prefKeyTamanoTexto = 'tamano_texto_preferencia';
+  static const String _prefKeyModoFacil = 'modo_facil_senior_activo';
 
   AccesibilidadService._() {
     _inicializacionFuture = _cargarPreferencias();
@@ -25,11 +26,13 @@ class AccesibilidadService extends ChangeNotifier {
   bool _modoAltoContraste = false;
   bool _modoDaltonismo = false;
   bool _mostrarZonasCalma = false;
+  bool _modoFacil = false;
   TamanoTexto _tamanoTexto = TamanoTexto.pequeno;
 
   bool get modoAltoContraste => _modoAltoContraste;
   bool get modoDaltonismo => _modoDaltonismo;
   bool get mostrarZonasCalma => _mostrarZonasCalma;
+  bool get modoFacil => _modoFacil;
   TamanoTexto get tamanoTexto => _tamanoTexto;
 
   /// Multiplicador de escala:
@@ -63,6 +66,7 @@ class AccesibilidadService extends ChangeNotifier {
       _modoAltoContraste = prefs.getBool(_prefKeyAltoContraste) ?? false;
       _modoDaltonismo = prefs.getBool(_prefKeyDaltonismo) ?? false;
       _mostrarZonasCalma = prefs.getBool(_prefKeyZonasCalma) ?? false;
+      _modoFacil = prefs.getBool(_prefKeyModoFacil) ?? false;
 
       final tamanoGuardado = prefs.getString(_prefKeyTamanoTexto);
       if (tamanoGuardado != null) {
@@ -116,6 +120,13 @@ class AccesibilidadService extends ChangeNotifier {
     _mostrarZonasCalma = activo;
     notifyListeners();
     await _guardarPref(_prefKeyZonasCalma, activo);
+  }
+
+  Future<void> setModoFacil(bool activo) async {
+    await inicializar();
+    _modoFacil = activo;
+    notifyListeners();
+    await _guardarPref(_prefKeyModoFacil, activo);
   }
 
   Future<void> toggleAltoContrasteYDaltonismo() async {

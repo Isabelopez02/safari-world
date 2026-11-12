@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 
-/// Servicio singleton para la Audioguía con voz real Text-To-Speech en español.
+/// Servicio singleton para la Audioguía con voz real Text-To-Speech en español, inglés o quechua.
 class AudioGuiaService extends ChangeNotifier {
   AudioGuiaService._() {
     _initTts();
@@ -75,8 +76,13 @@ class AudioGuiaService extends ChangeNotifier {
       _isPlaying = true;
       notifyListeners();
 
-      // Asegurar idioma español
-      await _tts.setLanguage('es-ES');
+      // Configurar idioma del sintetizador según el idioma activo
+      final idiomaActual = IdiomaService.instance.idioma;
+      if (idiomaActual == AppIdioma.en) {
+        await _tts.setLanguage('en-US');
+      } else {
+        await _tts.setLanguage('es-PE');
+      }
       await _tts.speak(texto);
     } catch (e) {
       debugPrint('Error al reproducir audio: $e');

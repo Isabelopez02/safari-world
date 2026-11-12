@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
@@ -30,7 +31,7 @@ class AccionesRapidasGrid extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '¿Qué quieres hacer hoy?',
+            'que_quieres_hacer'.tr,
             style: GoogleFonts.urbanist(
               fontSize: 18,
               fontWeight: FontWeight.w900,
@@ -47,8 +48,8 @@ class AccionesRapidasGrid extends StatelessWidget {
                 child: _buildTarjetaAccion(
                   icono: Icons.theater_comedy_rounded,
                   colorFondoIcono: const Color(0xFF0077B6),
-                  titulo: 'Ver shows',
-                  subtitulo: 'Horarios y eventos',
+                  titulo: 'accion_shows'.tr,
+                  subtitulo: 'horarios_fechas'.tr,
                   onTap: onVerShows,
                 ),
               ),
@@ -57,8 +58,8 @@ class AccionesRapidasGrid extends StatelessWidget {
                 child: _buildTarjetaAccion(
                   icono: Icons.alt_route_rounded,
                   colorFondoIcono: AppColors.verdePrincipal,
-                  titulo: 'Ruta del día',
-                  subtitulo: 'Senderos y paradas',
+                  titulo: 'accion_mapa'.tr,
+                  subtitulo: 'conoce_habitats'.tr,
                   onTap: onVerMapa,
                 ),
               ),
@@ -74,8 +75,8 @@ class AccionesRapidasGrid extends StatelessWidget {
                 child: _buildTarjetaAccion(
                   icono: Icons.storefront_rounded,
                   colorFondoIcono: const Color(0xFFD97706),
-                  titulo: 'Tiendas cercanas',
-                  subtitulo: 'Snacks y recuerdos',
+                  titulo: 'accion_tiendas'.tr,
+                  subtitulo: 'Snacks & Souvenirs',
                   onTap: onBuscarTiendas,
                 ),
               ),
@@ -84,8 +85,8 @@ class AccionesRapidasGrid extends StatelessWidget {
                 child: _buildTarjetaAccion(
                   icono: Icons.explore_rounded,
                   colorFondoIcono: const Color(0xFFE65100),
-                  titulo: '¿Te perdiste?',
-                  subtitulo: 'Orientación y ayuda',
+                  titulo: 'accion_te_perdiste'.tr,
+                  subtitulo: 'puntos_encuentro'.tr,
                   onTap: onTePerdiste,
                   destacado: true,
                 ),

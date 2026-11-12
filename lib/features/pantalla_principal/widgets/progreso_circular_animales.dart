@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
@@ -129,7 +130,7 @@ class ProgresoCircularAnimales extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Animales observados hoy',
+                          'animales_observados'.tr,
                           style: GoogleFonts.urbanist(
                             fontSize: 15.5,
                             fontWeight: FontWeight.w800,
@@ -140,10 +141,8 @@ class ProgresoCircularAnimales extends StatelessWidget {
                         const SizedBox(height: 3),
                         Text(
                           totalVisitados == 0
-                              ? '¡Comienza tu expedición por el zoológico!'
-                              : totalVisitados < 5
-                                  ? '¡Buen progreso! Sigue explorando hábitats.'
-                                  : '¡Excelente día de safari! Gran descubrimiento.',
+                              ? 'toca_para_explorar'.tr
+                              : '$totalVisitados / $totalAnimales (${'animales_explorados'.tr})',
                           style: GoogleFonts.urbanist(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -156,7 +155,7 @@ class ProgresoCircularAnimales extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              'Ver bitácora de animales',
+                              'toca_para_explorar'.tr,
                               style: GoogleFonts.urbanist(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w800,

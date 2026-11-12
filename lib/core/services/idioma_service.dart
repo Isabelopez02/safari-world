@@ -155,6 +155,43 @@ class IdiomaService extends ChangeNotifier {
       'capas_mapa': 'Capas del Mapa',
       'zonas_calma': 'Zonas de Calma & Silencio',
       'puntos_encuentro': 'Puntos de encuentro y guías',
+      'filtro_banios': 'Baños',
+      'filtro_salida': 'Salida',
+      'filtro_calma': 'Z. Tranquila',
+
+      // Inicio
+      'tu_aventura': 'Tu aventura empieza aquí',
+      'parque_nombre': 'Parque de las Leyendas',
+      'shows_actividades': 'Shows y Actividades',
+      'descubre_funciones': 'Descubre funciones acuáticas y aves',
+      'animales_observados': 'Animales observados hoy',
+      'toca_para_explorar': 'Toca para ver la lista completa',
+      'que_quieres_hacer': '¿Qué quieres hacer hoy?',
+      'accion_shows': 'Shows en vivo',
+      'accion_mapa': 'Ver Mapa',
+      'accion_tiendas': 'Snacks y Tiendas',
+      'accion_te_perdiste': '¿Te perdiste?',
+
+      // Perfil Adicional
+      'modo_daltonismo_tit': 'Modo Daltonismo',
+      'modo_daltonismo_sub': 'Paleta de alto contraste adaptada para visión de color',
+      'modo_facil_tit': 'Modo Fácil (Adulto Mayor)',
+      'modo_facil_sub': 'Interfaz simplificada, letras grandes y lectura guiada por voz',
+      'alertas_shows_sub': 'Recordatorios 15 minutos antes de iniciar cada función',
+      'sonido_haptica': 'Sonidos y Háptica',
+      'sonido_haptica_sub': 'Efectos sonoros y vibración al interactuar',
+      'preguntas_frecuentes': 'Preguntas Frecuentes',
+      'llamar_emergencia': 'Llamar a Emergencias',
+
+      // Modo Fácil
+      'volver_al_menu': '← Volver al Menú',
+      'salir_modo_facil': 'Salir del Modo Fácil\n(Modo Normal)',
+      'escanear_placa_guia': 'Escanear Placa QR / Guía',
+      'mapa_zoologico': 'Mapa del Zoológico',
+      'shows_hoy': 'Shows de Hoy',
+      'pedir_ayuda': 'Pedir Ayuda / Tópico',
+      'marcar_visitado': '✅ Marcar como Visitado',
+      'visitado_listo': 'Visitado ✓ (Toque para desmarcar)',
     },
 
     AppIdioma.en: {
@@ -217,6 +254,43 @@ class IdiomaService extends ChangeNotifier {
       'capas_mapa': 'Map Layers',
       'zonas_calma': 'Calm & Sensory Zones',
       'puntos_encuentro': 'Meeting points and guides',
+      'filtro_banios': 'Restrooms',
+      'filtro_salida': 'Exit',
+      'filtro_calma': 'Calm Zone',
+
+      // Home
+      'tu_aventura': 'Your adventure starts here',
+      'parque_nombre': 'Parque de las Leyendas Zoo',
+      'shows_actividades': 'Shows & Activities',
+      'descubre_funciones': 'Discover aquatic shows and birds',
+      'animales_observados': 'Animals visited today',
+      'toca_para_explorar': 'Tap to explore full list',
+      'que_quieres_hacer': 'What do you want to do today?',
+      'accion_shows': 'Live Shows',
+      'accion_mapa': 'View Map',
+      'accion_tiendas': 'Snacks & Stores',
+      'accion_te_perdiste': 'Are you lost?',
+
+      // Profile Additional
+      'modo_daltonismo_tit': 'Color Blind Mode',
+      'modo_daltonismo_sub': 'High contrast palette adapted for color vision',
+      'modo_facil_tit': 'Easy Mode (Senior)',
+      'modo_facil_sub': 'Simplified UI, large fonts, and guided voice readout',
+      'alertas_shows_sub': 'Reminders 15 minutes before each show',
+      'sonido_haptica': 'Sounds & Haptics',
+      'sonido_haptica_sub': 'Sound effects and vibration feedback',
+      'preguntas_frecuentes': 'Frequently Asked Questions',
+      'llamar_emergencia': 'Emergency Hotline',
+
+      // Easy Mode
+      'volver_al_menu': '← Back to Menu',
+      'salir_modo_facil': 'Exit Easy Mode\n(Normal Mode)',
+      'escanear_placa_guia': 'Scan QR Sign / Guide',
+      'mapa_zoologico': 'Zoo Map',
+      'shows_hoy': 'Today\'s Shows',
+      'pedir_ayuda': 'Get Help / First Aid',
+      'marcar_visitado': '✅ Mark as Visited',
+      'visitado_listo': 'Visited ✓ (Tap to unmark)',
     },
 
     AppIdioma.qu: {
@@ -279,6 +353,43 @@ class IdiomaService extends ChangeNotifier {
       'capas_mapa': 'Saywitipa Qatan',
       'zonas_calma': 'Ch\'in & Qasikay Kanchakuna',
       'puntos_encuentro': 'Tinkuna kiti & Yanapaq',
+      'filtro_banios': 'Hisp\'ana Wasi',
+      'filtro_salida': 'Lluqsina',
+      'filtro_calma': 'Qasikay',
+
+      // Home
+      'tu_aventura': 'Puriyniyki kaypim qallarin',
+      'parque_nombre': 'Leyendakuna Parki',
+      'shows_actividades': 'Rikuchiykuna & Ruraykuna',
+      'descubre_funciones': 'Yaku uywakunata & pisqukunata riqsiy',
+      'animales_observados': 'Uywakuna watukusqa kunan',
+      'toca_para_explorar': 'Tukuy uywakunata qhaway',
+      'que_quieres_hacer': '¿Imatataq kunan rurayta munanki?',
+      'accion_shows': 'Kawsay rikuchiykuna',
+      'accion_mapa': 'Saywitita qhaway',
+      'accion_tiendas': 'Mikhuna & Qhatu',
+      'accion_te_perdiste': '¿Chinkarqunkichu?',
+
+      // Profile Additional
+      'modo_daltonismo_tit': 'Llimp\'ikuna Allichay',
+      'modo_daltonismo_sub': 'K\'anchaq llimp\'ikuna ñawipaq allin qhawanapaq',
+      'modo_facil_tit': 'Ch\'uya Ñan (Machu Runa)',
+      'modo_facil_sub': 'Hatun sananpakuna, simiwan willasqa',
+      'alertas_shows_sub': '15 k\'iti ñawpaqta willay',
+      'sonido_haptica': 'Uywakunapa T\'uqyaynin',
+      'sonido_haptica_sub': 'T\'uqyaykuna hinaspa kuyuykuna',
+      'preguntas_frecuentes': 'Tapukuykuna',
+      'llamar_emergencia': 'Waqyay Yanapaqta',
+
+      // Easy Mode
+      'volver_al_menu': '← Kutiy Muyuman',
+      'salir_modo_facil': 'Lluqsiy Ch\'uya Ñanmanta\n(Tukuy Ñan)',
+      'escanear_placa_guia': 'QR Chipta Qhaway / Pusariq',
+      'mapa_zoologico': 'Parkipa Saywitin',
+      'shows_hoy': 'Kunan Rikuchiykuna',
+      'pedir_ayuda': 'Yanapayta Mañakuy',
+      'marcar_visitado': '✅ Watukusqañam',
+      'visitado_listo': 'Watukusqañam ✓ (Takyay llipipipananpaq)',
     },
   };
 }

@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
@@ -29,6 +30,8 @@ class PantallaMapa extends StatefulWidget {
   final bool esTabEmbedido;
   final String? habitatInicial;
   final int? claveNavegacion;
+  final bool modoFacil;
+  final VoidCallback? onVolverMenuFacil;
 
   const PantallaMapa({
     super.key,
@@ -37,6 +40,8 @@ class PantallaMapa extends StatefulWidget {
     this.esTabEmbedido = false,
     this.habitatInicial,
     this.claveNavegacion,
+    this.modoFacil = false,
+    this.onVolverMenuFacil,
   });
 
   @override
@@ -133,7 +138,7 @@ class _PantallaMapaState extends State<PantallaMapa>
         }
       } else if (widget.abrirExploracionesAlCargar) {
         _mostrarAnimalesPorVisitar(context);
-      } else {
+      } else if (!widget.modoFacil) {
         _checkTutorial();
       }
     });
@@ -734,6 +739,149 @@ class _PantallaMapaState extends State<PantallaMapa>
     );
   }
 
+  Widget _buildBarraFiltrosModoFacil() {
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (widget.onVolverMenuFacil != null) ...[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    SoundService.instance.playButtonTap();
+                    widget.onVolverMenuFacil!();
+                  },
+                  icon: const Icon(Icons.arrow_back_rounded, size: 24, color: Colors.white),
+                  label: Text(
+                    'volver_al_menu'.tr,
+                    style: GoogleFonts.urbanist(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E293B),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: const BorderSide(color: Colors.white, width: 1.5),
+                    ),
+                    elevation: 6,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            // 3 Filtros accesibles y grandes
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.95),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.12),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildBotonFiltroFacilItem(
+                      titulo: 'filtro_banios'.tr,
+                      icono: Icons.wc_rounded,
+                      color: const Color(0xFF0288D1),
+                      activo: _chipUrgencia == ChipUrgenciaMapa.banios,
+                      onTap: () {
+                        SoundService.instance.playButtonTap();
+                        HapticFeedback.selectionClick();
+                        setState(() => _chipUrgencia = ChipUrgenciaMapa.banios);
+                        _onFiltroCambiado(FiltroServicioMapa.banio);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: _buildBotonFiltroFacilItem(
+                      titulo: 'filtro_salida'.tr,
+                      icono: Icons.exit_to_app_rounded,
+                      color: const Color(0xFF2E7D32),
+                      activo: _chipUrgencia == ChipUrgenciaMapa.salidaParking,
+                      onTap: () {
+                        SoundService.instance.playButtonTap();
+                        HapticFeedback.selectionClick();
+                        setState(() => _chipUrgencia = ChipUrgenciaMapa.salidaParking);
+                        _onFiltroCambiado(FiltroServicioMapa.estacionamiento);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: _buildBotonFiltroFacilItem(
+                      titulo: 'filtro_calma'.tr,
+                      icono: Icons.park_rounded,
+                      color: const Color(0xFF6D4C41),
+                      activo: _filtroServicio == FiltroServicioMapa.calma,
+                      onTap: () {
+                        SoundService.instance.playButtonTap();
+                        HapticFeedback.selectionClick();
+                        setState(() => _chipUrgencia = ChipUrgenciaMapa.ninguno);
+                        _onFiltroCambiado(FiltroServicioMapa.calma);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBotonFiltroFacilItem({
+    required String titulo,
+    required IconData icono,
+    required Color color,
+    required bool activo,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: activo ? color : Colors.grey.shade100,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icono, color: activo ? Colors.white : color, size: 26),
+              const SizedBox(height: 4),
+              Text(
+                titulo,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.urbanist(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  color: activo ? Colors.white : Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildMarcadorPosicionado({
     required MarcadorMapa marcador,
     required bool isSelected,
@@ -1059,46 +1207,48 @@ class _PantallaMapaState extends State<PantallaMapa>
             ),
           ),
 
-          // BARRA SUPERIOR HÍBRIDA (Búsqueda + Capas + Chips de Urgencias)
+          // BARRA SUPERIOR HÍBRIDA O MODO FÁCIL
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            child: Center(
-              heightFactor: 1.0,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 680),
-                child: BarraBusquedaHibridaMapa(
-              chipActivo: _chipUrgencia,
-              onChipSeleccionado: (chip) {
-                setState(() => _chipUrgencia = chip);
-                switch (chip) {
-                  case ChipUrgenciaMapa.banios:
-                    _onFiltroCambiado(FiltroServicioMapa.banio);
-                    break;
-                  case ChipUrgenciaMapa.salidaParking:
-                    _onFiltroCambiado(FiltroServicioMapa.estacionamiento);
-                    break;
-                  case ChipUrgenciaMapa.animales:
-                    setState(() => _habitatFiltro = null);
-                    _onFiltroCambiado(FiltroServicioMapa.todos);
-                    break;
-                  case ChipUrgenciaMapa.snacks:
-                    ModalTiendasCercanas.mostrar(
-                      context,
-                      onAbrirEnMapa: () {},
-                    );
-                    break;
-                  case ChipUrgenciaMapa.ninguno:
-                    _onFiltroCambiado(FiltroServicioMapa.todos);
-                    break;
-                }
-              },
-              onAbrirCapas: _abrirModalCapas,
-            ),
+            child: widget.modoFacil
+                ? _buildBarraFiltrosModoFacil()
+                : Center(
+                    heightFactor: 1.0,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 680),
+                      child: BarraBusquedaHibridaMapa(
+                        chipActivo: _chipUrgencia,
+                        onChipSeleccionado: (chip) {
+                          setState(() => _chipUrgencia = chip);
+                          switch (chip) {
+                            case ChipUrgenciaMapa.banios:
+                              _onFiltroCambiado(FiltroServicioMapa.banio);
+                              break;
+                            case ChipUrgenciaMapa.salidaParking:
+                              _onFiltroCambiado(FiltroServicioMapa.estacionamiento);
+                              break;
+                            case ChipUrgenciaMapa.animales:
+                              setState(() => _habitatFiltro = null);
+                              _onFiltroCambiado(FiltroServicioMapa.todos);
+                              break;
+                            case ChipUrgenciaMapa.snacks:
+                              ModalTiendasCercanas.mostrar(
+                                context,
+                                onAbrirEnMapa: () {},
+                              );
+                              break;
+                            case ChipUrgenciaMapa.ninguno:
+                              _onFiltroCambiado(FiltroServicioMapa.todos);
+                              break;
+                          }
+                        },
+                        onAbrirCapas: _abrirModalCapas,
+                      ),
+                    ),
+                  ),
           ),
-        ),
-      ),
 
           // BOTONES FLOTANTES AL LADO INFERIOR DERECHO (UBICACIÓN ARRIBA Y CAPAS DEBAJO)
           AnimatedPositioned(
@@ -1123,18 +1273,20 @@ class _PantallaMapaState extends State<PantallaMapa>
                     _onMyLocationPressed();
                   },
                 ),
-                const SizedBox(height: 10),
-                // 2. BOTÓN CAPAS DEL MAPA (DEBAJO DE LA UBICACIÓN)
-                _buildBotonFlotanteCircular(
-                  icono: Icons.layers_rounded,
-                  tooltip: 'Capas y Filtros',
-                  colorIcono: AppColors.verdePrincipal,
-                  onPressed: () {
-                    HapticFeedback.lightImpact();
-                    SoundService.instance.playButtonTap();
-                    _abrirModalCapas();
-                  },
-                ),
+                if (!widget.modoFacil) ...[
+                  const SizedBox(height: 10),
+                  // 2. BOTÓN CAPAS DEL MAPA (DEBAJO DE LA UBICACIÓN)
+                  _buildBotonFlotanteCircular(
+                    icono: Icons.layers_rounded,
+                    tooltip: 'Capas y Filtros',
+                    colorIcono: AppColors.verdePrincipal,
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      SoundService.instance.playButtonTap();
+                      _abrirModalCapas();
+                    },
+                  ),
+                ],
               ],
             ),
           ),

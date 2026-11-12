@@ -35,36 +35,39 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFBF9F6), // Paleta safari unificada con el resto de la app
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: false,
-        automaticallyImplyLeading: false,
-        leading: widget.onVolverAlInicio != null
-            ? IconButton(
-                icon: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: AppColors.textoOscuro,
-                  size: 20,
-                ),
-                onPressed: () {
-                  SoundService.instance.playButtonTap();
-                  widget.onVolverAlInicio!();
-                },
-              )
-            : null,
-        title: Text(
-          'Perfil y Ajustes',
-          style: GoogleFonts.urbanist(
-            fontWeight: FontWeight.w900,
-            fontSize: 24,
-            color: AppColors.textoOscuro,
-            letterSpacing: -0.5,
+    return ListenableBuilder(
+      listenable: IdiomaService.instance,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFFBF9F6), // Paleta safari unificada con el resto de la app
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            centerTitle: false,
+            automaticallyImplyLeading: false,
+            leading: widget.onVolverAlInicio != null
+                ? IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: AppColors.textoOscuro,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      SoundService.instance.playButtonTap();
+                      widget.onVolverAlInicio!();
+                    },
+                  )
+                : null,
+            title: Text(
+              'perfil_titulo'.tr,
+              style: GoogleFonts.urbanist(
+                fontWeight: FontWeight.w900,
+                fontSize: 24,
+                color: AppColors.textoOscuro,
+                letterSpacing: -0.5,
+              ),
+            ),
           ),
-        ),
-      ),
       body: Builder(
         builder: (context) {
           final bool esTablet = MediaQuery.of(context).size.width >= 720;
@@ -106,13 +109,31 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                     return _buildIosSwitchRow(
                       icono: Icons.visibility_rounded,
                       colorIcono: AppColors.verdeAzulado,
-                      titulo: 'Modo Daltonismo',
-                      subtitulo:
-                          'Paleta de alto contraste adaptada para visión de color',
+                      titulo: 'modo_daltonismo_tit'.tr,
+                      subtitulo: 'modo_daltonismo_sub'.tr,
                       valor: daltonismoActivo,
                       onChanged: (val) {
                         SoundService.instance.playButtonTap();
                         AccesibilidadService.instance.setModoDaltonismo(val);
+                      },
+                    );
+                  },
+                ),
+                const Divider(height: 1, indent: 56),
+                AnimatedBuilder(
+                  animation: AccesibilidadService.instance,
+                  builder: (context, _) {
+                    final modoFacilActivo =
+                        AccesibilidadService.instance.modoFacil;
+                    return _buildIosSwitchRow(
+                      icono: Icons.elderly_rounded,
+                      colorIcono: const Color(0xFFC2185B),
+                      titulo: 'modo_facil_tit'.tr,
+                      subtitulo: 'modo_facil_sub'.tr,
+                      valor: modoFacilActivo,
+                      onChanged: (val) {
+                        SoundService.instance.playButtonTap();
+                        AccesibilidadService.instance.setModoFacil(val);
                       },
                     );
                   },
@@ -125,14 +146,14 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
             // ==========================================
             // 3. SECCIÓN NOTIFICACIONES
             // ==========================================
-            _buildSectionHeader('NOTIFICACIONES'),
+            _buildSectionHeader('notificaciones_titulo'.tr),
             _buildCardGroup(
               children: [
                 _buildIosSwitchRow(
                   icono: Icons.theater_comedy_rounded,
                   colorIcono: AppColors.verdePrincipal,
-                  titulo: 'Alertas de Shows',
-                  subtitulo: 'Aviso 15 min antes de cada función',
+                  titulo: 'alertas_shows'.tr,
+                  subtitulo: 'alertas_shows_sub'.tr,
                   valor: _notificacionesShows,
                   onChanged: (val) {
                     SoundService.instance.playButtonTap();
@@ -302,7 +323,9 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       },
     ),
   );
-}
+      },
+    );
+  }
 
   /// Tarjeta de Usuario estilo Apple ID
   Widget _buildAppleIdCard() {

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/accesibilidad_service.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
 import 'package:zoologico_front/features/mapa/widgets/modal_animales_por_visitar.dart';
+import 'package:zoologico_front/features/modo_facil/pantalla_modo_facil.dart';
 import 'package:zoologico_front/features/pantalla_principal/pantalla_perfil.dart';
 import 'package:zoologico_front/features/pantalla_principal/pantalla_ruta.dart';
 import 'package:zoologico_front/features/pantalla_principal/pantalla_shows.dart';
@@ -61,89 +64,106 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-
-        // Si estamos en cualquier otra pestaña que no sea Inicio, volver a Inicio primero
-        if (_tabActual != 0) {
-          setState(() => _tabActual = 0);
-          return;
-        }
-
-        final now = DateTime.now();
-        if (_lastBackPressTime == null ||
-            now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
-          _lastBackPressTime = now;
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: AppColors.verdePrincipal,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              content: Row(
-                children: [
-                  const Text('🌿', style: TextStyle(fontSize: 18)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Presiona atrás de nuevo para salir del Zoológico',
-                      style: GoogleFonts.urbanist(
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              duration: const Duration(seconds: 2),
-            ),
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        AccesibilidadService.instance,
+        IdiomaService.instance,
+      ]),
+      builder: (context, _) {
+        final bool modoFacil = AccesibilidadService.instance.modoFacil;
+        if (modoFacil) {
+          return PantallaModoFacil(
+            onSalirModoFacil: () {
+              AccesibilidadService.instance.setModoFacil(false);
+            },
           );
-        } else {
-          SystemNavigator.pop();
         }
+
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
+
+            // Si estamos en cualquier otra pestaña que no sea Inicio, volver a Inicio primero
+            if (_tabActual != 0) {
+              setState(() => _tabActual = 0);
+              return;
+            }
+
+            final now = DateTime.now();
+            if (_lastBackPressTime == null ||
+                now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
+              _lastBackPressTime = now;
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: AppColors.verdePrincipal,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  content: Row(
+                    children: [
+                      const Text('🌿', style: TextStyle(fontSize: 18)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Presiona atrás de nuevo para salir del Zoológico',
+                          style: GoogleFonts.urbanist(
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            } else {
+              SystemNavigator.pop();
+            }
+          },
+          child: Scaffold(
+            backgroundColor: const Color(0xFFFBF9F6),
+            body: IndexedStack(
+              index: _tabActual,
+              children: [
+                // PESTAÑA 0: INICIO (SUTIL, ELEGANTE Y DESPEJADA)
+                _buildCuerpoPrincipal(context),
+
+                // PESTAÑA 1: MAPA HÍBRIDO INTERACTIVO (FOOTER VISIBLE)
+                PantallaMapa(
+                  esTabEmbedido: true,
+                  habitatInicial: _habitatSeleccionadoParaMapa,
+                  claveNavegacion: _contadorNavegacionMapa,
+                ),
+
+                // PESTAÑA 2: CARTELERA DE SHOWS CINEPLANET (FOOTER VISIBLE)
+                PantallaShows(
+                  esTabEmbedido: true,
+                  onIrAlInicio: () => setState(() => _tabActual = 0),
+                  onVerEnMapa: (destino) => _irAlMapaConDestino(destino),
+                ),
+
+                // PESTAÑA 3: TU RUTA - HÁBITATS & EXPEDICIONES (FOOTER VISIBLE)
+                PantallaRuta(
+                  onTrazarRuta: (destino) => _irAlMapaConDestino(destino),
+                ),
+
+                // PESTAÑA 4: PERFIL DEL EXPLORADOR ESTILO IPHONE (FOOTER VISIBLE)
+                PantallaPerfil(
+                  onVolverAlInicio: () => setState(() => _tabActual = 0),
+                ),
+              ],
+            ),
+            bottomNavigationBar: FooterNavegacion(
+              indiceSeleccionado: _tabActual,
+              onTabSeleccionado: _onTabSeleccionado,
+            ),
+          ),
+        );
       },
-      child: Scaffold(
-        backgroundColor: const Color(0xFFFBF9F6),
-        body: IndexedStack(
-          index: _tabActual,
-          children: [
-            // PESTAÑA 0: INICIO (SUTIL, ELEGANTE Y DESPEJADA)
-            _buildCuerpoPrincipal(context),
-
-            // PESTAÑA 1: MAPA HÍBRIDO INTERACTIVO (FOOTER VISIBLE)
-            PantallaMapa(
-              esTabEmbedido: true,
-              habitatInicial: _habitatSeleccionadoParaMapa,
-              claveNavegacion: _contadorNavegacionMapa,
-            ),
-
-            // PESTAÑA 2: CARTELERA DE SHOWS CINEPLANET (FOOTER VISIBLE)
-            PantallaShows(
-              esTabEmbedido: true,
-              onIrAlInicio: () => setState(() => _tabActual = 0),
-              onVerEnMapa: (destino) => _irAlMapaConDestino(destino),
-            ),
-
-            // PESTAÑA 3: TU RUTA - HÁBITATS & EXPEDICIONES (FOOTER VISIBLE)
-            PantallaRuta(
-              onTrazarRuta: (destino) => _irAlMapaConDestino(destino),
-            ),
-
-            // PESTAÑA 4: PERFIL DEL EXPLORADOR ESTILO IPHONE (FOOTER VISIBLE)
-            PantallaPerfil(
-              onVolverAlInicio: () => setState(() => _tabActual = 0),
-            ),
-          ],
-        ),
-        bottomNavigationBar: FooterNavegacion(
-          indiceSeleccionado: _tabActual,
-          onTabSeleccionado: _onTabSeleccionado,
-        ),
-      ),
     );
   }
 

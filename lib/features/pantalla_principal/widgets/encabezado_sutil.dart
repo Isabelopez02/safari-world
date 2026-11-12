@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
@@ -123,7 +124,7 @@ class EncabezadoSutil extends StatelessWidget {
 
           // OVERLINE: "TU AVENTURA EMPIEZA AQUÍ"
           Text(
-            'TU AVENTURA EMPIEZA AQUÍ',
+            'tu_aventura'.tr.toUpperCase(),
             style: GoogleFonts.urbanist(
               fontSize: 12.5,
               fontWeight: FontWeight.w800,
@@ -145,15 +146,13 @@ class EncabezadoSutil extends StatelessWidget {
                 height: 1.15,
               ),
               children: [
-                const TextSpan(text: 'Bienvenido a\n'),
                 TextSpan(
-                  text: nombreParque,
+                  text: '${'parque_nombre'.tr} 🌿',
                   style: GoogleFonts.urbanist(
                     color: AppColors.verdePrincipal,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                const TextSpan(text: ' 🌿'),
               ],
             ),
           ),

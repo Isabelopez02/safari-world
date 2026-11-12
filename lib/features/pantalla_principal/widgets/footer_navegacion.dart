@@ -23,9 +23,12 @@ class FooterNavegacion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool esTablet = MediaQuery.of(context).size.width >= 720;
+    return ListenableBuilder(
+      listenable: IdiomaService.instance,
+      builder: (context, _) {
+        final bool esTablet = MediaQuery.of(context).size.width >= 720;
 
-    final navContent = Padding(
+        final navContent = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -98,6 +101,8 @@ class FooterNavegacion extends StatelessWidget {
               )
             : navContent,
       ),
+    );
+      },
     );
   }
 
