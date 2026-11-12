@@ -9,7 +9,7 @@ import 'package:zoologico_front/core/widgets/modal_animales_por_visitar.dart';
 import 'package:zoologico_front/features/modo_facil/pantalla_modo_facil.dart';
 import 'package:zoologico_front/features/perfil/pantalla_perfil.dart';
 import 'package:zoologico_front/features/rutas/screens/pantalla_ruta.dart';
-import 'package:zoologico_front/features/shows/pantalla_shows.dart';
+import 'package:zoologico_front/features/shows/screens/pantalla_shows.dart';
 
 import '../widgets/acciones_rapidas_grid.dart';
 import '../widgets/banner_bonito.dart';
