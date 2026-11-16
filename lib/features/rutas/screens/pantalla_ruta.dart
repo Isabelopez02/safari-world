@@ -19,7 +19,7 @@ class PantallaRuta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: AnimalService.instance,
+      listenable: Listenable.merge([AnimalService.instance, IdiomaService.instance]),
       builder: (context, _) {
         return Scaffold(
           backgroundColor: const Color(0xFFFBF9F6),

@@ -3,7 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/models/datos_animal.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
 import 'package:zoologico_front/core/services/accesibilidad_service.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+import 'package:zoologico_front/features/pantalla_principal/widgets/footer_navegacion.dart';
 import 'pantalla_detalle_animal.dart';
 
 /// Layout optimizado para pantallas de teléfonos móviles (< 720px)
@@ -36,7 +38,7 @@ class DetalleAnimalMovil extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: AccesibilidadService.instance,
+      listenable: Listenable.merge([AccesibilidadService.instance, IdiomaService.instance]),
       builder: (context, _) {
         final a11y = AccesibilidadService.instance;
         final bool oscuro = a11y.modoAltoContraste;
@@ -50,11 +52,8 @@ class DetalleAnimalMovil extends StatelessWidget {
             oscuro ? const Color(0xFFFDE047) : theme.accent;
 
         return Scaffold(
-      backgroundColor: fondoPantalla,
-      body: Stack(
-        children: [
-          // CONTENIDO CON DESPLAZAMIENTO FLUIDO
-          CustomScrollView(
+          backgroundColor: fondoPantalla,
+          body: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
               // 1. CABECERA HERO PANORÁMICA EXPANDIBLE
@@ -115,7 +114,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              isPlayingAudio ? 'Pausar' : 'Audioguía',
+                              isPlayingAudio ? 'pausar'.tr : 'audioguia'.tr,
                               style: GoogleFonts.urbanist(
                                 color: Colors.white,
                                 fontSize: 12,
@@ -191,7 +190,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 5),
                                   Text(
-                                    theme.nombreHabitat,
+                                    theme.nombreHabitat.tr,
                                     style: GoogleFonts.urbanist(
                                       color: Colors.white,
                                       fontSize: 12,
@@ -248,7 +247,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  animal.nombre,
+                                  animal.nombre.tr,
                                   style: GoogleFonts.urbanist(
                                     fontSize: 25,
                                     fontWeight: FontWeight.w900,
@@ -309,12 +308,12 @@ class DetalleAnimalMovil extends StatelessWidget {
                         children: [
                           _buildChip(
                             icon: Icons.restaurant_rounded,
-                            label: datos.dieta,
+                            label: datos.dieta.tr,
                             color: accentColor,
                           ),
                           _buildChip(
                             icon: Icons.shield_rounded,
-                            label: datos.estadoConservacion,
+                            label: datos.estadoConservacion.tr,
                             color: oscuro ? const Color(0xFFFB923C) : const Color(0xFFE65100),
                             esAlerta: true,
                           ),
@@ -341,62 +340,67 @@ class DetalleAnimalMovil extends StatelessWidget {
 
                       // ¿SABÍAS QUE? (CURIOSIDAD DEL EXPLORADOR)
                       _buildTarjetaCuriosidad(),
+
+                      const SizedBox(height: 18),
+
+                      // PASAPORTE DE VISITAS
+                      _buildBotonPasaporte(),
+
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
               ),
             ],
           ),
-
-          // 3. BOTÓN FLOTANTE INFERIOR: PASAPORTE DE VISITAS
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 16,
-            child: SafeArea(
-              top: false,
-              child: SizedBox(
-                height: 52,
-                child: ElevatedButton.icon(
-                  onPressed: onToggleVisitado,
-                  icon: Icon(
-                    esVisitado
-                        ? Icons.check_circle_rounded
-                        : Icons.bookmark_add_rounded,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                  label: Text(
-                    esVisitado
-                        ? 'Explorado en tu Pasaporte ✓ (Desmarcar)'
-                        : 'Marcar en mi pasaporte de visitas 🐾',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: esVisitado
-                        ? const Color(0xFF15803D)
-                        : theme.accent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 4,
-                    shadowColor: (esVisitado
-                            ? const Color(0xFF15803D)
-                            : theme.accent)
-                        .withValues(alpha: 0.4),
-                  ),
-                ),
-              ),
-            ),
+          bottomNavigationBar: FooterNavegacion(
+            indiceSeleccionado: 1,
+            onTabSeleccionado: (index) {
+              Navigator.of(context).pop();
+            },
           ),
-        ],
-      ),
-    );
+        );
       },
+    );
+  }
+
+  Widget _buildBotonPasaporte() {
+    return SizedBox(
+      height: 52,
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: onToggleVisitado,
+        icon: Icon(
+          esVisitado
+              ? Icons.check_circle_rounded
+              : Icons.bookmark_add_rounded,
+          size: 20,
+          color: Colors.white,
+        ),
+        label: Text(
+          esVisitado
+              ? 'explorado_pasaporte'.tr
+              : 'marcar_pasaporte'.tr,
+          style: GoogleFonts.urbanist(
+            fontSize: 14,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: esVisitado
+              ? const Color(0xFF15803D)
+              : theme.accent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 4,
+          shadowColor: (esVisitado
+                  ? const Color(0xFF15803D)
+                  : theme.accent)
+              .withValues(alpha: 0.4),
+        ),
+      ),
     );
   }
 
@@ -510,7 +514,7 @@ class DetalleAnimalMovil extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            datos.narracionAudioguia,
+            datos.getNarracion(animal.nombre),
             style: GoogleFonts.urbanist(
               fontSize: 12.5,
               color: Colors.brown.shade800,
@@ -612,7 +616,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Alimentación y dieta diaria',
+                      'alimentacion_dieta_diaria'.tr,
                       style: GoogleFonts.urbanist(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
@@ -672,7 +676,7 @@ class DetalleAnimalMovil extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Comportamiento en su hábitat',
+                  'comportamiento_habitat'.tr,
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
@@ -684,7 +688,7 @@ class DetalleAnimalMovil extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            datos.comportamiento,
+            datos.getComportamiento(animal.nombre),
             style: GoogleFonts.urbanist(
               fontSize: 13,
               color: textoSecundario,
@@ -730,7 +734,7 @@ class DetalleAnimalMovil extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '¿Sabías que?',
+                  'sabias_que'.tr,
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
@@ -739,7 +743,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  datos.curiosidad,
+                  datos.getCuriosidad(animal.nombre),
                   style: GoogleFonts.urbanist(
                     fontSize: 12.5,
                     color: textoBody,

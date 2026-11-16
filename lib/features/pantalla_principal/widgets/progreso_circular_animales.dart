@@ -117,7 +117,7 @@ class ProgresoCircularAnimales extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                '$porcentajeEntero% COMPLETADO',
+                                '$porcentajeEntero% ${'completado'.tr}',
                                 style: GoogleFonts.urbanist(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w800,

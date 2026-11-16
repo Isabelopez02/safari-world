@@ -3,7 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/models/datos_animal.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
 import 'package:zoologico_front/core/services/accesibilidad_service.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+import 'package:zoologico_front/features/pantalla_principal/widgets/footer_navegacion.dart';
 import 'pantalla_detalle_animal.dart';
 
 /// Layout optimizado para pantallas grandes (Tablets, iPad, Desktop y Plegables >= 720px)
@@ -36,7 +38,7 @@ class DetalleAnimalTablet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: AccesibilidadService.instance,
+      listenable: Listenable.merge([AccesibilidadService.instance, IdiomaService.instance]),
       builder: (context, _) {
         final a11y = AccesibilidadService.instance;
         final bool oscuro = a11y.modoAltoContraste;
@@ -100,17 +102,17 @@ class DetalleAnimalTablet extends StatelessWidget {
                                   children: [
                                     _buildChip(
                                       icon: Icons.terrain_rounded,
-                                      label: '${theme.emoji} ${theme.nombreHabitat}',
+                                      label: '${theme.emoji} ${theme.nombreHabitat.tr}',
                                       color: oscuro ? const Color(0xFFFDE047) : theme.accent,
                                     ),
                                     _buildChip(
                                       icon: Icons.restaurant_rounded,
-                                      label: datos.dieta,
+                                      label: datos.dieta.tr,
                                       color: oscuro ? const Color(0xFFFDE047) : theme.accent,
                                     ),
                                     _buildChip(
                                       icon: Icons.shield_rounded,
-                                      label: datos.estadoConservacion,
+                                      label: datos.estadoConservacion.tr,
                                       color: oscuro ? const Color(0xFFFB923C) : const Color(0xFFE65100),
                                       esAlerta: true,
                                     ),
@@ -141,6 +143,12 @@ class DetalleAnimalTablet extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          bottomNavigationBar: FooterNavegacion(
+            indiceSeleccionado: 1,
+            onTabSeleccionado: (index) {
+              Navigator.of(context).pop();
+            },
           ),
         );
       },
@@ -260,7 +268,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    animal.nombre,
+                    animal.nombre.tr,
                     style: GoogleFonts.urbanist(
                       fontSize: 28,
                       fontWeight: FontWeight.w900,
@@ -370,7 +378,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                       : Icons.play_arrow_rounded,
                   size: 18,
                 ),
-                label: Text(isPlayingAudio ? 'Pausar' : 'Escuchar'),
+                label: Text(isPlayingAudio ? 'pausar'.tr : 'audioguia'.tr),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isPlayingAudio
                       ? const Color(0xFFE65100)
@@ -386,7 +394,7 @@ class DetalleAnimalTablet extends StatelessWidget {
           if (isPlayingAudio) ...[
             const SizedBox(height: 12),
             Text(
-              datos.narracionAudioguia,
+              datos.getNarracion(animal.nombre),
               style: GoogleFonts.urbanist(
                 fontSize: 12.5,
                 color: Colors.brown.shade800,
@@ -471,8 +479,8 @@ class DetalleAnimalTablet extends StatelessWidget {
               ),
               label: Text(
                 esVisitado
-                    ? 'Desmarcar de mi pasaporte'
-                    : 'Marcar en mi pasaporte 🐾',
+                    ? 'explorado_pasaporte'.tr
+                    : 'marcar_pasaporte'.tr,
                 style: GoogleFonts.urbanist(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
@@ -614,7 +622,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Dieta y alimentos suministrados',
+                      'alimentacion_dieta_diaria'.tr,
                       style: GoogleFonts.urbanist(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -673,7 +681,7 @@ class DetalleAnimalTablet extends StatelessWidget {
               Icon(Icons.psychology_rounded, size: 20, color: accentColor),
               const SizedBox(width: 8),
               Text(
-                'Comportamiento en el hábitat',
+                'comportamiento_habitat'.tr,
                 style: GoogleFonts.urbanist(
                   fontSize: 15,
                   fontWeight: FontWeight.w900,
@@ -684,7 +692,7 @@ class DetalleAnimalTablet extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            datos.comportamiento,
+            datos.getComportamiento(animal.nombre),
             style: GoogleFonts.urbanist(
               fontSize: 13.5,
               color: textoSecundario,
@@ -730,7 +738,7 @@ class DetalleAnimalTablet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '¿Sabías que?',
+                  'sabias_que'.tr,
                   style: GoogleFonts.urbanist(
                     fontSize: 15,
                     fontWeight: FontWeight.w900,
@@ -739,7 +747,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  datos.curiosidad,
+                  datos.getCuriosidad(animal.nombre),
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     color: textoBody,

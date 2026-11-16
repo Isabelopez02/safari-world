@@ -217,7 +217,7 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
 
   void _toggleAudioguia(DatosAnimal datos) {
     SoundService.instance.playButtonTap();
-    AudioGuiaService.instance.toggleHablar(datos.narracionAudioguia);
+    AudioGuiaService.instance.toggleHablar(datos.getNarracion(widget.animal.nombre));
   }
 
   Future<void> _marcarVisitado() async {

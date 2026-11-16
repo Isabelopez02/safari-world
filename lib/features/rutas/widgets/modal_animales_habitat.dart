@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_detalle_animal.dart';
@@ -111,7 +112,7 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                widget.habitat.nombre,
+                                widget.habitat.nombre.tr,
                                 style: GoogleFonts.urbanist(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w900,
@@ -304,7 +305,7 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    animal.nombre,
+                                                    animal.nombre.tr,
                                                     style: GoogleFonts.urbanist(
                                                       fontSize: 15.5,
                                                       fontWeight: FontWeight.w900,

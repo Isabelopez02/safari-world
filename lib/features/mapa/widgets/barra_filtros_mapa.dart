@@ -4,17 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
-
-/// Tipos de filtro rápido disponibles en el mapa interactivo
-enum FiltroServicioMapa {
-  todos,
-  calma,
-  banio,
-  estacionamiento,
-  boleteria,
-  salida,
-  juegos,
-}
+import '../data/filtro_servicio_mapa.dart';
+export '../data/filtro_servicio_mapa.dart';
 
 class _OpcionFiltro {
   final FiltroServicioMapa tipo;

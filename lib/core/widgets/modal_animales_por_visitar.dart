@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/data/datos_marcadores.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
@@ -363,7 +364,7 @@ class _ModalAnimalesPorVisitarState extends State<ModalAnimalesPorVisitar> {
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(
-                                    meta.nombre,
+                                    meta.nombre.tr,
                                     style: GoogleFonts.urbanist(
                                       fontSize: 15.5,
                                       fontWeight: FontWeight.w900,
@@ -516,7 +517,7 @@ class _ModalAnimalesPorVisitarState extends State<ModalAnimalesPorVisitar> {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        meta.nombre,
+                        meta.nombre.tr,
                         style: GoogleFonts.urbanist(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
@@ -692,7 +693,7 @@ class _ModalAnimalesPorVisitarState extends State<ModalAnimalesPorVisitar> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    marcador.nombre,
+                                    marcador.nombre.tr,
                                     style: GoogleFonts.urbanist(
                                       color: Colors.white,
                                       fontSize: 15.5,

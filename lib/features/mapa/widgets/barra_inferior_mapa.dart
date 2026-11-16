@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
@@ -530,7 +531,7 @@ class BarraInferiorMapa extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        sel.visitado ? 'Visto' : 'Marcar',
+                        sel.visitado ? 'visto'.tr : 'marcar'.tr,
                         style: GoogleFonts.urbanist(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w800,
@@ -596,7 +597,7 @@ class BarraInferiorMapa extends StatelessWidget {
                         : AppColors.verdePrincipal,
                   ),
                   label: Text(
-                    'Ver Ficha',
+                    'ver_ficha'.tr,
                     style: GoogleFonts.urbanist(
                       fontWeight: FontWeight.w900,
                       fontSize: 14,
@@ -640,10 +641,10 @@ class BarraInferiorMapa extends StatelessWidget {
                 ),
                 label: Text(
                   esCalma
-                      ? 'Ruta de Calma ($metros m)'
+                      ? '${'filtro_calma'.tr} ($metros m)'
                       : (sel.esBanio
-                          ? 'Guiarme al Baño ($metros m)'
-                          : 'Iniciar Guía ($metros m)'),
+                          ? '${'filtro_banios'.tr} ($metros m)'
+                          : '${'iniciar_guia'.tr} ($metros m)'),
                   style: GoogleFonts.urbanist(
                     color: Colors.white,
                     fontWeight: FontWeight.w900,

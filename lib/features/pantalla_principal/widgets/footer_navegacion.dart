@@ -29,39 +29,49 @@ class FooterNavegacion extends StatelessWidget {
         final bool esTablet = MediaQuery.of(context).size.width >= 720;
 
         final navContent = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(
-            index: 0,
-            iconoActivo: Icons.home_rounded,
-            iconoInactivo: Icons.home_outlined,
-            etiqueta: 'nav_inicio'.tr,
+          Expanded(
+            child: _buildNavItem(
+              index: 0,
+              iconoActivo: Icons.home_rounded,
+              iconoInactivo: Icons.home_outlined,
+              etiqueta: 'nav_inicio'.tr,
+            ),
           ),
-          _buildNavItem(
-            index: 1,
-            iconoActivo: Icons.map_rounded,
-            iconoInactivo: Icons.map_outlined,
-            etiqueta: 'nav_mapa'.tr,
+          Expanded(
+            child: _buildNavItem(
+              index: 1,
+              iconoActivo: Icons.map_rounded,
+              iconoInactivo: Icons.map_outlined,
+              etiqueta: 'nav_mapa'.tr,
+            ),
           ),
-          _buildNavItem(
-            index: 2,
-            iconoActivo: Icons.theater_comedy_rounded,
-            iconoInactivo: Icons.theater_comedy_outlined,
-            etiqueta: 'nav_shows'.tr,
+          Expanded(
+            child: _buildNavItem(
+              index: 2,
+              iconoActivo: Icons.theater_comedy_rounded,
+              iconoInactivo: Icons.theater_comedy_outlined,
+              etiqueta: 'nav_shows'.tr,
+            ),
           ),
-          _buildNavItem(
-            index: 3,
-            iconoActivo: Icons.alt_route_rounded,
-            iconoInactivo: Icons.alt_route_outlined,
-            etiqueta: 'nav_ruta'.tr,
+          Expanded(
+            child: _buildNavItem(
+              index: 3,
+              iconoActivo: Icons.alt_route_rounded,
+              iconoInactivo: Icons.alt_route_outlined,
+              etiqueta: 'nav_ruta'.tr,
+            ),
           ),
-          _buildNavItem(
-            index: 4,
-            iconoActivo: Icons.person_rounded,
-            iconoInactivo: Icons.person_outline_rounded,
-            etiqueta: 'nav_perfil'.tr,
+          Expanded(
+            child: _buildNavItem(
+              index: 4,
+              iconoActivo: Icons.person_rounded,
+              iconoInactivo: Icons.person_outline_rounded,
+              etiqueta: 'nav_perfil'.tr,
+            ),
           ),
         ],
       ),
@@ -123,7 +133,7 @@ class FooterNavegacion extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
         curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
         decoration: BoxDecoration(
           color: activo
               ? AppColors.verdePrincipal.withValues(alpha: 0.1)
@@ -141,6 +151,8 @@ class FooterNavegacion extends StatelessWidget {
             const SizedBox(height: 3),
             Text(
               etiqueta,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: GoogleFonts.urbanist(
                 fontSize: 11,
                 fontWeight: activo ? FontWeight.w800 : FontWeight.w600,

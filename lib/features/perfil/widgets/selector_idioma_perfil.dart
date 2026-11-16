@@ -48,6 +48,17 @@ class SelectorIdiomaPerfil extends StatelessWidget {
                 IdiomaService.instance.cambiarIdioma(AppIdioma.qu);
               },
             ),
+            const Divider(height: 1, indent: 56),
+            _buildOpcionIdioma(
+              titulo: 'Aymar aru / Aimara',
+              subtitulo: 'Qullasuyu jaqinakan arupa',
+              bandera: '☀️',
+              seleccionado: idiomaActual == AppIdioma.ay,
+              onTap: () {
+                SoundService.instance.playButtonTap();
+                IdiomaService.instance.cambiarIdioma(AppIdioma.ay);
+              },
+            ),
           ],
         );
       },

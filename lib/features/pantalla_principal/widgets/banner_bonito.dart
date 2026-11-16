@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
@@ -124,7 +125,7 @@ class BannerBonito extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'SHOW ESTELAR HOY',
+                            'show_estelar_hoy'.tr,
                             style: GoogleFonts.urbanist(
                               fontSize: 10.5,
                               fontWeight: FontWeight.w800,
@@ -185,7 +186,7 @@ class BannerBonito extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Ver detalles',
+                            'ver_detalles'.tr,
                             style: GoogleFonts.urbanist(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,

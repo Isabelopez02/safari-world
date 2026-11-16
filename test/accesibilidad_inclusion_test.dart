@@ -107,7 +107,7 @@ void main() {
       expect(seleccionado, equals(FiltroServicioMapa.calma));
     });
 
-    testWidgets('PantallaMapa incluye botón de Accesibilidad en barra superior',
+    testWidgets('PantallaMapa incluye botón de Capas en barra superior',
         (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1080, 2200);
       tester.view.devicePixelRatio = 1.0;
@@ -121,7 +121,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
 
-      expect(find.text('A11y'), findsOneWidget);
+      expect(find.byIcon(Icons.layers_rounded), findsOneWidget);
     });
 
     testWidgets('Al seleccionar un marcador, los demás marcadores se atenúan para no tapar el recorrido',

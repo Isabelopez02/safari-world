@@ -1,3 +1,5 @@
+import '../services/idioma_service.dart';
+
 /// Modelo de datos para la información zoológica y educativa de un animal.
 class DatosAnimal {
   final String dieta;
@@ -23,4 +25,26 @@ class DatosAnimal {
     required this.estadoConservacion,
     required this.narracionAudioguia,
   });
+
+  /// Retorna la curiosidad localizada si existe en el diccionario activo, o la versión por defecto.
+  String getCuriosidad(String animalNombre) {
+    final key = '${animalNombre}_curiosidad';
+    final trad = IdiomaService.tr(key);
+    return trad != key ? trad : curiosidad;
+  }
+
+  /// Retorna el comportamiento localizado si existe en el diccionario activo, o la versión por defecto.
+  String getComportamiento(String animalNombre) {
+    final key = '${animalNombre}_comportamiento';
+    final trad = IdiomaService.tr(key);
+    return trad != key ? trad : comportamiento;
+  }
+
+  /// Retorna la narración de audioguía localizada si existe en el diccionario activo, o la versión por defecto.
+  String getNarracion(String animalNombre) {
+    final key = '${animalNombre}_audioguia';
+    final trad = IdiomaService.tr(key);
+    return trad != key ? trad : narracionAudioguia;
+  }
 }
+

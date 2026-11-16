@@ -28,7 +28,7 @@ void main() {
 
     test('Verifica los accesos, entradas, salidas, estacionamientos y juegos', () {
       final accesos = AnimalService.instance.obtenerAccesos();
-      expect(accesos.length, equals(5));
+      expect(accesos.length, equals(8));
 
       final ids = accesos.map((a) => a.id).toList();
       expect(ids, containsAll(['ENT_01', 'SAL_01', 'EST_01', 'EST_02', 'JUE_01']));
@@ -172,7 +172,6 @@ void main() {
       await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.byType(PantallaMapa), findsOneWidget);
-      expect(find.text('Regresar'), findsOneWidget);
       expect(find.text('SOS'), findsOneWidget);
       expect(find.text('Tus Exploraciones'), findsOneWidget);
       expect(find.text('Explorar'), findsOneWidget);
