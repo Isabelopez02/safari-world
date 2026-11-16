@@ -210,7 +210,7 @@ class IdiomaService extends ChangeNotifier {
       'modo_facil': 'Modo Fácil',
       'letra_grande_sub': 'Letra grande y lectura guiada',
       'salir': 'Salir',
-      'volver_al_menu': '← Volver al Menú',
+      'volver_al_menu': 'Volver al Menú',
       'salir_modo_facil': 'Salir del Modo Fácil\n(Modo Normal)',
       'bienvenido_parque': '¡Bienvenido al Parque! 🦁',
       'bienvenido_sub':
@@ -442,7 +442,7 @@ class IdiomaService extends ChangeNotifier {
       'modo_facil': 'Easy Mode',
       'letra_grande_sub': 'Large print & voice guidance',
       'salir': 'Exit',
-      'volver_al_menu': '← Back to Menu',
+      'volver_al_menu': 'Back to Menu',
       'salir_modo_facil': 'Exit Easy Mode\n(Normal Mode)',
       'bienvenido_parque': 'Welcome to the Zoo! 🦁',
       'bienvenido_sub':
@@ -694,7 +694,7 @@ class IdiomaService extends ChangeNotifier {
       'modo_facil': 'Ch\'uya Ñan',
       'letra_grande_sub': 'Hatun sananpa, simiwan willasqa',
       'salir': 'Lluqsiy',
-      'volver_al_menu': '← Kutiy Muyuman',
+      'volver_al_menu': 'Kutiy Muyuman',
       'salir_modo_facil': 'Lluqsiy Ch\'uya Ñanmanta\n(Tukuy Ñan)',
       'bienvenido_parque': '¡Allin hamusqayki Parkiman! 🦁',
       'bienvenido_sub':
@@ -946,7 +946,7 @@ class IdiomaService extends ChangeNotifier {
       'modo_facil': 'Modo Fácil',
       'letra_grande_sub': 'Jach’a qillqanaka, aruwan uñacht’äwi',
       'salir': 'Mistuña',
-      'volver_al_menu': '← Menu-ru Kutiña',
+      'volver_al_menu': 'Menu-ru Kutiña',
       'salir_modo_facil': 'Modo Fácil-tat mistuña\n(Modo Normal)',
       'bienvenido_parque': '¡Suma purt’äwix Parkiru! 🦁',
       'bienvenido_sub':

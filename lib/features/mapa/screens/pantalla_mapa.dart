@@ -126,19 +126,14 @@ class _PantallaMapaState extends State<PantallaMapa>
     AccesibilidadService.instance.addListener(_onAccesibilidadChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _centrarEnUbicacionInicial(false);
       if (widget.habitatInicial != null) {
         _enfocarYTrazarDestino(widget.habitatInicial!);
       } else if (widget.animalIdInicial != null) {
-        final matches = marcadores.where((m) => m.id == widget.animalIdInicial);
-        if (matches.isNotEmpty) {
-          _mostrarInfoMarcador(matches.first);
-          if (widget.modoFacil) {
-            setState(() => _isNavigating = true);
-            _routeProgressController.forward(from: 0);
-          }
-        }
-      } else if (widget.abrirExploracionesAlCargar) {
+        _enfocarYTrazarDestino(widget.animalIdInicial!);
+      } else {
+        _centrarEnUbicacionInicial(false);
+      }
+      if (widget.abrirExploracionesAlCargar) {
         _mostrarAnimalesPorVisitar(context);
       } else if (!widget.modoFacil) {
         _checkTutorial();
@@ -157,30 +152,33 @@ class _PantallaMapaState extends State<PantallaMapa>
         if (widget.habitatInicial != null) {
           _enfocarYTrazarDestino(widget.habitatInicial!);
         } else if (widget.animalIdInicial != null) {
-          final matches = marcadores.where((m) => m.id == widget.animalIdInicial);
-          if (matches.isNotEmpty) {
-            _mostrarInfoMarcador(matches.first);
-            if (widget.modoFacil) {
-              setState(() => _isNavigating = true);
-              _routeProgressController.forward(from: 0);
-            }
-          }
+          _enfocarYTrazarDestino(widget.animalIdInicial!);
         }
       });
     }
   }
 
-  /// Traza y enfoca automáticamente un destino (escenario, animal o hábitat)
+  /// Traza y enfoca automáticamente un destino (escenario, animal, baño o hábitat)
   void _enfocarYTrazarDestino(String destino) {
-    final destLower = destino.toLowerCase();
+    final destLower = destino.toLowerCase().trim();
 
-    // 0. Puntos de encuentro y auxilio (desde ¿Te perdiste?)
+    // 0. Puntos de encuentro y auxilio (desde ¿Te perdiste?, Tópico Médico o SOS)
     if (destLower.contains('encuentro') ||
         destLower.contains('ayuda') ||
         destLower.contains('perdiste') ||
-        destLower.contains('auxilio')) {
-      final puntosAyuda = accesos.where((a) => a.tipoServicio == 'ayuda').toList();
+        destLower.contains('auxilio') ||
+        destLower.contains('topico') ||
+        destLower.contains('tópico') ||
+        destLower == 'ayuda_02' ||
+        destLower == 'ayuda_01') {
+      final puntosAyuda = accesos.where((a) {
+        if (destLower == 'ayuda_02' || destLower == 'ayuda_01') {
+          return a.id.toLowerCase() == destLower;
+        }
+        return a.tipoServicio == 'ayuda' || a.id.toUpperCase().startsWith('AYUDA');
+      }).toList();
       if (puntosAyuda.isNotEmpty) {
+        final target = puntosAyuda.first;
         setState(() {
           _serviciosFiltrados = List.from(puntosAyuda);
           _indiceServicioActual = 0;
@@ -188,7 +186,7 @@ class _PantallaMapaState extends State<PantallaMapa>
           _chipUrgencia = ChipUrgenciaMapa.ninguno;
           _filtroServicio = FiltroServicioMapa.todos;
         });
-        _mostrarInfoMarcador(puntosAyuda.first, sincronizarCarrusel: false);
+        _mostrarInfoMarcador(target, sincronizarCarrusel: false);
         setState(() {
           _isNavigating = true;
         });
@@ -199,7 +197,7 @@ class _PantallaMapaState extends State<PantallaMapa>
 
     // 1. Buscar si coincide directamente con el ID de un animal / marcador (ej. 'C05', 'S03', 'I02', 'C08')
     final porId = marcadores.where(
-      (m) => m.id.toLowerCase() == destino.trim().toLowerCase(),
+      (m) => m.id.toLowerCase() == destLower,
     );
     if (porId.isNotEmpty) {
       final marcador = porId.first;
@@ -214,12 +212,73 @@ class _PantallaMapaState extends State<PantallaMapa>
       return;
     }
 
-    // 1.1 Buscar en accesos y paradas clave
+    // 1.1 Buscar en accesos, salidas y entradas (ej. 'SAL_01', 'ENT_01')
     final porAcceso = accesos.where(
-      (a) => a.id.toLowerCase() == destino.trim().toLowerCase(),
+      (a) => a.id.toLowerCase() == destLower || a.nombre.toLowerCase().contains(destLower),
     );
     if (porAcceso.isNotEmpty) {
       final marcador = porAcceso.first;
+      setState(() {
+        _habitatFiltro = null;
+      });
+      _mostrarInfoMarcador(marcador);
+      setState(() {
+        _isNavigating = true;
+      });
+      _routeProgressController.forward(from: 0);
+      return;
+    }
+
+    // 1.2 Buscar en baños del zoológico (ej. 'B01', 'B02', 'baño')
+    final porBanio = banios.where(
+      (b) => b.id.toLowerCase() == destLower || b.nombre.toLowerCase().contains(destLower),
+    );
+    if (porBanio.isNotEmpty) {
+      final marcador = porBanio.first;
+      setState(() {
+        _mostrarBanios = true;
+        _chipUrgencia = ChipUrgenciaMapa.banios;
+        _filtroServicio = FiltroServicioMapa.banio;
+        _habitatFiltro = null;
+      });
+      _mostrarInfoMarcador(marcador);
+      setState(() {
+        _isNavigating = true;
+      });
+      _routeProgressController.forward(from: 0);
+      return;
+    }
+
+    // 1.3 Buscar en zonas de calma
+    final porCalma = zonasCalma.where(
+      (c) => c.id.toLowerCase() == destLower || c.nombre.toLowerCase().contains(destLower),
+    );
+    if (porCalma.isNotEmpty) {
+      final marcador = porCalma.first;
+      setState(() {
+        _mostrarZonasCalma = true;
+        _chipUrgencia = ChipUrgenciaMapa.ninguno;
+        _filtroServicio = FiltroServicioMapa.calma;
+        _habitatFiltro = null;
+      });
+      _mostrarInfoMarcador(marcador);
+      setState(() {
+        _isNavigating = true;
+      });
+      _routeProgressController.forward(from: 0);
+      return;
+    }
+
+    // 1.4 Buscar animal por coincidencia de nombre
+    final porNombre = marcadores.where(
+      (m) => m.nombre.toLowerCase().contains(destLower) ||
+             destLower.contains(m.nombre.toLowerCase()),
+    );
+    if (porNombre.isNotEmpty) {
+      final marcador = porNombre.first;
+      setState(() {
+        _habitatFiltro = marcador.habitat;
+      });
       _mostrarInfoMarcador(marcador);
       setState(() {
         _isNavigating = true;
@@ -537,8 +596,8 @@ class _PantallaMapaState extends State<PantallaMapa>
     );
     setState(() {
       _marcadorSeleccionado = marcador;
-      // Previsualizar marcador sin bloquearlo de inmediato en navegación
-      _isNavigating = false;
+      // En modo fácil la navegación se activa de inmediato para dibujar el sendero
+      _isNavigating = widget.modoFacil;
       _rutaActual = nuevaRuta;
       _rutaSvgActual = rutaSvg;
 

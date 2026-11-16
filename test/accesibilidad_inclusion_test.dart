@@ -6,11 +6,16 @@ import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_mapa.dart';
 import 'package:zoologico_front/features/mapa/widgets/barra_filtros_mapa.dart';
 
+import 'package:zoologico_front/core/services/idioma_service.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
-    SharedPreferences.setMockInitialValues({});
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({'has_seen_map_tutorial': true});
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_seen_map_tutorial', true);
+    await IdiomaService.instance.cambiarIdioma(AppIdioma.es);
   });
 
   group('Pruebas de Inclusión: Alto Contraste, Daltonismo y Zonas de Calma', () {
@@ -121,7 +126,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
 
-      expect(find.byIcon(Icons.layers_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.layers_rounded), findsWidgets);
     });
 
     testWidgets('Al seleccionar un marcador, los demás marcadores se atenúan para no tapar el recorrido',

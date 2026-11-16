@@ -133,7 +133,7 @@ void main() {
   });
 
   group('Pruebas de Modo Fácil y Footer en Modo Fácil y Modo Animal', () {
-    testWidgets('PantallaModoFacil tiene barra superior con botón de idioma y salir',
+    testWidgets('PantallaModoFacil tiene barra superior limpia sin botón de idioma ES ni Salir',
         (WidgetTester tester) async {
       tester.view.physicalSize = const Size(400, 900);
       tester.view.devicePixelRatio = 1.0;
@@ -151,11 +151,21 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.text('Modo Fácil'), findsOneWidget);
-      expect(find.text('Salir'), findsOneWidget);
-      expect(find.text('🇵🇪 ES'), findsOneWidget);
+      expect(find.text('🇵🇪 ES'), findsNothing);
+      expect(find.widgetWithText(ElevatedButton, 'Salir'), findsNothing);
 
-      // Botón Salir funciona
-      await tester.tap(find.text('Salir'));
+      // Ir a Ayuda para salir
+      await tester.tap(find.text('Ayuda'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.drag(find.byType(ListView), const Offset(0, -700));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Botón Salir en Ayuda funciona
+      final btnSalir = find.textContaining('Salir al Modo Normal');
+      expect(btnSalir, findsOneWidget);
+      await tester.tap(btnSalir);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
       expect(salio, isTrue);
@@ -206,12 +216,26 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
-      // Comprobar actualización de textos en modo fácil
-      expect(find.text('☀️ AY'), findsOneWidget);
-      expect(find.text('Mistuña'), findsOneWidget); // Salir en Aimara
+      // Comprobar actualización de textos en modo fácil en menú y footer
       expect(find.text('Qallta'), findsOneWidget); // Inicio en Aimara
       expect(find.text('Uywanaka'), findsOneWidget); // Animales en Aimara
       expect(find.text('Yanapt’a'), findsOneWidget); // Ayuda en Aimara
+
+      // Scroll para ver la tarjeta de cambiar idioma en el menú
+      await tester.drag(find.byType(ListView), const Offset(0, -350));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.textContaining('Aru Mayjt’ayaña'), findsOneWidget); // Cambiar Idioma en tarjeta del menú
+
+      // Verificar que el botón de Salir ('Mistuña') se encuentra en la pantalla de Ayuda exclusiva
+      final ayudaTab = find.text('Yanapt’a');
+      await tester.tap(ayudaTab);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.drag(find.byType(ListView), const Offset(0, -700));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.textContaining('Mistuña'), findsWidgets); // Salir en Aimara dentro de Ayuda
     });
 
     testWidgets('PantallaDetalleAnimal (Modo Animal) incluye FooterNavegacion en la parte inferior',
@@ -265,7 +289,8 @@ void main() {
 
       // Tocar el botón de micrófono
       await tester.tap(micIcon.first);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Verificar que el modal de búsqueda por voz se abre
       expect(find.text('Búsqueda por Voz'), findsNWidgets(2));
@@ -294,12 +319,114 @@ void main() {
       expect(sosIcon, findsWidgets);
 
       await tester.tap(sosIcon.first);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Verificar que se activa el protocolo SOS con alerta visible
       expect(find.text('¡ALERTA SOS ACTIVADA!'), findsOneWidget);
       expect(find.text('Desactivar Alerta SOS'), findsOneWidget);
       expect(find.textContaining('Tópico'), findsWidgets);
+    });
+
+    testWidgets('Encabezado superior de Modo Fácil NO contiene selector de idioma ES ni botón Salir',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
+      await IdiomaService.instance.cambiarIdioma(AppIdioma.es);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PantallaModoFacil(
+            onSalirModoFacil: () {},
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // 1. En el encabezado superior NO debe existir 'ES' ni dropdown de bandera
+      expect(find.text('🇪🇸 ES'), findsNothing);
+      expect(find.byIcon(Icons.arrow_drop_down_rounded), findsNothing);
+
+      // 2. En el encabezado superior NO debe existir botón Salir
+      expect(find.widgetWithText(ElevatedButton, 'Salir'), findsNothing);
+      expect(find.byIcon(Icons.close_rounded), findsNothing);
+
+      // 3. El botón Salir debe existir únicamente dentro de Ayuda
+      final tabAyuda = find.text('Ayuda');
+      await tester.tap(tabAyuda);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.drag(find.byType(ListView), const Offset(0, -700));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.textContaining('Salir al Modo Normal'), findsOneWidget);
+    });
+
+    testWidgets('Al abrir Mapa desde Modo Fácil, solo aparece un único botón de Volver al Menú',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
+      await IdiomaService.instance.cambiarIdioma(AppIdioma.es);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PantallaModoFacil(
+            onSalirModoFacil: () {},
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Ir al mapa fácil
+      final tabMapa = find.text('Mapa');
+      await tester.tap(tabMapa);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verificar que 'Volver al Menú' aparece EXACTAMENTE una vez (no duplicado)
+      expect(find.text('Volver al Menú'), findsOneWidget);
+    });
+
+    testWidgets('Búsqueda por voz ejecuta trazado de ruta en el mapa real',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
+      await IdiomaService.instance.cambiarIdioma(AppIdioma.es);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PantallaModoFacil(
+            onSalirModoFacil: () {},
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Abrir modal de búsqueda por voz
+      final micIcon = find.byIcon(Icons.mic_rounded);
+      await tester.tap(micIcon.first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Tocar el chip de Leones
+      final chipLeones = find.text('🦁 Leones');
+      expect(chipLeones, findsOneWidget);
+      await tester.tap(chipLeones);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verificar que se encuentra en la vista del mapa con navegación activa
+      expect(find.text('Volver al Menú'), findsOneWidget);
+      expect(find.textContaining('Leones'), findsWidgets);
     });
   });
 }

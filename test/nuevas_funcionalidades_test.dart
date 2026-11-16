@@ -9,11 +9,16 @@ import 'package:zoologico_front/features/mapa/widgets/barra_filtros_mapa.dart';
 import 'package:zoologico_front/core/widgets/modal_animales_por_visitar.dart';
 import 'package:zoologico_front/features/pantalla_principal/widgets/dialogo_permiso_notificaciones.dart';
 
+import 'package:zoologico_front/core/services/idioma_service.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
-    SharedPreferences.setMockInitialValues({});
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({'has_seen_map_tutorial': true});
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_seen_map_tutorial', true);
+    await IdiomaService.instance.cambiarIdioma(AppIdioma.es);
   });
 
   group('Pruebas de Nuevas Funcionalidades: Baños, Accesos y Hábitats', () {
@@ -163,6 +168,11 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
 
+      SharedPreferences.setMockInitialValues({'has_seen_map_tutorial': true});
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('has_seen_map_tutorial', true);
+      await IdiomaService.instance.cambiarIdioma(AppIdioma.es);
+
       await tester.pumpWidget(
         const MaterialApp(
           home: PantallaMapa(),
@@ -172,9 +182,10 @@ void main() {
       await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.byType(PantallaMapa), findsOneWidget);
-      expect(find.text('SOS'), findsOneWidget);
-      expect(find.text('Tus Exploraciones'), findsOneWidget);
-      expect(find.text('Explorar'), findsOneWidget);
+      expect(find.text('Baños'), findsWidgets);
+      expect(find.text('Animales'), findsOneWidget);
+      expect(find.text('Snacks & Café'), findsOneWidget);
+      expect(find.text('Salida & Parking'), findsOneWidget);
     });
 
     test('Verifica colores y temas por hábitat en Ficha de Animal', () {

@@ -648,27 +648,38 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
     );
   }
 
+  String _quitarAcentos(String s) {
+    return s
+        .toLowerCase()
+        .replaceAll('á', 'a')
+        .replaceAll('é', 'e')
+        .replaceAll('í', 'i')
+        .replaceAll('ó', 'o')
+        .replaceAll('ú', 'u')
+        .replaceAll('ü', 'u');
+  }
+
   void _procesarResultadoVoz(String consulta, BuildContext modalContext) {
     if (Navigator.of(modalContext).canPop()) {
       Navigator.of(modalContext).pop();
     }
-    final q = consulta.toLowerCase().trim();
+    final q = _quitarAcentos(consulta.trim());
 
     // 1. Caso Baños
-    if (q.contains('baño') || q.contains('servicio') || q.contains('sshh') || q.contains('sanitario')) {
+    if (q.contains('bano') || q.contains('servicio') || q.contains('sshh') || q.contains('sanitario') || q.contains('wc')) {
       AudioGuiaService.instance.reproducir('Localizando baños en el mapa real.');
       _irAlMapaConRuta(animalId: 'B01');
       return;
     }
 
-    // 2. Caso Tópico / Auxilio
-    if (q.contains('topico') || q.contains('tópico') || q.contains('medico') || q.contains('médico') || q.contains('auxilio')) {
+    // 2. Caso Tópico / Médico / Auxilio
+    if (q.contains('topico') || q.contains('medico') || q.contains('auxilio') || q.contains('primeros auxilios')) {
       AudioGuiaService.instance.reproducir('Trazando sendero hacia el Tópico Médico.');
       _irAlMapaConRuta(animalId: 'AYUDA_02');
       return;
     }
 
-    // 3. Caso Salida / Entrada
+    // 3. Caso Salida / Entrada / Puerta
     if (q.contains('salida') || q.contains('salir') || q.contains('puerta')) {
       AudioGuiaService.instance.reproducir('Trazando sendero hacia la Salida Principal.');
       _irAlMapaConRuta(animalId: 'SAL_01');
@@ -677,7 +688,7 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
 
     // 4. Buscar animal por nombre en marcadoresZoologico
     for (final m in marcadoresZoologico) {
-      final nom = m.nombre.toLowerCase();
+      final nom = _quitarAcentos(m.nombre);
       if (nom.contains(q) || q.contains(nom)) {
         AudioGuiaService.instance.reproducir('Encontrado: ${m.nombre.tr}. Trazando sendero en el mapa.');
         _irAlMapaConRuta(animalId: m.id);
@@ -687,8 +698,8 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
 
     // Por palabra clave de animal
     for (final m in marcadoresZoologico) {
-      for (final palabra in m.nombre.toLowerCase().split(' ')) {
-        if (palabra.length > 3 && q.contains(palabra)) {
+      for (final palabra in _quitarAcentos(m.nombre).split(' ')) {
+        if (palabra.length > 3 && (q.contains(palabra) || palabra.contains(q))) {
           AudioGuiaService.instance.reproducir('Encontrado: ${m.nombre.tr}. Trazando sendero en el mapa.');
           _irAlMapaConRuta(animalId: m.id);
           return;
@@ -696,41 +707,17 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
       }
     }
 
+    // Por hábitats
+    for (final habitat in ['Zona Costa', 'Zona Sierra', 'Zona Selva', 'Zona Internacional', 'Granja Interactiva']) {
+      if (q.contains(_quitarAcentos(habitat))) {
+        AudioGuiaService.instance.reproducir('Mostrando $habitat en el mapa.');
+        _irAlMapaConRuta(habitat: habitat);
+        return;
+      }
+    }
+
     AudioGuiaService.instance.reproducir('Mostrando mapa general.');
     _irAlMapaConRuta();
-  }
-
-  Widget _buildBotonIdiomaEncabezado() {
-    return InkWell(
-      onTap: () {
-        SoundService.instance.playButtonTap();
-        _mostrarModalIdiomaFacil(context);
-      },
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF1F5F9),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFCBD5E1), width: 1.2),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              IdiomaService.instance.banderaIdioma,
-              style: GoogleFonts.urbanist(
-                fontSize: 12,
-                fontWeight: FontWeight.w900,
-                color: AppColors.textoOscuro,
-              ),
-            ),
-            const SizedBox(width: 2),
-            const Icon(Icons.arrow_drop_down_rounded, size: 16, color: AppColors.textoOscuro),
-          ],
-        ),
-      ),
-    );
   }
 
   /// Barra superior fija que jamás desaparece al hacer scroll
@@ -738,7 +725,7 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
     final esMenu = _vistaActual == SubVistaModoFacil.menuPrincipal && _animalEscaneado == null;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(
@@ -766,7 +753,7 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                   ),
                   child: const Text('👵', style: TextStyle(fontSize: 20)),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -777,7 +764,7 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.urbanist(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w900,
                           color: AppColors.verdePrincipal,
                           letterSpacing: 0.4,
@@ -788,7 +775,7 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.urbanist(
-                          fontSize: 10.5,
+                          fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textoGris,
                         ),
@@ -796,42 +783,15 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 6),
                 _buildBotonVozEncabezado(),
-                const SizedBox(width: 4),
+                const SizedBox(width: 6),
                 _buildBotonSosEncabezado(),
-                const SizedBox(width: 4),
-                _buildBotonIdiomaEncabezado(),
-                const SizedBox(width: 4),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    SoundService.instance.playButtonTap();
-                    AudioGuiaService.instance.detener();
-                    widget.onSalirModoFacil();
-                  },
-                  icon: const Icon(Icons.exit_to_app_rounded, size: 14, color: Colors.white),
-                  label: Text(
-                    'salir'.tr,
-                    style: GoogleFonts.urbanist(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC62828),
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    elevation: 0,
-                  ),
-                ),
               ],
             )
           : Row(
               children: [
-                // 1. BOTÓN GIGANTE VOLVER AL MENÚ (NUNCA SE CONFUNDE)
+                // 1. BOTÓN ÚNICO VOLVER AL MENÚ (NUNCA DUPLICADO)
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
@@ -842,13 +802,13 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                         _vistaActual = SubVistaModoFacil.menuPrincipal;
                       });
                     },
-                    icon: const Icon(Icons.arrow_back_rounded, size: 22, color: Colors.white),
+                    icon: const Icon(Icons.arrow_back_rounded, size: 20, color: Colors.white),
                     label: Text(
                       'volver_al_menu'.tr,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.urbanist(
-                        fontSize: 14,
+                        fontSize: 15,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
                       ),
@@ -860,32 +820,14 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                         borderRadius: BorderRadius.circular(12),
                         side: const BorderSide(color: Color(0xFF334155), width: 1.5),
                       ),
-                      elevation: 3,
+                      elevation: 2,
                     ),
                   ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 8),
                 _buildBotonVozEncabezado(),
-                const SizedBox(width: 4),
+                const SizedBox(width: 6),
                 _buildBotonSosEncabezado(),
-                const SizedBox(width: 4),
-                _buildBotonIdiomaEncabezado(),
-                const SizedBox(width: 4),
-                // 2. BOTÓN SALIR DEL MODO FÁCIL AL MODO ESTÁNDAR COMPACTO
-                IconButton(
-                  onPressed: () {
-                    SoundService.instance.playButtonTap();
-                    AudioGuiaService.instance.detener();
-                    widget.onSalirModoFacil();
-                  },
-                  icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFFC62828)),
-                  tooltip: 'salir_modo_facil'.tr,
-                  style: IconButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFEBEE),
-                    padding: const EdgeInsets.all(6),
-                    minimumSize: const Size(32, 32),
-                  ),
-                ),
               ],
             ),
     );
@@ -1702,7 +1644,7 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
       animalIdInicial: _destinoAnimalId,
       habitatInicial: _destinoHabitat,
       claveNavegacion: _claveNavegacionMapa,
-      onVolverMenuFacil: () => _cambiarVista(SubVistaModoFacil.menuPrincipal),
+      onVolverMenuFacil: null, // El encabezado superior ya tiene el botón 'Volver al Menú', evitando duplicarlo
     );
   }
 
@@ -2312,6 +2254,90 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                   label: Text(
                     '🗺️ Ver Módulo de Guardaparques en el Mapa',
                     style: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w800, color: const Color(0xFF1565C0)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 18),
+
+        // ==========================================
+        // 4. SALIR DEL MODO FÁCIL (EXCLUSIVO EN ESTA PANTALLA)
+        // ==========================================
+        Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFEBEE),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: const Color(0xFFEF9A9A), width: 1.8),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFC62828).withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.exit_to_app_rounded, color: Color(0xFFC62828), size: 26),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'salir_modo_facil'.tr,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: const Color(0xFFC62828),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Volver a la vista completa estándar del zoológico con letra y controles regulares.',
+                style: GoogleFonts.urbanist(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.grey.shade800,
+                  height: 1.3,
+                ),
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    SoundService.instance.playButtonTap();
+                    AudioGuiaService.instance.detener();
+                    widget.onSalirModoFacil();
+                  },
+                  icon: const Icon(Icons.exit_to_app_rounded, color: Colors.white, size: 22),
+                  label: Text(
+                    '${'salir'.tr} al Modo Normal',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFC62828),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 3,
                   ),
                 ),
               ),
