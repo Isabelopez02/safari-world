@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'ruta_painter.dart';
 
 /// Componente visual reutilizable para renderizar los trazos vectoriales del zoológico

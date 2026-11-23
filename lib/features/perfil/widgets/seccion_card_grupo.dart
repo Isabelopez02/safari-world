@@ -43,9 +43,7 @@ class SeccionCardGrupo extends StatelessWidget {
               ),
             ],
           ),
-          child: Column(
-            children: children,
-          ),
+          child: Column(children: children),
         ),
       ],
     );

@@ -48,9 +48,18 @@ class ModalInsigniasPerfil extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: const [
-              Text('🦁 Rey León', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-              Text('🐬 Acróbata', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-              Text('🚜 Granjero', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+              Text(
+                '🦁 Rey León',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '🐬 Acróbata',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '🚜 Granjero',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
           const SizedBox(height: 20),

@@ -83,12 +83,8 @@ class SelectorIdiomaPerfil extends StatelessWidget {
               subtitulo: 'Predeterminado (Perú)',
               bandera: '🇵🇪',
               seleccionado: idiomaActual == AppIdioma.es,
-              onTap: () => _seleccionarIdioma(
-                context,
-                AppIdioma.es,
-                'Español',
-                '🇵🇪',
-              ),
+              onTap: () =>
+                  _seleccionarIdioma(context, AppIdioma.es, 'Español', '🇵🇪'),
             ),
             const Divider(height: 1, indent: 56),
             _buildOpcionIdioma(
@@ -96,12 +92,8 @@ class SelectorIdiomaPerfil extends StatelessWidget {
               subtitulo: 'International tourists',
               bandera: '🇺🇸',
               seleccionado: idiomaActual == AppIdioma.en,
-              onTap: () => _seleccionarIdioma(
-                context,
-                AppIdioma.en,
-                'English',
-                '🇺🇸',
-              ),
+              onTap: () =>
+                  _seleccionarIdioma(context, AppIdioma.en, 'English', '🇺🇸'),
             ),
             const Divider(height: 1, indent: 56),
             _buildOpcionIdioma(
@@ -169,8 +161,9 @@ class SelectorIdiomaPerfil extends StatelessWidget {
                     titulo,
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
-                      fontWeight:
-                          seleccionado ? FontWeight.w900 : FontWeight.w700,
+                      fontWeight: seleccionado
+                          ? FontWeight.w900
+                          : FontWeight.w700,
                       color: AppColors.textoOscuro,
                     ),
                   ),

@@ -20,7 +20,9 @@ import '../widgets/dialogo_permiso_notificaciones.dart';
 import '../widgets/encabezado_sutil.dart';
 import '../widgets/footer_navegacion.dart';
 import '../widgets/modal_te_perdiste.dart';
+
 import 'package:zoologico_front/core/widgets/modal_tiendas_cercanas.dart';
+
 import '../widgets/progreso_circular_animales.dart';
 
 class PantallaPrincipal extends StatefulWidget {
@@ -95,7 +97,8 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 
             final now = DateTime.now();
             if (_lastBackPressTime == null ||
-                now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
+                now.difference(_lastBackPressTime!) >
+                    const Duration(seconds: 2)) {
               _lastBackPressTime = now;
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
               ScaffoldMessenger.of(context).showSnackBar(
@@ -195,9 +198,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
         const SizedBox(height: 14),
 
         // 2. BANNER BONITO DESTACADO
-        BannerBonito(
-          onTap: () => setState(() => _tabActual = 2),
-        ),
+        BannerBonito(onTap: () => setState(() => _tabActual = 2)),
 
         const SizedBox(height: 20),
 
@@ -281,7 +282,11 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
           ),
           child: Row(
             children: [
-              const Icon(Icons.search_rounded, color: AppColors.verdePrincipal, size: 22),
+              const Icon(
+                Icons.search_rounded,
+                color: AppColors.verdePrincipal,
+                size: 22,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -299,7 +304,11 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                   color: AppColors.verdePrincipal.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.tune_rounded, color: AppColors.verdePrincipal, size: 18),
+                child: const Icon(
+                  Icons.tune_rounded,
+                  color: AppColors.verdePrincipal,
+                  size: 18,
+                ),
               ),
             ],
           ),
@@ -309,13 +318,14 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   }
 
   void _mostrarBuscadorHome(BuildContext context) {
+    final TextEditingController searchCtrl = TextEditingController();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (modalContext) {
         String query = '';
-        final TextEditingController searchCtrl = TextEditingController();
 
         return StatefulBuilder(
           builder: (ctx, setModalState) {
@@ -378,10 +388,16 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                                 fontWeight: FontWeight.w600,
                                 color: Colors.grey.shade400,
                               ),
-                              prefixIcon: const Icon(Icons.search_rounded, color: AppColors.verdePrincipal),
+                              prefixIcon: const Icon(
+                                Icons.search_rounded,
+                                color: AppColors.verdePrincipal,
+                              ),
                               suffixIcon: query.isNotEmpty
                                   ? IconButton(
-                                      icon: const Icon(Icons.clear_rounded, size: 20),
+                                      icon: const Icon(
+                                        Icons.clear_rounded,
+                                        size: 20,
+                                      ),
                                       onPressed: () {
                                         searchCtrl.clear();
                                         setModalState(() => query = '');
@@ -390,7 +406,10 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                                   : null,
                               filled: true,
                               fillColor: const Color(0xFFF1F5F9),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
                                 borderSide: BorderSide.none,
@@ -428,14 +447,46 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                                 spacing: 8,
                                 runSpacing: 8,
                                 children: [
-                                  _buildChipBusquedaRapida('🦁 Leones', 'I02', modalContext),
-                                  _buildChipBusquedaRapida('🐧 Pingüinos', 'C08', modalContext),
-                                  _buildChipBusquedaRapida('🦅 Cóndor', 'S03', modalContext),
-                                  _buildChipBusquedaRapida('🦒 Jirafa', 'I12', modalContext),
-                                  _buildChipBusquedaRapida('🚻 Baño', 'B01', modalContext),
-                                  _buildChipBusquedaRapida('🚪 Salida', 'SAL_01', modalContext),
-                                  _buildChipBusquedaRapida('🚑 Tópico Médico', 'AYUDA_02', modalContext),
-                                  _buildChipBusquedaRapida('🎠 Zona de Juegos', 'JUE_01', modalContext),
+                                  _buildChipBusquedaRapida(
+                                    '🦁 Leones',
+                                    'I02',
+                                    modalContext,
+                                  ),
+                                  _buildChipBusquedaRapida(
+                                    '🐧 Pingüinos',
+                                    'C08',
+                                    modalContext,
+                                  ),
+                                  _buildChipBusquedaRapida(
+                                    '🦅 Cóndor',
+                                    'S03',
+                                    modalContext,
+                                  ),
+                                  _buildChipBusquedaRapida(
+                                    '🦒 Jirafa',
+                                    'I12',
+                                    modalContext,
+                                  ),
+                                  _buildChipBusquedaRapida(
+                                    '🚻 Baño',
+                                    'B01',
+                                    modalContext,
+                                  ),
+                                  _buildChipBusquedaRapida(
+                                    '🚪 Salida',
+                                    'SAL_01',
+                                    modalContext,
+                                  ),
+                                  _buildChipBusquedaRapida(
+                                    '🚑 Tópico Médico',
+                                    'AYUDA_02',
+                                    modalContext,
+                                  ),
+                                  _buildChipBusquedaRapida(
+                                    '🎠 Zona de Juegos',
+                                    'JUE_01',
+                                    modalContext,
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 20),
@@ -453,94 +504,129 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                                 runSpacing: 8,
                                 children: [
                                   _buildChipHabitat('Zona Costa', modalContext),
-                                  _buildChipHabitat('Zona Sierra', modalContext),
+                                  _buildChipHabitat(
+                                    'Zona Sierra',
+                                    modalContext,
+                                  ),
                                   _buildChipHabitat('Zona Selva', modalContext),
-                                  _buildChipHabitat('Zona Internacional', modalContext),
-                                  _buildChipHabitat('Granja Interactiva', modalContext),
+                                  _buildChipHabitat(
+                                    'Zona Internacional',
+                                    modalContext,
+                                  ),
+                                  _buildChipHabitat(
+                                    'Granja Interactiva',
+                                    modalContext,
+                                  ),
                                 ],
                               ),
                             ],
                           )
                         : (sugerencias.isEmpty
-                            ? Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(24.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(Icons.search_off_rounded, size: 48, color: Colors.grey),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        'No se encontraron lugares con "$query"',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.urbanist(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.grey.shade700,
+                              ? Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(24.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.search_off_rounded,
+                                          size: 48,
+                                          color: Colors.grey,
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          'No se encontraron lugares con "$query"',
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.urbanist(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.grey.shade700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : ListView.separated(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  itemCount: sugerencias.length,
+                                  separatorBuilder: (_, _) =>
+                                      const Divider(height: 1),
+                                  itemBuilder: (ctx, idx) {
+                                    final pin = sugerencias[idx];
+                                    final colorPin =
+                                        pin.colorZona ??
+                                        AppColors.verdePrincipal;
+                                    return ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundColor: colorPin.withValues(
+                                          alpha: 0.15,
+                                        ),
+                                        child: Icon(
+                                          pin.icono,
+                                          color: colorPin,
+                                          size: 22,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : ListView.separated(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                itemCount: sugerencias.length,
-                                separatorBuilder: (_, _) => const Divider(height: 1),
-                                itemBuilder: (ctx, idx) {
-                                  final pin = sugerencias[idx];
-                                  final colorPin = pin.colorZona ?? AppColors.verdePrincipal;
-                                  return ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundColor: colorPin.withValues(alpha: 0.15),
-                                      child: Icon(pin.icono, color: colorPin, size: 22),
-                                    ),
-                                    title: Text(
-                                      pin.nombre.tr,
-                                      style: GoogleFonts.urbanist(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w800,
-                                        color: AppColors.textoOscuro,
+                                      title: Text(
+                                        pin.nombre.tr,
+                                        style: GoogleFonts.urbanist(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w800,
+                                          color: AppColors.textoOscuro,
+                                        ),
                                       ),
-                                    ),
-                                    subtitle: Text(
-                                      pin.habitat.tr,
-                                      style: GoogleFonts.urbanist(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.grey.shade600,
+                                      subtitle: Text(
+                                        pin.habitat.tr,
+                                        style: GoogleFonts.urbanist(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey.shade600,
+                                        ),
                                       ),
-                                    ),
-                                    trailing: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.verdePrincipal.withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(Icons.navigation_rounded, size: 14, color: AppColors.verdePrincipal),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            'Ver en Mapa',
-                                            style: GoogleFonts.urbanist(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w800,
+                                      trailing: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 5,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.verdePrincipal
+                                              .withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(
+                                              Icons.navigation_rounded,
+                                              size: 14,
                                               color: AppColors.verdePrincipal,
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              'Ver en Mapa',
+                                              style: GoogleFonts.urbanist(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w800,
+                                                color: AppColors.verdePrincipal,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    onTap: () {
-                                      SoundService.instance.playButtonTap();
-                                      Navigator.of(modalContext).pop();
-                                      _irAlMapaConDestino(pin.id);
-                                    },
-                                  );
-                                },
-                              )),
+                                      onTap: () {
+                                        SoundService.instance.playButtonTap();
+                                        Navigator.of(modalContext).pop();
+                                        _irAlMapaConDestino(pin.id);
+                                      },
+                                    );
+                                  },
+                                )),
                   ),
                 ],
               ),
@@ -548,12 +634,20 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
           },
         );
       },
-    );
+    ).whenComplete(() => searchCtrl.dispose());
   }
 
-  Widget _buildChipBusquedaRapida(String etiqueta, String destinoId, BuildContext modalContext) {
+  Widget _buildChipBusquedaRapida(
+    String etiqueta,
+    String destinoId,
+    BuildContext modalContext,
+  ) {
     return ActionChip(
-      avatar: const Icon(Icons.location_on_rounded, size: 16, color: AppColors.verdePrincipal),
+      avatar: const Icon(
+        Icons.location_on_rounded,
+        size: 16,
+        color: AppColors.verdePrincipal,
+      ),
       label: Text(
         etiqueta,
         style: GoogleFonts.urbanist(

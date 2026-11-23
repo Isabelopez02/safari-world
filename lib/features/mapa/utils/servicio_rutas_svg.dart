@@ -1,6 +1,8 @@
 import 'dart:ui';
+
 import 'package:flutter/services.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
+
 import '../data/datos_trazos_svg.dart';
 
 export '../data/datos_trazos_svg.dart' show SegmentoTrazoSvg;
@@ -56,7 +58,9 @@ class ServicioRutasSvg {
   }
 
   /// Carga opcional desde asset en tiempo de ejecución
-  Future<void> cargarDesdeAsset([String assetPath = DatosTrazosSvg.assetPath]) async {
+  Future<void> cargarDesdeAsset([
+    String assetPath = DatosTrazosSvg.assetPath,
+  ]) async {
     try {
       final contenido = await rootBundle.loadString(assetPath);
       _inicializarGrafo(contenido);

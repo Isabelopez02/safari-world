@@ -1,0 +1,116 @@
+name: Flutter CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, correccion ]
+  pull_request:
+    branches: [ main, master, correccion ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ========================================================
+  # ETAPA 1: Control de Calidad Estático y Suite de Pruebas
+  # ========================================================
+  quality_checks:
+    name: Análisis Estático y Pruebas Automatizadas
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Clonar Repositorio
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configurar Entorno Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+
+      - name: 📦 Instalar Dependencias
+        run: flutter pub get
+
+      - name: 📐 Verificar Formato de Código (Dart Format)
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: 🔍 Análisis Estático Riguroso (Flutter Analyze)
+        run: flutter analyze --fatal-infos --fatal-warnings
+
+      - name: 🧪 Ejecutar Suite de Pruebas Automatizadas con Cobertura
+        run: flutter test --coverage
+
+      - name: 📊 Cargar Reporte de Cobertura de Pruebas
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-coverage-report
+          path: coverage/lcov.info
+          retention-days: 7
+
+  # ========================================================
+  # ETAPA 2: Compilación y Despliegue de Artefacto Web (Wasm)
+  # ========================================================
+  build_web:
+    name: Compilación WebAssembly (Flutter Web)
+    needs: quality_checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Clonar Repositorio
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configurar Entorno Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Instalar Dependencias
+        run: flutter pub get
+
+      - name: 🚀 Compilar Flutter Web con Wasm y Optimización O4
+        run: flutter build web --wasm --release -O4 --no-source-maps
+
+      - name: 📦 Cargar Artefacto Web Compilado
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-web-bundle
+          path: build/web
+          retention-days: 14
+
+  # ========================================================
+  # ETAPA 3: Compilación de Paquete Android (APK Release)
+  # ========================================================
+  build_android:
+    name: Compilación APK Android (Release)
+    needs: quality_checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Clonar Repositorio
+        uses: actions/checkout@v4
+
+      - name: ☕ Configurar Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: ⚙️ Configurar Entorno Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Instalar Dependencias
+        run: flutter pub get
+
+      - name: 📱 Compilar APK de Producción (Split per ABI)
+        run: flutter build apk --release --split-per-abi
+
+      - name: 📦 Cargar APKs Compiladas
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-apks
+          path: build/app/outputs/flutter-apk/*.apk
+          retention-days: 14

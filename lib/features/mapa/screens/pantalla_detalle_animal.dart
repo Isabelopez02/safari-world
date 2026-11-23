@@ -6,6 +6,7 @@ import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/services/audioguia_service.dart';
 import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
+
 import 'detalle_animal_movil.dart';
 import 'detalle_animal_tablet.dart';
 
@@ -218,13 +219,17 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
 
   void _toggleAudioguia(DatosAnimal datos) {
     SoundService.instance.playButtonTap();
-    AudioGuiaService.instance.toggleHablar(datos.getNarracion(widget.animal.nombre));
+    AudioGuiaService.instance.toggleHablar(
+      datos.getNarracion(widget.animal.nombre),
+    );
   }
 
   Future<void> _marcarVisitado() async {
     SoundService.instance.playButtonTap();
     final messenger = ScaffoldMessenger.of(context);
-    final nuevoEstado = await AnimalService.instance.toggleVisitado(widget.animal.id);
+    final nuevoEstado = await AnimalService.instance.toggleVisitado(
+      widget.animal.id,
+    );
     if (!mounted) return;
 
     if (nuevoEstado) {
@@ -248,13 +253,17 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
-        backgroundColor: nuevoEstado ? const Color(0xFF15803D) : Colors.grey.shade800,
+        backgroundColor: nuevoEstado
+            ? const Color(0xFF15803D)
+            : Colors.grey.shade800,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         content: Row(
           children: [
             Icon(
-              nuevoEstado ? Icons.check_circle_rounded : Icons.info_outline_rounded,
+              nuevoEstado
+                  ? Icons.check_circle_rounded
+                  : Icons.info_outline_rounded,
               color: Colors.white,
               size: 18,
             ),
@@ -281,7 +290,10 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
   Widget build(BuildContext context) {
     final datos = AnimalService.instance.obtenerDatos(widget.animal.nombre);
     final esVisitado = AnimalService.instance.esVisitado(widget.animal.id);
-    final theme = getHabitatTheme(widget.animal.habitat, widget.animal.colorZona);
+    final theme = getHabitatTheme(
+      widget.animal.habitat,
+      widget.animal.colorZona,
+    );
 
     return Stack(
       children: [
@@ -331,14 +343,20 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                         child: Transform.scale(
                           scale: _stampScaleAnimation.value,
                           child: Opacity(
-                            opacity: _stampOpacityAnimation.value.clamp(0.0, 1.0),
+                            opacity: _stampOpacityAnimation.value.clamp(
+                              0.0,
+                              1.0,
+                            ),
                             child: child,
                           ),
                         ),
                       );
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 18,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(22),
@@ -355,11 +373,15 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                         ],
                       ),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: const Color(0xFFC62828).withValues(alpha: 0.7),
+                            color: const Color(0xFFC62828)
+                                .withValues(alpha: 0.7),
                             width: 2.0,
                           ),
                         ),
@@ -408,7 +430,8 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
                               style: GoogleFonts.urbanist(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
-                                color: const Color(0xFFC62828).withValues(alpha: 0.85),
+                                color: const Color(0xFFC62828)
+                                    .withValues(alpha: 0.85),
                               ),
                             ),
                           ],

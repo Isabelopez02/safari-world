@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'pathfinding.dart';
 import '../../../../core/data/datos_marcadores.dart';
 
@@ -74,7 +75,8 @@ final GrafoZoolologico grafoMapa = () {
     ]) {
       final caminoNodo = grafo.nodos[caminoId];
       if (caminoNodo != null) {
-        final dist = (caminoNodo.posicion - Offset(marcador.x, marcador.y)).distance;
+        final dist =
+            (caminoNodo.posicion - Offset(marcador.x, marcador.y)).distance;
         if (dist < distMin) {
           distMin = dist;
           nodoMasCercano = caminoId;
@@ -134,7 +136,8 @@ final GrafoZoolologico grafoMapa = () {
     ]) {
       final caminoNodo = grafo.nodos[caminoId];
       if (caminoNodo != null) {
-        final dist = (caminoNodo.posicion - Offset(acceso.x, acceso.y)).distance;
+        final dist =
+            (caminoNodo.posicion - Offset(acceso.x, acceso.y)).distance;
         if (dist < distMin) {
           distMin = dist;
           nodoMasCercano = caminoId;

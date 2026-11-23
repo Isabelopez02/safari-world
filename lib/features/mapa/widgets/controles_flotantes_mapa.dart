@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:zoologico_front/core/services/accesibilidad_service.dart';
@@ -81,7 +82,8 @@ class ControlesFlotantesMapa extends StatelessWidget {
       duration: const Duration(milliseconds: 280),
       curve: Curves.easeOutCubic,
       right: 16,
-      bottom: (hayMarcadorSeleccionado ? 190.0 : 105.0) +
+      bottom:
+          (hayMarcadorSeleccionado ? 190.0 : 105.0) +
           MediaQuery.of(context).padding.bottom,
       child: Column(
         mainAxisSize: MainAxisSize.min,

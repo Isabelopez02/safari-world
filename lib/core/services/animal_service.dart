@@ -247,39 +247,125 @@ class AnimalService extends ChangeNotifier {
 
     final tokens = qNorm.split(' ').where((t) => t.isNotEmpty).toList();
     const palabrasRelleno = {
-      'quiero', 'quisiera', 'deseo', 'ir', 'a', 'al', 'un', 'una', 'unos', 'unas',
+      'quiero',
+      'quisiera',
+      'deseo',
+      'ir',
+      'a',
+      'al',
+      'un',
+      'una',
+      'unos',
+      'unas',
       'el', 'la', 'los', 'las', 'del', 'de', 'en', 'por', 'favor',
       'llevame', 'guiame', 'orientame', 'conduceme', 'donde', 'esta', 'estan',
       'queda', 'quedan', 'como', 'llego', 'voy', 'ver', 'buscar', 'busca',
       'mostrar', 'muestrame', 'dime', 'necesito', 'saber', 'conocer', 'hacia',
       'camino', 'sendero', 'ruta', 'para', 'hasta', 'cerca',
       // Inglés
-      'i', 'want', 'to', 'go', 'take', 'me', 'where', 'is', 'are', 'find', 'show',
+      'i',
+      'want',
+      'to',
+      'go',
+      'take',
+      'me',
+      'where',
+      'is',
+      'are',
+      'find',
+      'show',
       // Quechua
       'munani', 'rinayta', 'maypim', 'kashan',
     };
 
-    final tokensLimpios = tokens.where((t) => !palabrasRelleno.contains(t)).toList();
+    final tokensLimpios = tokens
+        .where((t) => !palabrasRelleno.contains(t))
+        .toList();
     final tokensBusqueda = tokensLimpios.isNotEmpty ? tokensLimpios : tokens;
 
     // 2. Mapeos prioritarios por sinónimos directos para servicios críticos y traducciones
     final sinonimosDirectos = <List<String>, String>{
       // Baños
-      ['bano', 'banos', 'sshh', 'wc', 'sanitario', 'sanitarios', 'inodoro', 'toilet', 'restroom', 'hispana']: 'B01',
+      [
+        'bano',
+        'banos',
+        'sshh',
+        'wc',
+        'sanitario',
+        'sanitarios',
+        'inodoro',
+        'toilet',
+        'restroom',
+        'hispana',
+      ]: 'B01',
       // Tópico / Salud / SOS
-      ['topico', 'medico', 'doctor', 'enfermeria', 'auxilio', 'primeros auxilios', 'herida', 'accidente', 'ambulancia', 'salud', 'first aid']: 'AYUDA_02',
+      [
+        'topico',
+        'medico',
+        'doctor',
+        'enfermeria',
+        'auxilio',
+        'primeros auxilios',
+        'herida',
+        'accidente',
+        'ambulancia',
+        'salud',
+        'first aid',
+      ]: 'AYUDA_02',
       // Salida
       ['salida', 'salir', 'retorno', 'exit']: 'SAL_01',
       // Entrada / Boletería
-      ['entrada', 'entrar', 'boleteria', 'boletos', 'tickets', 'ingreso', 'ticket', 'entrance']: 'ENT_01',
+      [
+        'entrada',
+        'entrar',
+        'boleteria',
+        'boletos',
+        'tickets',
+        'ingreso',
+        'ticket',
+        'entrance',
+      ]: 'ENT_01',
       // Estacionamiento
-      ['estacionamiento', 'estacionar', 'parqueo', 'cochera', 'parking', 'auto', 'carro', 'vehiculo']: 'EST_01',
+      [
+        'estacionamiento',
+        'estacionar',
+        'parqueo',
+        'cochera',
+        'parking',
+        'auto',
+        'carro',
+        'vehiculo',
+      ]: 'EST_01',
       // Juegos infantiles
-      ['juego', 'juegos', 'carrusel', 'infantil', 'columpios', 'ninos', 'playground']: 'JUE_01',
+      [
+        'juego',
+        'juegos',
+        'carrusel',
+        'infantil',
+        'columpios',
+        'ninos',
+        'playground',
+      ]: 'JUE_01',
       // Zonas de Calma / Silencio
-      ['calma', 'silencio', 'descanso', 'tranquilo', 'tranquila', 'sensorial', 'relajo', 'quiet']: 'CALMA_01',
+      [
+        'calma',
+        'silencio',
+        'descanso',
+        'tranquilo',
+        'tranquila',
+        'sensorial',
+        'relajo',
+        'quiet',
+      ]: 'CALMA_01',
       // Guardaparques / Punto de encuentro
-      ['guardaparque', 'guardaparques', 'guardia', 'guia', 'informes', 'orientador']: 'AYUDA_01',
+      [
+        'guardaparque',
+        'guardaparques',
+        'guardia',
+        'guia',
+        'informes',
+        'orientador',
+      ]: 'AYUDA_01',
       // Traducciones y alias de animales frecuentes en inglés
       ['lion', 'lions']: 'I02',
       ['giraffe', 'giraffes']: 'I12',
@@ -295,9 +381,13 @@ class AnimalService extends ChangeNotifier {
     for (final entry in sinonimosDirectos.entries) {
       final palabrasClave = entry.key;
       final targetId = entry.value;
-      if (palabrasClave.any((clave) =>
-          qNorm.contains(clave) ||
-          tokensBusqueda.any((t) => t == clave || extraerRaiz(t) == extraerRaiz(clave)))) {
+      if (palabrasClave.any(
+        (clave) =>
+            qNorm.contains(clave) ||
+            tokensBusqueda.any(
+              (t) => t == clave || extraerRaiz(t) == extraerRaiz(clave),
+            ),
+      )) {
         for (final p in todosLosPines) {
           if (p.id == targetId) return p;
         }
@@ -330,9 +420,19 @@ class AnimalService extends ChangeNotifier {
           score += 200;
         } else if (pStems.contains(tStem)) {
           score += 180;
-        } else if (pTokens.any((pt) => (pt.startsWith(t) || t.startsWith(pt)) && pt.length >= 3 && t.length >= 3)) {
+        } else if (pTokens.any(
+          (pt) =>
+              (pt.startsWith(t) || t.startsWith(pt)) &&
+              pt.length >= 3 &&
+              t.length >= 3,
+        )) {
           score += 120;
-        } else if (pStems.any((ps) => (ps.startsWith(tStem) || tStem.startsWith(ps)) && ps.length >= 3 && tStem.length >= 3)) {
+        } else if (pStems.any(
+          (ps) =>
+              (ps.startsWith(tStem) || tStem.startsWith(ps)) &&
+              ps.length >= 3 &&
+              tStem.length >= 3,
+        )) {
           score += 100;
         } else if (pNom.contains(t) || pNom.contains(tStem)) {
           score += 60;

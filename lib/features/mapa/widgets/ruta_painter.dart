@@ -44,8 +44,20 @@ class RutaPainter extends CustomPainter {
     }
 
     // Dibujar progresivamente
-    _drawDashedProgressive(canvas, pathParaDibujar, paintBorde, progress, isBorder: true);
-    _drawDashedProgressive(canvas, pathParaDibujar, paintPista, progress, isBorder: false);
+    _drawDashedProgressive(
+      canvas,
+      pathParaDibujar,
+      paintBorde,
+      progress,
+      isBorder: true,
+    );
+    _drawDashedProgressive(
+      canvas,
+      pathParaDibujar,
+      paintPista,
+      progress,
+      isBorder: false,
+    );
   }
 
   void _drawDashedProgressive(

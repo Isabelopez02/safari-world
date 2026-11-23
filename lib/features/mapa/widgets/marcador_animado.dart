@@ -140,10 +140,10 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
         final Widget pinWidget = widget.marcador.esZonaCalma
             ? _buildCalmZonePin()
             : (widget.marcador.esBanio
-                ? _buildBathroomPin()
-                : (widget.marcador.tipoServicio != null
-                    ? _buildAccessPin()
-                    : _buildAnimalParadero()));
+                  ? _buildBathroomPin()
+                  : (widget.marcador.tipoServicio != null
+                        ? _buildAccessPin()
+                        : _buildAnimalParadero()));
 
         // Si el filtro no coincide con este marcador o hay una ruta activa, se atenúa en segundo plano
         if (widget.isDimmed) {
@@ -152,10 +152,26 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
             opacity: 0.16,
             child: ColorFiltered(
               colorFilter: const ColorFilter.matrix(<double>[
-                0.2126, 0.7152, 0.0722, 0, 0,
-                0.2126, 0.7152, 0.0722, 0, 0,
-                0.2126, 0.7152, 0.0722, 0, 0,
-                0,      0,      0,      1, 0,
+                0.2126,
+                0.7152,
+                0.0722,
+                0,
+                0,
+                0.2126,
+                0.7152,
+                0.0722,
+                0,
+                0,
+                0.2126,
+                0.7152,
+                0.0722,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
               ]),
               child: pinWidget,
             ),
@@ -179,7 +195,8 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
     final sound = SoundService.instance.getSoundReaction(
       widget.marcador.nombre,
     );
-    final Color colorZonaBase = widget.marcador.colorZona ?? AppColors.verdePrincipal;
+    final Color colorZonaBase =
+        widget.marcador.colorZona ?? AppColors.verdePrincipal;
     final Color colorZona = a11y.getColorZona(
       habitat: widget.marcador.habitat,
       colorPorDefecto: colorZonaBase,
@@ -194,7 +211,9 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
               : colorZona);
 
     // Diámetro más compacto para que no sature el mapa ni tape zonas contiguas
-    final double pinSize = widget.isSelected ? 38.0 : (a11yActivo ? 30.0 : 28.0);
+    final double pinSize = widget.isSelected
+        ? 38.0
+        : (a11yActivo ? 30.0 : 28.0);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -272,11 +291,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                               BoxShadow(color: Colors.black54, blurRadius: 3),
                             ],
                           ),
-                          child: Icon(
-                            iconoZona,
-                            size: 11,
-                            color: colorZona,
-                          ),
+                          child: Icon(iconoZona, size: 11, color: colorZona),
                         ),
                       ),
                   ],
@@ -289,14 +304,17 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                   Transform.translate(
                     offset: const Offset(0, -2.5),
                     child: Container(
-                      constraints: BoxConstraints(maxWidth: a11yActivo ? 74 : 66),
+                      constraints: BoxConstraints(
+                        maxWidth: a11yActivo ? 74 : 66,
+                      ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 4,
                         vertical: 1.0,
                       ),
                       decoration: BoxDecoration(
                         color: a11yActivo
-                            ? Colors.black // Negro puro para alto contraste WCAG AAA
+                            ? Colors
+                                  .black // Negro puro para alto contraste WCAG AAA
                             : const Color(0xFF1E293B),
                         borderRadius: BorderRadius.circular(6),
                         boxShadow: const [
@@ -308,7 +326,9 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                         ],
                         border: Border.all(
                           color: widget.isSelected
-                              ? (a11yActivo ? const Color(0xFFFDE047) : const Color(0xFFFFB74D))
+                              ? (a11yActivo
+                                    ? const Color(0xFFFDE047)
+                                    : const Color(0xFFFFB74D))
                               : (a11yActivo ? colorZona : colorZona),
                           width: a11yActivo ? 1.6 : 1.0,
                         ),
@@ -533,14 +553,14 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
               Transform.translate(
                 offset: const Offset(0, -2),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 1,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF0D47A1),
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 1.0,
-                    ),
+                    border: Border.all(color: Colors.white, width: 1.0),
                     boxShadow: const [
                       BoxShadow(
                         color: Colors.black38,
@@ -606,7 +626,9 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                           width: widget.isSelected ? 32 : 26,
                           height: widget.isSelected ? 32 : 26,
                           decoration: BoxDecoration(
-                            color: a11yActivo ? const Color(0xFF047857) : pinColor,
+                            color: a11yActivo
+                                ? const Color(0xFF047857)
+                                : pinColor,
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: Colors.white,
@@ -645,12 +667,12 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                     vertical: 1.5,
                   ),
                   decoration: BoxDecoration(
-                    color: a11yActivo
-                        ? Colors.black
-                        : const Color(0xFF065F46),
+                    color: a11yActivo ? Colors.black : const Color(0xFF065F46),
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: a11yActivo ? const Color(0xFF4ADE80) : Colors.white,
+                      color: a11yActivo
+                          ? const Color(0xFF4ADE80)
+                          : Colors.white,
                       width: a11yActivo ? 1.5 : 1.0,
                     ),
                     boxShadow: const [
@@ -664,10 +686,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        '🌿 ',
-                        style: TextStyle(fontSize: 7.0),
-                      ),
+                      const Text('🌿 ', style: TextStyle(fontSize: 7.0)),
                       Flexible(
                         child: Text(
                           'Zona Calma',
@@ -700,22 +719,30 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
 
     switch (widget.marcador.tipoServicio) {
       case 'boleteria':
-        pinColor = a11yActivo ? const Color(0xFFF59E0B) : const Color(0xFFD97706);
+        pinColor = a11yActivo
+            ? const Color(0xFFF59E0B)
+            : const Color(0xFFD97706);
         labelCorta = 'Boletería';
         simbolo = '🎟️';
         break;
       case 'salida':
-        pinColor = a11yActivo ? const Color(0xFFF43F5E) : const Color(0xFFE11D48);
+        pinColor = a11yActivo
+            ? const Color(0xFFF43F5E)
+            : const Color(0xFFE11D48);
         labelCorta = 'Salida';
         simbolo = '🚪';
         break;
       case 'estacionamiento':
-        pinColor = a11yActivo ? const Color(0xFF38BDF8) : const Color(0xFF2563EB);
+        pinColor = a11yActivo
+            ? const Color(0xFF38BDF8)
+            : const Color(0xFF2563EB);
         labelCorta = 'Cochera';
         simbolo = '🅿️';
         break;
       case 'juegos':
-        pinColor = a11yActivo ? const Color(0xFFC084FC) : const Color(0xFF9333EA);
+        pinColor = a11yActivo
+            ? const Color(0xFFC084FC)
+            : const Color(0xFF9333EA);
         labelCorta = 'Juegos';
         simbolo = '🎠';
         break;
@@ -825,10 +852,7 @@ class _MarcadorAnimadoState extends State<MarcadorAnimado>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        '$simbolo ',
-                        style: const TextStyle(fontSize: 7.0),
-                      ),
+                      Text('$simbolo ', style: const TextStyle(fontSize: 7.0)),
                       Flexible(
                         child: Text(
                           labelCorta,

@@ -6,6 +6,7 @@ import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/pantalla_principal/widgets/footer_navegacion.dart';
+
 import 'pantalla_detalle_animal.dart';
 
 /// Layout optimizado para pantallas de teléfonos móviles (< 720px)
@@ -38,18 +39,22 @@ class DetalleAnimalMovil extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([AccesibilidadService.instance, IdiomaService.instance]),
+      listenable: Listenable.merge([
+        AccesibilidadService.instance,
+        IdiomaService.instance,
+      ]),
       builder: (context, _) {
         final a11y = AccesibilidadService.instance;
         final bool oscuro = a11y.modoAltoContraste;
 
         // En modo alto contraste: fondo oscuro profundo, texto blanco, tarjetas dark
-        final Color fondoPantalla =
-            oscuro ? const Color(0xFF020617) : theme.background;
-        final Color textoTitulo =
-            oscuro ? Colors.white : AppColors.textoOscuro;
-        final Color accentColor =
-            oscuro ? const Color(0xFFFDE047) : theme.accent;
+        final Color fondoPantalla = oscuro
+            ? const Color(0xFF020617)
+            : theme.background;
+        final Color textoTitulo = oscuro ? Colors.white : AppColors.textoOscuro;
+        final Color accentColor = oscuro
+            ? const Color(0xFFFDE047)
+            : theme.accent;
 
         return Scaffold(
           backgroundColor: fondoPantalla,
@@ -82,7 +87,11 @@ class DetalleAnimalMovil extends StatelessWidget {
                 actions: [
                   // BOTÓN AUDIOGUÍA FLOTANTE
                   Padding(
-                    padding: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+                    padding: const EdgeInsets.only(
+                      right: 12,
+                      top: 8,
+                      bottom: 8,
+                    ),
                     child: GestureDetector(
                       onTap: onToggleAudioguia,
                       child: Container(
@@ -138,7 +147,8 @@ class DetalleAnimalMovil extends StatelessWidget {
                             ? Image.asset(
                                 animal.imagen!,
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) => _buildFallbackImage(),
+                                errorBuilder: (context, error, stackTrace) =>
+                                    _buildFallbackImage(),
                               )
                             : _buildFallbackImage(),
                       ),
@@ -278,7 +288,8 @@ class DetalleAnimalMovil extends StatelessWidget {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFC62828).withValues(alpha: 0.08),
+                                  color: const Color(0xFFC62828)
+                                      .withValues(alpha: 0.08),
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
                                     color: const Color(0xFFC62828),
@@ -314,7 +325,9 @@ class DetalleAnimalMovil extends StatelessWidget {
                           _buildChip(
                             icon: Icons.shield_rounded,
                             label: datos.estadoConservacion.tr,
-                            color: oscuro ? const Color(0xFFFB923C) : const Color(0xFFE65100),
+                            color: oscuro
+                                ? const Color(0xFFFB923C)
+                                : const Color(0xFFE65100),
                             esAlerta: true,
                           ),
                         ],
@@ -371,16 +384,12 @@ class DetalleAnimalMovil extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: onToggleVisitado,
         icon: Icon(
-          esVisitado
-              ? Icons.check_circle_rounded
-              : Icons.bookmark_add_rounded,
+          esVisitado ? Icons.check_circle_rounded : Icons.bookmark_add_rounded,
           size: 20,
           color: Colors.white,
         ),
         label: Text(
-          esVisitado
-              ? 'explorado_pasaporte'.tr
-              : 'marcar_pasaporte'.tr,
+          esVisitado ? 'explorado_pasaporte'.tr : 'marcar_pasaporte'.tr,
           style: GoogleFonts.urbanist(
             fontSize: 14,
             fontWeight: FontWeight.w900,
@@ -388,16 +397,12 @@ class DetalleAnimalMovil extends StatelessWidget {
           ),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: esVisitado
-              ? const Color(0xFF15803D)
-              : theme.accent,
+          backgroundColor: esVisitado ? const Color(0xFF15803D) : theme.accent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           elevation: 4,
-          shadowColor: (esVisitado
-                  ? const Color(0xFF15803D)
-                  : theme.accent)
+          shadowColor: (esVisitado ? const Color(0xFF15803D) : theme.accent)
               .withValues(alpha: 0.4),
         ),
       ),
@@ -426,10 +431,14 @@ class DetalleAnimalMovil extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 280),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: esAlerta ? const Color(0xFFFFF3E0) : color.withValues(alpha: 0.1),
+        color: esAlerta
+            ? const Color(0xFFFFF3E0)
+            : color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: esAlerta ? const Color(0xFFFFB74D) : color.withValues(alpha: 0.3),
+          color: esAlerta
+              ? const Color(0xFFFFB74D)
+              : color.withValues(alpha: 0.3),
           width: 1.2,
         ),
       ),
@@ -462,11 +471,7 @@ class DetalleAnimalMovil extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFFFB74D), width: 1.2),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -494,7 +499,8 @@ class DetalleAnimalMovil extends StatelessWidget {
                 builder: (context, child) {
                   return Row(
                     children: List.generate(4, (i) {
-                      final h = 5.0 +
+                      final h =
+                          5.0 +
                           (12.0 *
                               ((audioWaveController.value + (i * 0.25)) % 1.0));
                       return Container(
@@ -533,7 +539,9 @@ class DetalleAnimalMovil extends StatelessWidget {
     final Color fondoTarjeta = oscuro ? const Color(0xFF0F172A) : Colors.white;
     final Color bordeTarjeta = oscuro ? Colors.white12 : Colors.grey.shade200;
     final Color textoTitulo = oscuro ? Colors.white : AppColors.textoOscuro;
-    final Color textoSecundario = oscuro ? const Color(0xFF94A3B8) : Colors.grey.shade600;
+    final Color textoSecundario = oscuro
+        ? const Color(0xFF94A3B8)
+        : Colors.grey.shade600;
     final Color accentColor = oscuro ? const Color(0xFFFDE047) : theme.accent;
 
     return Container(
@@ -544,11 +552,7 @@ class DetalleAnimalMovil extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: bordeTarjeta),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -563,7 +567,11 @@ class DetalleAnimalMovil extends StatelessWidget {
                   color: accentColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.schedule_rounded, size: 16, color: accentColor),
+                child: Icon(
+                  Icons.schedule_rounded,
+                  size: 16,
+                  color: accentColor,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -594,8 +602,11 @@ class DetalleAnimalMovil extends StatelessWidget {
 
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Divider(height: 1, thickness: 0.8,
-                color: oscuro ? Colors.white12 : Colors.grey.shade200),
+            child: Divider(
+              height: 1,
+              thickness: 0.8,
+              color: oscuro ? Colors.white12 : Colors.grey.shade200,
+            ),
           ),
 
           // FILA DIETA (TEXTO COMPLETO SIN RECORTES)
@@ -608,7 +619,11 @@ class DetalleAnimalMovil extends StatelessWidget {
                   color: accentColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.restaurant_menu_rounded, size: 16, color: accentColor),
+                child: Icon(
+                  Icons.restaurant_menu_rounded,
+                  size: 16,
+                  color: accentColor,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -649,7 +664,9 @@ class DetalleAnimalMovil extends StatelessWidget {
     final Color fondoTarjeta = oscuro ? const Color(0xFF0F172A) : Colors.white;
     final Color bordeTarjeta = oscuro ? Colors.white12 : Colors.grey.shade200;
     final Color textoTitulo = oscuro ? Colors.white : AppColors.textoOscuro;
-    final Color textoSecundario = oscuro ? const Color(0xFF94A3B8) : Colors.grey.shade800;
+    final Color textoSecundario = oscuro
+        ? const Color(0xFF94A3B8)
+        : Colors.grey.shade800;
     final Color accentColor = oscuro ? const Color(0xFFFDE047) : theme.accent;
 
     return Container(
@@ -660,11 +677,7 @@ class DetalleAnimalMovil extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: bordeTarjeta),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -711,7 +724,9 @@ class DetalleAnimalMovil extends StatelessWidget {
         ? const Color(0xFFFDE047).withValues(alpha: 0.5)
         : theme.accent.withValues(alpha: 0.35);
     final Color accentColor = oscuro ? const Color(0xFFFDE047) : theme.accent;
-    final Color textoBody = oscuro ? const Color(0xFFCBD5E1) : Colors.grey.shade900;
+    final Color textoBody = oscuro
+        ? const Color(0xFFCBD5E1)
+        : Colors.grey.shade900;
 
     return Container(
       width: double.infinity,
@@ -719,10 +734,7 @@ class DetalleAnimalMovil extends StatelessWidget {
       decoration: BoxDecoration(
         color: fondoCuriosidad,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: bordeColor,
-          width: 1.2,
-        ),
+        border: Border.all(color: bordeColor, width: 1.2),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -7,10 +7,7 @@ import 'package:zoologico_front/core/theme/app_colors.dart';
 class BannerDestacadoShows extends StatelessWidget {
   final int cantidadAlertas;
 
-  const BannerDestacadoShows({
-    super.key,
-    required this.cantidadAlertas,
-  });
+  const BannerDestacadoShows({super.key, required this.cantidadAlertas});
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +18,7 @@ class BannerDestacadoShows extends StatelessWidget {
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [
-              AppColors.verdePrincipal,
-              Color(0xFF1E3A2F),
-            ],
+            colors: [AppColors.verdePrincipal, Color(0xFF1E3A2F)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -44,7 +38,10 @@ class BannerDestacadoShows extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(20),

@@ -32,7 +32,10 @@ class EncabezadoSutil extends StatelessWidget {
             children: [
               // Chip sutil del parque / estado
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.verdePrincipal.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(20),
@@ -80,7 +83,10 @@ class EncabezadoSutil extends StatelessWidget {
                         },
                         borderRadius: BorderRadius.circular(16),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 7,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
@@ -92,7 +98,9 @@ class EncabezadoSutil extends StatelessWidget {
                               ),
                             ],
                             border: Border.all(
-                              color: AppColors.verdePrincipal.withValues(alpha: 0.25),
+                              color: AppColors.verdePrincipal.withValues(
+                                alpha: 0.25,
+                              ),
                               width: 1.2,
                             ),
                           ),
@@ -350,7 +358,9 @@ class EncabezadoSutil extends StatelessWidget {
                     titulo,
                     style: GoogleFonts.urbanist(
                       fontSize: 16,
-                      fontWeight: seleccionado ? FontWeight.w900 : FontWeight.w700,
+                      fontWeight: seleccionado
+                          ? FontWeight.w900
+                          : FontWeight.w700,
                       color: AppColors.textoOscuro,
                     ),
                   ),

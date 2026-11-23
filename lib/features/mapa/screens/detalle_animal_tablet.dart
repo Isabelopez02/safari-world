@@ -6,6 +6,7 @@ import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/pantalla_principal/widgets/footer_navegacion.dart';
+
 import 'pantalla_detalle_animal.dart';
 
 /// Layout optimizado para pantallas grandes (Tablets, iPad, Desktop y Plegables >= 720px)
@@ -38,12 +39,16 @@ class DetalleAnimalTablet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([AccesibilidadService.instance, IdiomaService.instance]),
+      listenable: Listenable.merge([
+        AccesibilidadService.instance,
+        IdiomaService.instance,
+      ]),
       builder: (context, _) {
         final a11y = AccesibilidadService.instance;
         final bool oscuro = a11y.modoAltoContraste;
-        final Color fondoPantalla =
-            oscuro ? const Color(0xFF020617) : theme.background;
+        final Color fondoPantalla = oscuro
+            ? const Color(0xFF020617)
+            : theme.background;
 
         return Scaffold(
           backgroundColor: fondoPantalla,
@@ -102,18 +107,25 @@ class DetalleAnimalTablet extends StatelessWidget {
                                   children: [
                                     _buildChip(
                                       icon: Icons.terrain_rounded,
-                                      label: '${theme.emoji} ${theme.nombreHabitat.tr}',
-                                      color: oscuro ? const Color(0xFFFDE047) : theme.accent,
+                                      label:
+                                          '${theme.emoji} ${theme.nombreHabitat.tr}',
+                                      color: oscuro
+                                          ? const Color(0xFFFDE047)
+                                          : theme.accent,
                                     ),
                                     _buildChip(
                                       icon: Icons.restaurant_rounded,
                                       label: datos.dieta.tr,
-                                      color: oscuro ? const Color(0xFFFDE047) : theme.accent,
+                                      color: oscuro
+                                          ? const Color(0xFFFDE047)
+                                          : theme.accent,
                                     ),
                                     _buildChip(
                                       icon: Icons.shield_rounded,
                                       label: datos.estadoConservacion.tr,
-                                      color: oscuro ? const Color(0xFFFB923C) : const Color(0xFFE65100),
+                                      color: oscuro
+                                          ? const Color(0xFFFB923C)
+                                          : const Color(0xFFE65100),
                                       esAlerta: true,
                                     ),
                                   ],
@@ -197,9 +209,7 @@ class DetalleAnimalTablet extends StatelessWidget {
             decoration: BoxDecoration(
               color: theme.accent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: theme.accent.withValues(alpha: 0.3),
-              ),
+              border: Border.all(color: theme.accent.withValues(alpha: 0.3)),
             ),
             child: Text(
               '${'parada_num'.tr} #${animal.id}',
@@ -238,7 +248,8 @@ class DetalleAnimalTablet extends StatelessWidget {
               Image.asset(
                 animal.imagen!,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => _buildFallbackPhoto(),
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildFallbackPhoto(),
               )
             else
               _buildFallbackPhoto(),
@@ -318,11 +329,7 @@ class DetalleAnimalTablet extends StatelessWidget {
           width: 1.2,
         ),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -421,11 +428,7 @@ class DetalleAnimalTablet extends StatelessWidget {
           width: 1.2,
         ),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -482,9 +485,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                 size: 18,
               ),
               label: Text(
-                esVisitado
-                    ? 'explorado_pasaporte'.tr
-                    : 'marcar_pasaporte'.tr,
+                esVisitado ? 'explorado_pasaporte'.tr : 'marcar_pasaporte'.tr,
                 style: GoogleFonts.urbanist(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
@@ -515,10 +516,14 @@ class DetalleAnimalTablet extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        color: esAlerta ? const Color(0xFFFFF3E0) : color.withValues(alpha: 0.1),
+        color: esAlerta
+            ? const Color(0xFFFFF3E0)
+            : color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: esAlerta ? const Color(0xFFFFB74D) : color.withValues(alpha: 0.3),
+          color: esAlerta
+              ? const Color(0xFFFFB74D)
+              : color.withValues(alpha: 0.3),
           width: 1.2,
         ),
       ),
@@ -546,7 +551,9 @@ class DetalleAnimalTablet extends StatelessWidget {
     final Color fondoTarjeta = oscuro ? const Color(0xFF0F172A) : Colors.white;
     final Color bordeTarjeta = oscuro ? Colors.white12 : Colors.grey.shade200;
     final Color textoTitulo = oscuro ? Colors.white : AppColors.textoOscuro;
-    final Color textoSecundario = oscuro ? const Color(0xFF94A3B8) : Colors.grey[600]!;
+    final Color textoSecundario = oscuro
+        ? const Color(0xFF94A3B8)
+        : Colors.grey[600]!;
     final Color accentColor = oscuro ? const Color(0xFFFDE047) : theme.accent;
 
     return Container(
@@ -557,11 +564,7 @@ class DetalleAnimalTablet extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: bordeTarjeta),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -575,7 +578,11 @@ class DetalleAnimalTablet extends StatelessWidget {
                   color: accentColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.schedule_rounded, size: 18, color: accentColor),
+                child: Icon(
+                  Icons.schedule_rounded,
+                  size: 18,
+                  color: accentColor,
+                ),
               ),
               const SizedBox(width: 10),
               Column(
@@ -618,7 +625,11 @@ class DetalleAnimalTablet extends StatelessWidget {
                   color: accentColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.restaurant_menu_rounded, size: 18, color: accentColor),
+                child: Icon(
+                  Icons.restaurant_menu_rounded,
+                  size: 18,
+                  color: accentColor,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -659,7 +670,9 @@ class DetalleAnimalTablet extends StatelessWidget {
     final Color fondoTarjeta = oscuro ? const Color(0xFF0F172A) : Colors.white;
     final Color bordeTarjeta = oscuro ? Colors.white12 : Colors.grey.shade200;
     final Color textoTitulo = oscuro ? Colors.white : AppColors.textoOscuro;
-    final Color textoSecundario = oscuro ? const Color(0xFF94A3B8) : Colors.grey.shade800;
+    final Color textoSecundario = oscuro
+        ? const Color(0xFF94A3B8)
+        : Colors.grey.shade800;
     final Color accentColor = oscuro ? const Color(0xFFFDE047) : theme.accent;
 
     return Container(
@@ -670,11 +683,7 @@ class DetalleAnimalTablet extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: bordeTarjeta),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -719,7 +728,9 @@ class DetalleAnimalTablet extends StatelessWidget {
         ? const Color(0xFFFDE047).withValues(alpha: 0.5)
         : theme.accent.withValues(alpha: 0.35);
     final Color accentColor = oscuro ? const Color(0xFFFDE047) : theme.accent;
-    final Color textoBody = oscuro ? const Color(0xFFCBD5E1) : Colors.grey.shade900;
+    final Color textoBody = oscuro
+        ? const Color(0xFFCBD5E1)
+        : Colors.grey.shade900;
 
     return Container(
       width: double.infinity,
@@ -727,10 +738,7 @@ class DetalleAnimalTablet extends StatelessWidget {
       decoration: BoxDecoration(
         color: fondoCuriosidad,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: bordeColor,
-          width: 1.2,
-        ),
+        border: Border.all(color: bordeColor, width: 1.2),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

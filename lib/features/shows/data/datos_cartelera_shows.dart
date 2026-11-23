@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'show_models.dart';
 
 /// Catálogo de espectáculos, escenarios y reglas del zoológico
@@ -63,8 +64,7 @@ class DatosCarteleraShows {
       zonaTag: 'ZONA COSTA',
       capacidad: '450 personas (Techado)',
       showPrincipal: 'Show Acuático de Lobos & Focas',
-      descripcion:
-          'Piscina oceánica de agua salada con graderías techadas, sonido envolvente y vista submarina.',
+      descripcion: 'Piscina oceánica de agua salada con graderías techadas, sonido envolvente y vista submarina.',
       colorAcento: Color(0xFF0077B6),
       habitatMapa: 'C05',
       imagenAsset: 'assets/images/animales_con_fondo/foca-card.jpg',
@@ -74,8 +74,7 @@ class DatosCarteleraShows {
       zonaTag: 'ZONA SIERRA',
       capacidad: '300 personas (Campo abierto)',
       showPrincipal: 'Vuelo Libre de Rapaces & Cóndores',
-      descripcion:
-          'Ubicado en la ladera alta del zoológico, aprovecha las corrientes térmicas andinas para vuelos naturales.',
+      descripcion: 'Ubicado en la ladera alta del zoológico, aprovecha las corrientes térmicas andinas para vuelos naturales.',
       colorAcento: Color(0xFF8D6E63),
       habitatMapa: 'S03',
       imagenAsset: 'assets/images/animales_con_fondo/aguila.jpg',
@@ -85,8 +84,7 @@ class DatosCarteleraShows {
       zonaTag: 'ZONA COSTA',
       capacidad: '200 personas (Semi-techado)',
       showPrincipal: 'Alimentación de Pingüinos Humboldt',
-      descripcion:
-          'Plataforma cercana de observación con cristales sumergidos y charlas biológicas interactivas.',
+      descripcion: 'Plataforma cercana de observación con cristales sumergidos y charlas biológicas interactivas.',
       colorAcento: Color(0xFF0E6568),
       habitatMapa: 'C08',
       imagenAsset: 'assets/images/animales_con_fondo/pinguino-card.jpg',
@@ -96,8 +94,7 @@ class DatosCarteleraShows {
       zonaTag: 'ZONA INTERNACIONAL',
       capacidad: '350 personas (Pasarela)',
       showPrincipal: 'Charla & Enriquecimiento con Leones',
-      descripcion:
-          'Pasarela elevada con vista a la pradera africana y ventanales de máxima seguridad para charlas guiadas.',
+      descripcion: 'Pasarela elevada con vista a la pradera africana y ventanales de máxima seguridad para charlas guiadas.',
       colorAcento: Color(0xFFD97706),
       habitatMapa: 'I02',
       imagenAsset: 'assets/images/animales_con_fondo/leon-card.jpg',
@@ -109,43 +106,37 @@ class DatosCarteleraShows {
       icono: Icons.no_flash_rounded,
       colorIcono: Color(0xFFDC2626),
       titulo: 'Prohibido usar flash en fotos',
-      descripcion:
-          'La luz intensa puede asustar o desorientar a lobos marinos y aves rapaces durante las maniobras.',
+      descripcion: 'La luz intensa puede asustar o desorientar a lobos marinos y aves rapaces durante las maniobras.',
     ),
     ReglaShowData(
       icono: Icons.no_food_rounded,
       colorIcono: Color(0xFFEA580C),
       titulo: 'No arrojar comida al escenario',
-      descripcion:
-          'Los animales reciben dietas balanceadas pesadas por gramaje diario con estricto control veterinario.',
+      descripcion: 'Los animales reciben dietas balanceadas pesadas por gramaje diario con estricto control veterinario.',
     ),
     ReglaShowData(
       icono: Icons.access_time_filled_rounded,
       colorIcono: Color(0xFF0284C7),
       titulo: 'Llegada 15 minutos antes',
-      descripcion:
-          'El aforo en graderías es controlado por seguridad. Se cierran accesos puntualmente al iniciar.',
+      descripcion: 'El aforo en graderías es controlado por seguridad. Se cierran accesos puntualmente al iniciar.',
     ),
     ReglaShowData(
       icono: Icons.volume_off_rounded,
       colorIcono: Color(0xFF7C3AED),
       titulo: 'Silencio y respeto durante el show',
-      descripcion:
-          'Evita ruidos estridentes o levantarte bruscamente durante los vuelos o ejercicios en vivo.',
+      descripcion: 'Evita ruidos estridentes o levantarte bruscamente durante los vuelos o ejercicios en vivo.',
     ),
     ReglaShowData(
       icono: Icons.accessible_rounded,
       colorIcono: Color(0xFF0D9488),
       titulo: 'Zonas de acceso preferente',
-      descripcion:
-          'Espacios reservados de fácil acceso para personas con movilidad reducida y cochecitos de bebé.',
+      descripcion: 'Espacios reservados de fácil acceso para personas con movilidad reducida y cochecitos de bebé.',
     ),
     ReglaShowData(
       icono: Icons.wb_sunny_rounded,
       colorIcono: Color(0xFFD97706),
       titulo: 'Protección solar y clima',
-      descripcion:
-          'Los anfiteatros al aire libre disponen de zonas sombreadas. Se recomienda uso de gorra e hidratación.',
+      descripcion: 'Los anfiteatros al aire libre disponen de zonas sombreadas. Se recomienda uso de gorra e hidratación.',
     ),
   ];
 }

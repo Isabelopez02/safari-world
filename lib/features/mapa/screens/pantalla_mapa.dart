@@ -17,9 +17,12 @@ import '../widgets/barra_inferior_mapa.dart';
 import '../widgets/barra_superior_mapa.dart';
 import '../widgets/canvas_mapa_interactivo.dart';
 import '../widgets/controles_flotantes_mapa.dart';
+
 import 'package:zoologico_front/core/widgets/modal_animales_por_visitar.dart';
+
 import '../widgets/modal_capas_mapa.dart';
 import '../widgets/tutorial_overlay.dart';
+
 import 'package:zoologico_front/core/widgets/modal_tiendas_cercanas.dart';
 
 class PantallaMapa extends StatefulWidget {
@@ -89,7 +92,8 @@ class _PantallaMapaState extends State<PantallaMapa>
       .obtenerTodosLosAnimales();
   final List<MarcadorMapa> banios = AnimalService.instance.obtenerBanios();
   final List<MarcadorMapa> accesos = AnimalService.instance.obtenerAccesos();
-  final List<MarcadorMapa> zonasCalma = AnimalService.instance.obtenerZonasCalma();
+  final List<MarcadorMapa> zonasCalma = AnimalService.instance
+      .obtenerZonasCalma();
 
   @override
   void initState() {
@@ -145,8 +149,8 @@ class _PantallaMapaState extends State<PantallaMapa>
   void didUpdateWidget(PantallaMapa oldWidget) {
     super.didUpdateWidget(oldWidget);
     if ((widget.claveNavegacion != oldWidget.claveNavegacion ||
-            widget.habitatInicial != oldWidget.habitatInicial ||
-            widget.animalIdInicial != oldWidget.animalIdInicial)) {
+        widget.habitatInicial != oldWidget.habitatInicial ||
+        widget.animalIdInicial != oldWidget.animalIdInicial)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         if (widget.habitatInicial != null) {
@@ -176,14 +180,15 @@ class _PantallaMapaState extends State<PantallaMapa>
           _chipUrgencia = ChipUrgenciaMapa.ninguno;
           _filtroServicio = FiltroServicioMapa.calma;
           _habitatFiltro = null;
-        } else if (pinInteligente.tipoServicio == 'ayuda' || pinInteligente.id.startsWith('AYUDA')) {
+        } else if (pinInteligente.tipoServicio == 'ayuda' ||
+            pinInteligente.id.startsWith('AYUDA')) {
           _habitatFiltro = null;
           _chipUrgencia = ChipUrgenciaMapa.ninguno;
           _filtroServicio = FiltroServicioMapa.todos;
         } else if (pinInteligente.tipoServicio == 'salida' ||
-                   pinInteligente.tipoServicio == 'boleteria' ||
-                   pinInteligente.tipoServicio == 'estacionamiento' ||
-                   pinInteligente.tipoServicio == 'juegos') {
+            pinInteligente.tipoServicio == 'boleteria' ||
+            pinInteligente.tipoServicio == 'estacionamiento' ||
+            pinInteligente.tipoServicio == 'juegos') {
           _habitatFiltro = null;
           _chipUrgencia = ChipUrgenciaMapa.ninguno;
           _filtroServicio = FiltroServicioMapa.todos;
@@ -214,7 +219,8 @@ class _PantallaMapaState extends State<PantallaMapa>
         if (destLower == 'ayuda_02' || destLower == 'ayuda_01') {
           return a.id.toLowerCase() == destLower;
         }
-        return a.tipoServicio == 'ayuda' || a.id.toUpperCase().startsWith('AYUDA');
+        return a.tipoServicio == 'ayuda' ||
+            a.id.toUpperCase().startsWith('AYUDA');
       }).toList();
       if (puntosAyuda.isNotEmpty) {
         final target = puntosAyuda.first;
@@ -235,9 +241,7 @@ class _PantallaMapaState extends State<PantallaMapa>
     }
 
     // 1. Buscar si coincide directamente con el ID de un animal / marcador (ej. 'C05', 'S03', 'I02', 'C08')
-    final porId = marcadores.where(
-      (m) => m.id.toLowerCase() == destLower,
-    );
+    final porId = marcadores.where((m) => m.id.toLowerCase() == destLower);
     if (porId.isNotEmpty) {
       final marcador = porId.first;
       setState(() {
@@ -253,7 +257,9 @@ class _PantallaMapaState extends State<PantallaMapa>
 
     // 1.1 Buscar en accesos, salidas y entradas (ej. 'SAL_01', 'ENT_01')
     final porAcceso = accesos.where(
-      (a) => a.id.toLowerCase() == destLower || a.nombre.toLowerCase().contains(destLower),
+      (a) =>
+          a.id.toLowerCase() == destLower ||
+          a.nombre.toLowerCase().contains(destLower),
     );
     if (porAcceso.isNotEmpty) {
       final marcador = porAcceso.first;
@@ -270,7 +276,9 @@ class _PantallaMapaState extends State<PantallaMapa>
 
     // 1.2 Buscar en baños del zoológico (ej. 'B01', 'B02', 'baño')
     final porBanio = banios.where(
-      (b) => b.id.toLowerCase() == destLower || b.nombre.toLowerCase().contains(destLower),
+      (b) =>
+          b.id.toLowerCase() == destLower ||
+          b.nombre.toLowerCase().contains(destLower),
     );
     if (porBanio.isNotEmpty) {
       final marcador = porBanio.first;
@@ -290,7 +298,9 @@ class _PantallaMapaState extends State<PantallaMapa>
 
     // 1.3 Buscar en zonas de calma
     final porCalma = zonasCalma.where(
-      (c) => c.id.toLowerCase() == destLower || c.nombre.toLowerCase().contains(destLower),
+      (c) =>
+          c.id.toLowerCase() == destLower ||
+          c.nombre.toLowerCase().contains(destLower),
     );
     if (porCalma.isNotEmpty) {
       final marcador = porCalma.first;
@@ -310,8 +320,9 @@ class _PantallaMapaState extends State<PantallaMapa>
 
     // 1.4 Buscar animal por coincidencia de nombre
     final porNombre = marcadores.where(
-      (m) => m.nombre.toLowerCase().contains(destLower) ||
-             destLower.contains(m.nombre.toLowerCase()),
+      (m) =>
+          m.nombre.toLowerCase().contains(destLower) ||
+          destLower.contains(m.nombre.toLowerCase()),
     );
     if (porNombre.isNotEmpty) {
       final marcador = porNombre.first;
@@ -388,10 +399,16 @@ class _PantallaMapaState extends State<PantallaMapa>
       _habitatFiltro = habitatNormalizado;
     });
 
-    final enHabitat = marcadores.where((m) => m.habitat == habitatNormalizado).toList();
+    final enHabitat = marcadores
+        .where((m) => m.habitat == habitatNormalizado)
+        .toList();
     if (enHabitat.isNotEmpty) {
-      final favoritos = enHabitat.where((m) => m.categoria == 'Favoritos').toList();
-      final destinoMarcador = favoritos.isNotEmpty ? favoritos.first : enHabitat.first;
+      final favoritos = enHabitat
+          .where((m) => m.categoria == 'Favoritos')
+          .toList();
+      final destinoMarcador = favoritos.isNotEmpty
+          ? favoritos.first
+          : enHabitat.first;
       _mostrarInfoMarcador(destinoMarcador);
       setState(() {
         _isNavigating = true;
@@ -522,7 +539,9 @@ class _PantallaMapaState extends State<PantallaMapa>
     if (nuevoFiltro != FiltroServicioMapa.todos) {
       MarcadorMapa? objetivo;
       if (nuevoFiltro == FiltroServicioMapa.banio) {
-        objetivo = _encontrarBanioMasCercano() ?? (banios.isNotEmpty ? banios.first : null);
+        objetivo =
+            _encontrarBanioMasCercano() ??
+            (banios.isNotEmpty ? banios.first : null);
         _serviciosFiltrados = List.from(banios);
         final idx = _serviciosFiltrados.indexWhere((b) => b.id == objetivo?.id);
         _indiceServicioActual = idx >= 0 ? idx : 0;
@@ -534,8 +553,9 @@ class _PantallaMapaState extends State<PantallaMapa>
         }
       } else {
         _serviciosFiltrados = [];
-        final matches =
-            accesos.where((a) => _isMarkerMatchingFilter(a)).toList();
+        final matches = accesos
+            .where((a) => _isMarkerMatchingFilter(a))
+            .toList();
         if (matches.isNotEmpty) {
           objetivo = matches.first;
         }
@@ -584,7 +604,10 @@ class _PantallaMapaState extends State<PantallaMapa>
     );
     final double currentScale = _transformationController.value
         .getMaxScaleOnAxis();
-    final double zoomScale = math.max(currentScale, math.max(minMapScale, 1.35));
+    final double zoomScale = math.max(
+      currentScale,
+      math.max(minMapScale, 1.35),
+    );
 
     final double dx = (size.width / 2) - (x * zoomScale);
     final double dy = (size.height / 2) - (y * zoomScale);
@@ -624,15 +647,15 @@ class _PantallaMapaState extends State<PantallaMapa>
     }
   }
 
-  void _mostrarInfoMarcador(MarcadorMapa marcador, {bool sincronizarCarrusel = true}) {
+  void _mostrarInfoMarcador(
+    MarcadorMapa marcador, {
+    bool sincronizarCarrusel = true,
+  }) {
     final origen =
         grafoMapa.nodos[_nodoActual]?.posicion ??
         ServicioRutasSvg.puntoEntradaOficial;
     final nuevaRuta = grafoMapa.encontrarRutaMasCorta(_nodoActual, marcador.id);
-    final rutaSvg = ServicioRutasSvg.obtenerRutaHacia(
-      marcador,
-      origen: origen,
-    );
+    final rutaSvg = ServicioRutasSvg.obtenerRutaHacia(marcador, origen: origen);
     setState(() {
       _marcadorSeleccionado = marcador;
       // En modo fácil la navegación se activa de inmediato para dibujar el sendero
@@ -643,13 +666,17 @@ class _PantallaMapaState extends State<PantallaMapa>
       if (sincronizarCarrusel) {
         if (marcador.esBanio) {
           _serviciosFiltrados = List.from(banios);
-          final idx = _serviciosFiltrados.indexWhere((b) => b.id == marcador.id);
+          final idx = _serviciosFiltrados.indexWhere(
+            (b) => b.id == marcador.id,
+          );
           _indiceServicioActual = idx >= 0 ? idx : 0;
           _chipUrgencia = ChipUrgenciaMapa.banios;
           _filtroServicio = FiltroServicioMapa.banio;
         } else if (marcador.esZonaCalma) {
           _serviciosFiltrados = List.from(zonasCalma);
-          final idx = _serviciosFiltrados.indexWhere((z) => z.id == marcador.id);
+          final idx = _serviciosFiltrados.indexWhere(
+            (z) => z.id == marcador.id,
+          );
           _indiceServicioActual = idx >= 0 ? idx : 0;
           _filtroServicio = FiltroServicioMapa.calma;
         } else {
@@ -667,12 +694,14 @@ class _PantallaMapaState extends State<PantallaMapa>
     HapticFeedback.selectionClick();
     final nuevoIndice =
         (_indiceServicioActual - 1 + _serviciosFiltrados.length) %
-            _serviciosFiltrados.length;
+        _serviciosFiltrados.length;
     setState(() {
       _indiceServicioActual = nuevoIndice;
     });
-    _mostrarInfoMarcador(_serviciosFiltrados[nuevoIndice],
-        sincronizarCarrusel: false);
+    _mostrarInfoMarcador(
+      _serviciosFiltrados[nuevoIndice],
+      sincronizarCarrusel: false,
+    );
   }
 
   void _siguienteServicio() {
@@ -684,8 +713,10 @@ class _PantallaMapaState extends State<PantallaMapa>
     setState(() {
       _indiceServicioActual = nuevoIndice;
     });
-    _mostrarInfoMarcador(_serviciosFiltrados[nuevoIndice],
-        sincronizarCarrusel: false);
+    _mostrarInfoMarcador(
+      _serviciosFiltrados[nuevoIndice],
+      sincronizarCarrusel: false,
+    );
   }
 
   Rect _getRect(GlobalKey key) {
@@ -761,7 +792,9 @@ class _PantallaMapaState extends State<PantallaMapa>
           _habitatFiltro = nuevoHabitat;
           _marcadorSeleccionado = null;
           if (nuevoHabitat != null) {
-            final enZona = marcadores.where((m) => m.habitat == nuevoHabitat).toList();
+            final enZona = marcadores
+                .where((m) => m.habitat == nuevoHabitat)
+                .toList();
             if (enZona.isNotEmpty) {
               _centrarEnPunto(enZona.first.x, enZona.first.y);
             }
@@ -790,7 +823,10 @@ class _PantallaMapaState extends State<PantallaMapa>
             _serviciosFiltrados = List.from(zonasCalma);
             _indiceServicioActual = 0;
             if (zonasCalma.isNotEmpty) {
-              _mostrarInfoMarcador(zonasCalma.first, sincronizarCarrusel: false);
+              _mostrarInfoMarcador(
+                zonasCalma.first,
+                sincronizarCarrusel: false,
+              );
             }
           } else if (servicio == 'snacks' || servicio == 'tiendas') {
             ModalTiendasCercanas.mostrar(context, onAbrirEnMapa: () {});
@@ -800,20 +836,22 @@ class _PantallaMapaState extends State<PantallaMapa>
     );
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final double minMapScale = math.max(
       screenSize.width / mapaAncho,
       screenSize.height / mapaAlto,
     );
-    final double currentScale =
-        _transformationController.value.getMaxScaleOnAxis();
+    final double currentScale = _transformationController.value
+        .getMaxScaleOnAxis();
     final bool mostrarEtiquetasAnimales = currentScale >= 1.25;
     final a11y = AccesibilidadService.instance;
 
     return Scaffold(
-      backgroundColor: a11y.modoAltoContraste ? const Color(0xFF020617) : Colors.white,
+      backgroundColor: a11y.modoAltoContraste
+          ? const Color(0xFF020617)
+          : Colors.white,
       extendBody: true,
       body: Stack(
         children: [
@@ -872,10 +910,7 @@ class _PantallaMapaState extends State<PantallaMapa>
                   _onFiltroCambiado(FiltroServicioMapa.todos);
                   break;
                 case ChipUrgenciaMapa.snacks:
-                  ModalTiendasCercanas.mostrar(
-                    context,
-                    onAbrirEnMapa: () {},
-                  );
+                  ModalTiendasCercanas.mostrar(context, onAbrirEnMapa: () {});
                   break;
                 case ChipUrgenciaMapa.ninguno:
                   _onFiltroCambiado(FiltroServicioMapa.todos);
@@ -934,8 +969,12 @@ class _PantallaMapaState extends State<PantallaMapa>
                       _rutaSvgActual = null;
                     });
                   },
-                  indiceServicio: _serviciosFiltrados.isNotEmpty ? _indiceServicioActual : null,
-                  totalServicios: _serviciosFiltrados.isNotEmpty ? _serviciosFiltrados.length : null,
+                  indiceServicio: _serviciosFiltrados.isNotEmpty
+                      ? _indiceServicioActual
+                      : null,
+                  totalServicios: _serviciosFiltrados.isNotEmpty
+                      ? _serviciosFiltrados.length
+                      : null,
                   onServicioAnterior: _anteriorServicio,
                   onServicioSiguiente: _siguienteServicio,
                 ),

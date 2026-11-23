@@ -5,6 +5,7 @@ import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_detalle_animal.dart';
+
 import '../data/habitat_ruta_item.dart';
 
 /// Modal que lista todos los animales del hábitat seleccionado con:
@@ -31,10 +32,8 @@ class ModalAnimalesHabitat extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => ModalAnimalesHabitat(
-        habitat: habitat,
-        onTrazarRuta: onTrazarRuta,
-      ),
+      builder: (context) =>
+          ModalAnimalesHabitat(habitat: habitat, onTrazarRuta: onTrazarRuta),
     );
   }
 
@@ -50,7 +49,9 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
     return ListenableBuilder(
       listenable: AnimalService.instance,
       builder: (context, _) {
-        final todos = AnimalService.instance.obtenerPorHabitat(widget.habitat.habitatFiltro);
+        final todos = AnimalService.instance.obtenerPorHabitat(
+          widget.habitat.habitatFiltro,
+        );
         final explorados = todos.where((a) => a.visitado).length;
         final total = todos.length;
 
@@ -98,7 +99,10 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                           decoration: BoxDecoration(
                             color: widget.habitat.colorFondo,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: widget.habitat.colorBorde, width: 1.2),
+                            border: Border.all(
+                              color: widget.habitat.colorBorde,
+                              width: 1.2,
+                            ),
                           ),
                           child: Icon(
                             Icons.pets_rounded,
@@ -153,7 +157,10 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                       },
                       borderRadius: BorderRadius.circular(14),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
                           color: widget.habitat.colorFondo,
                           borderRadius: BorderRadius.circular(14),
@@ -161,7 +168,11 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.explore_rounded, color: widget.habitat.colorAcento, size: 18),
+                            Icon(
+                              Icons.explore_rounded,
+                              color: widget.habitat.colorAcento,
+                              size: 18,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -173,7 +184,11 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                                 ),
                               ),
                             ),
-                            Icon(Icons.arrow_forward_ios_rounded, color: widget.habitat.colorAcento, size: 13),
+                            Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: widget.habitat.colorAcento,
+                              size: 13,
+                            ),
                           ],
                         ),
                       ),
@@ -184,9 +199,17 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                     // BUSCADOR EN VIVO
                     TextField(
                       decoration: InputDecoration(
-                        hintText: 'Buscar animal en ${widget.habitat.nombre}...',
-                        hintStyle: GoogleFonts.urbanist(color: AppColors.textoGris, fontSize: 13.5),
-                        prefixIcon: Icon(Icons.search_rounded, color: widget.habitat.colorAcento, size: 22),
+                        hintText:
+                            'Buscar animal en ${widget.habitat.nombre}...',
+                        hintStyle: GoogleFonts.urbanist(
+                          color: AppColors.textoGris,
+                          fontSize: 13.5,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search_rounded,
+                          color: widget.habitat.colorAcento,
+                          size: 22,
+                        ),
                         suffixIcon: _busqueda.isNotEmpty
                             ? IconButton(
                                 icon: const Icon(Icons.clear_rounded, size: 18),
@@ -195,7 +218,10 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                             : null,
                         filled: true,
                         fillColor: Colors.grey.shade100,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 11,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide.none,
@@ -224,7 +250,8 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                           : ListView.separated(
                               physics: const BouncingScrollPhysics(),
                               itemCount: listaFiltrada.length,
-                              separatorBuilder: (context, index) => const SizedBox(height: 10),
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: 10),
                               itemBuilder: (context, index) {
                                 final animal = listaFiltrada[index];
                                 final bool esExplorado = animal.visitado;
@@ -238,14 +265,18 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                                     border: Border.all(
                                       color: esExplorado
                                           ? Colors.grey.shade300
-                                          : Colors.black.withValues(alpha: 0.08),
+                                          : Colors.black.withValues(
+                                              alpha: 0.08,
+                                            ),
                                       width: 1.2,
                                     ),
                                     boxShadow: esExplorado
                                         ? []
                                         : [
                                             BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.04),
+                                              color: Colors.black.withValues(
+                                                alpha: 0.04,
+                                              ),
                                               blurRadius: 8,
                                               offset: const Offset(0, 2),
                                             ),
@@ -261,7 +292,10 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => PantallaDetalleAnimal(animal: animal),
+                                            builder: (context) =>
+                                                PantallaDetalleAnimal(
+                                                  animal: animal,
+                                                ),
                                           ),
                                         );
                                       },
@@ -271,29 +305,45 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                                           children: [
                                             // Foto del animal
                                             ClipRRect(
-                                              borderRadius: BorderRadius.circular(16),
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
                                               child: SizedBox(
                                                 width: 88,
                                                 height: 88,
                                                 child: esExplorado
                                                     ? ColorFiltered(
-                                                        colorFilter: const ColorFilter.mode(
-                                                          Colors.grey,
-                                                          BlendMode.saturation,
-                                                        ),
+                                                        colorFilter:
+                                                            const ColorFilter.mode(
+                                                              Colors.grey,
+                                                              BlendMode
+                                                                  .saturation,
+                                                            ),
                                                         child: Opacity(
                                                           opacity: 0.70,
                                                           child: Image.asset(
                                                             animal.imagen ?? 'assets/images/animales_con_fondo/leon-card.jpg',
                                                             fit: BoxFit.cover,
-                                                            errorBuilder: (ctx, err, stack) => const Icon(Icons.pets, size: 36),
+                                                            errorBuilder:
+                                                                (
+                                                                  ctx,
+                                                                  err,
+                                                                  stack,
+                                                                ) => const Icon(
+                                                                  Icons.pets,
+                                                                  size: 36,
+                                                                ),
                                                           ),
                                                         ),
                                                       )
                                                     : Image.asset(
                                                         animal.imagen ?? 'assets/images/animales_con_fondo/leon-card.jpg',
                                                         fit: BoxFit.cover,
-                                                        errorBuilder: (ctx, err, stack) => const Icon(Icons.pets, size: 36),
+                                                        errorBuilder:
+                                                            (ctx, err, stack) =>
+                                                                const Icon(
+                                                                  Icons.pets,
+                                                                  size: 36,
+                                                                ),
                                                       ),
                                               ),
                                             ),
@@ -302,16 +352,21 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                                             // Información y acciones
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     animal.nombre.tr,
                                                     style: GoogleFonts.urbanist(
                                                       fontSize: 15.5,
-                                                      fontWeight: FontWeight.w900,
+                                                      fontWeight:
+                                                          FontWeight.w900,
                                                       color: esExplorado
-                                                          ? const Color(0xFF64748B)
-                                                          : AppColors.textoOscuro,
+                                                          ? const Color(
+                                                              0xFF64748B,
+                                                            )
+                                                          : AppColors
+                                                                .textoOscuro,
                                                       height: 1.15,
                                                     ),
                                                   ),
@@ -320,7 +375,8 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                                                     animal.categoria,
                                                     style: GoogleFonts.urbanist(
                                                       fontSize: 12,
-                                                      fontWeight: FontWeight.w600,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                       color: esExplorado
                                                           ? Colors.grey.shade500
                                                           : AppColors.textoGris,
@@ -332,37 +388,72 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                                                     children: [
                                                       // Badge Explorado / Por descubrir
                                                       Container(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 7,
+                                                              vertical: 3,
+                                                            ),
                                                         decoration: BoxDecoration(
                                                           color: esExplorado
-                                                              ? const Color(0xFFE2E8F0)
-                                                              : widget.habitat.colorFondo,
-                                                          borderRadius: BorderRadius.circular(8),
+                                                              ? const Color(
+                                                                  0xFFE2E8F0,
+                                                                )
+                                                              : widget
+                                                                    .habitat
+                                                                    .colorFondo,
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                8,
+                                                              ),
                                                           border: Border.all(
                                                             color: esExplorado
-                                                                ? Colors.grey.shade400
-                                                                : widget.habitat.colorBorde,
+                                                                ? Colors
+                                                                      .grey
+                                                                      .shade400
+                                                                : widget
+                                                                      .habitat
+                                                                      .colorBorde,
                                                           ),
                                                         ),
                                                         child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
                                                           children: [
                                                             Icon(
-                                                              esExplorado ? Icons.check_circle_rounded : Icons.pending_rounded,
+                                                              esExplorado
+                                                                  ? Icons
+                                                                        .check_circle_rounded
+                                                                  : Icons
+                                                                        .pending_rounded,
                                                               size: 11,
                                                               color: esExplorado
-                                                                  ? const Color(0xFF16A34A)
-                                                                  : widget.habitat.colorAcento,
+                                                                  ? const Color(
+                                                                      0xFF16A34A,
+                                                                    )
+                                                                  : widget
+                                                                        .habitat
+                                                                        .colorAcento,
                                                             ),
-                                                            const SizedBox(width: 3.5),
+                                                            const SizedBox(
+                                                              width: 3.5,
+                                                            ),
                                                             Text(
-                                                              esExplorado ? 'Explorado' : 'Por descubrir',
+                                                              esExplorado
+                                                                  ? 'Explorado'
+                                                                  : 'Por descubrir',
                                                               style: GoogleFonts.urbanist(
                                                                 fontSize: 10,
-                                                                fontWeight: FontWeight.w800,
-                                                                color: esExplorado
-                                                                    ? const Color(0xFF16A34A)
-                                                                    : widget.habitat.colorAcento,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                                color:
+                                                                    esExplorado
+                                                                    ? const Color(
+                                                                        0xFF16A34A,
+                                                                      )
+                                                                    : widget
+                                                                          .habitat
+                                                                          .colorAcento,
                                                               ),
                                                             ),
                                                           ],
@@ -373,33 +464,77 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                                                       // Botón Trazar ruta rápida
                                                       InkWell(
                                                         onTap: () {
-                                                          SoundService.instance.playButtonTap();
-                                                          Navigator.pop(context);
-                                                          if (widget.onTrazarRuta != null) {
-                                                            widget.onTrazarRuta!(animal.id);
+                                                          SoundService.instance
+                                                              .playButtonTap();
+                                                          Navigator.pop(
+                                                            context,
+                                                          );
+                                                          if (widget
+                                                                  .onTrazarRuta !=
+                                                              null) {
+                                                            widget
+                                                                .onTrazarRuta!(
+                                                              animal.id,
+                                                            );
                                                           }
                                                         },
-                                                        borderRadius: BorderRadius.circular(8),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              8,
+                                                            ),
                                                         child: Container(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 8,
+                                                                vertical: 3.5,
+                                                              ),
                                                           decoration: BoxDecoration(
-                                                            color: widget.habitat.colorAcento.withValues(alpha: 0.1),
-                                                            borderRadius: BorderRadius.circular(8),
+                                                            color: widget
+                                                                .habitat
+                                                                .colorAcento
+                                                                .withValues(
+                                                                  alpha: 0.1,
+                                                                ),
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  8,
+                                                                ),
                                                             border: Border.all(
-                                                              color: widget.habitat.colorAcento.withValues(alpha: 0.28),
+                                                              color: widget
+                                                                  .habitat
+                                                                  .colorAcento
+                                                                  .withValues(
+                                                                    alpha: 0.28,
+                                                                  ),
                                                             ),
                                                           ),
                                                           child: Row(
-                                                            mainAxisSize: MainAxisSize.min,
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
                                                             children: [
-                                                              Icon(Icons.near_me_rounded, size: 11, color: widget.habitat.colorAcento),
-                                                              const SizedBox(width: 3),
+                                                              Icon(
+                                                                Icons
+                                                                    .near_me_rounded,
+                                                                size: 11,
+                                                                color: widget
+                                                                    .habitat
+                                                                    .colorAcento,
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 3,
+                                                              ),
                                                               Text(
                                                                 'Trazar',
                                                                 style: GoogleFonts.urbanist(
-                                                                  fontSize: 10.5,
-                                                                  fontWeight: FontWeight.w900,
-                                                                  color: widget.habitat.colorAcento,
+                                                                  fontSize:
+                                                                      10.5,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w900,
+                                                                  color: widget
+                                                                      .habitat
+                                                                      .colorAcento,
                                                                 ),
                                                               ),
                                                             ],
@@ -411,19 +546,35 @@ class _ModalAnimalesHabitatState extends State<ModalAnimalesHabitat> {
                                                       // Botón marcar visitado
                                                       InkWell(
                                                         onTap: () {
-                                                          SoundService.instance.playButtonTap();
-                                                          AnimalService.instance.toggleVisitado(animal.id);
+                                                          SoundService.instance
+                                                              .playButtonTap();
+                                                          AnimalService.instance
+                                                              .toggleVisitado(
+                                                                animal.id,
+                                                              );
                                                         },
-                                                        borderRadius: BorderRadius.circular(8),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              8,
+                                                            ),
                                                         child: Padding(
-                                                          padding: const EdgeInsets.all(3.0),
+                                                          padding:
+                                                              const EdgeInsets.all(
+                                                                3.0,
+                                                              ),
                                                           child: Icon(
                                                             esExplorado
-                                                                ? Icons.check_circle_rounded
-                                                                : Icons.radio_button_unchecked_rounded,
+                                                                ? Icons
+                                                                      .check_circle_rounded
+                                                                : Icons
+                                                                      .radio_button_unchecked_rounded,
                                                             color: esExplorado
-                                                                ? const Color(0xFF16A34A)
-                                                                : Colors.grey.shade400,
+                                                                ? const Color(
+                                                                    0xFF16A34A,
+                                                                  )
+                                                                : Colors
+                                                                      .grey
+                                                                      .shade400,
                                                             size: 22,
                                                           ),
                                                         ),

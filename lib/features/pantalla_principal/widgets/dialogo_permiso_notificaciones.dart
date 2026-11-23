@@ -158,7 +158,8 @@ class DialogoPermisoNotificaciones extends StatelessWidget {
               icon: Icons.explore_rounded,
               color: const Color(0xFF16A34A),
               titulo: 'Descubre Animales Cercanos',
-              descripcion: 'Te avisamos cuando estés cerca de especies por visitar.',
+              descripcion:
+                  'Te avisamos cuando estés cerca de especies por visitar.',
             ),
             const SizedBox(height: 12),
             _buildBeneficioItem(

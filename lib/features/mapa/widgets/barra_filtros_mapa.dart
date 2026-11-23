@@ -1,9 +1,11 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+
 import '../data/filtro_servicio_mapa.dart';
 export '../data/filtro_servicio_mapa.dart';
 
@@ -117,17 +119,19 @@ class BarraFiltrosMapa extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? (altoContraste ? const Color(0xFFFDE047) : opcion.colorActivo)
+                        ? (altoContraste
+                              ? const Color(0xFFFDE047)
+                              : opcion.colorActivo)
                         : (altoContraste
-                            ? const Color(0xFF0F172A)
-                            : Colors.white.withValues(alpha: 0.88)),
+                              ? const Color(0xFF0F172A)
+                              : Colors.white.withValues(alpha: 0.88)),
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(
                       color: isSelected
                           ? (altoContraste ? Colors.white : opcion.colorActivo)
                           : (altoContraste
-                              ? const Color(0xFF475569)
-                              : const Color(0xFFCBD5E1)),
+                                ? const Color(0xFF475569)
+                                : const Color(0xFFCBD5E1)),
                       width: isSelected ? 2.0 : (altoContraste ? 1.5 : 1.2),
                     ),
                     boxShadow: [
@@ -148,18 +152,23 @@ class BarraFiltrosMapa extends StatelessWidget {
                         size: 16,
                         color: isSelected
                             ? (altoContraste ? Colors.black : Colors.white)
-                            : (altoContraste ? Colors.white : const Color(0xFF334155)),
+                            : (altoContraste
+                                  ? Colors.white
+                                  : const Color(0xFF334155)),
                       ),
                       const SizedBox(width: 6),
                       Text(
                         opcion.etiqueta,
                         style: GoogleFonts.urbanist(
                           fontSize: 12.5,
-                          fontWeight:
-                              isSelected ? FontWeight.w900 : FontWeight.w700,
+                          fontWeight: isSelected
+                              ? FontWeight.w900
+                              : FontWeight.w700,
                           color: isSelected
                               ? (altoContraste ? Colors.black : Colors.white)
-                              : (altoContraste ? Colors.white : const Color(0xFF1E293B)),
+                              : (altoContraste
+                                    ? Colors.white
+                                    : const Color(0xFF1E293B)),
                         ),
                       ),
                       if (opcion.badge != null) ...[

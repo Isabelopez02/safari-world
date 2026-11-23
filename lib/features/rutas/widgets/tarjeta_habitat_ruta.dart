@@ -1,10 +1,12 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+
 import '../data/habitat_ruta_item.dart';
 import 'modal_animales_habitat.dart';
 
@@ -21,7 +23,9 @@ class TarjetaHabitatRuta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final animalesZona = AnimalService.instance.obtenerPorHabitat(habitat.habitatFiltro);
+    final animalesZona = AnimalService.instance.obtenerPorHabitat(
+      habitat.habitatFiltro,
+    );
     final totalZona = animalesZona.length;
     final exploradosZona = animalesZona.where((a) => a.visitado).length;
 
@@ -42,10 +46,7 @@ class TarjetaHabitatRuta extends StatelessWidget {
           decoration: BoxDecoration(
             color: habitat.colorFondo,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: habitat.colorBorde,
-              width: 1.4,
-            ),
+            border: Border.all(color: habitat.colorBorde, width: 1.4),
             boxShadow: [
               BoxShadow(
                 color: habitat.colorAcento.withValues(alpha: 0.08),
@@ -62,17 +63,24 @@ class TarjetaHabitatRuta extends StatelessWidget {
                 child: Stack(
                   children: [
                     ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(19),
+                      ),
                       child: SizedBox(
                         width: double.infinity,
                         height: double.infinity,
                         child: Image.asset(
                           habitat.imagen,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: Colors.grey.shade200,
-                            child: const Icon(Icons.nature_people, size: 36, color: Colors.grey),
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                color: Colors.grey.shade200,
+                                child: const Icon(
+                                  Icons.nature_people,
+                                  size: 36,
+                                  color: Colors.grey,
+                                ),
+                              ),
                         ),
                       ),
                     ),
@@ -80,7 +88,9 @@ class TarjetaHabitatRuta extends StatelessWidget {
                     Positioned.fill(
                       child: DecoratedBox(
                         decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(19),
+                          ),
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
@@ -103,7 +113,10 @@ class TarjetaHabitatRuta extends StatelessWidget {
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.black.withValues(alpha: 0.45),
                               borderRadius: BorderRadius.circular(8),
@@ -115,7 +128,11 @@ class TarjetaHabitatRuta extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.schedule_rounded, size: 10.5, color: Colors.white),
+                                const Icon(
+                                  Icons.schedule_rounded,
+                                  size: 10.5,
+                                  color: Colors.white,
+                                ),
                                 const SizedBox(width: 3.5),
                                 Text(
                                   habitat.duracion,
@@ -140,10 +157,15 @@ class TarjetaHabitatRuta extends StatelessWidget {
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3.5,
+                            ),
                             decoration: BoxDecoration(
-                              color: (exploradosZona == totalZona && totalZona > 0)
-                                  ? const Color(0xFF15803D).withValues(alpha: 0.85)
+                              color:
+                                  (exploradosZona == totalZona && totalZona > 0)
+                                  ? const Color(0xFF15803D)
+                                        .withValues(alpha: 0.85)
                                   : Colors.black.withValues(alpha: 0.65),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
@@ -218,7 +240,9 @@ class TarjetaHabitatRuta extends StatelessWidget {
                               Icon(
                                 Icons.arrow_forward_rounded,
                                 size: 11.5,
-                                color: habitat.colorAcento.withValues(alpha: 0.8),
+                                color: habitat.colorAcento.withValues(
+                                  alpha: 0.8,
+                                ),
                               ),
                               const SizedBox(width: 3),
                               Expanded(
@@ -244,19 +268,30 @@ class TarjetaHabitatRuta extends StatelessWidget {
                           },
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
-                              color: habitat.colorAcento.withValues(alpha: 0.12),
+                              color: habitat.colorAcento.withValues(
+                                alpha: 0.12,
+                              ),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: habitat.colorAcento.withValues(alpha: 0.3),
+                                color: habitat.colorAcento.withValues(
+                                  alpha: 0.3,
+                                ),
                                 width: 0.8,
                               ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.near_me_rounded, size: 10, color: habitat.colorAcento),
+                                Icon(
+                                  Icons.near_me_rounded,
+                                  size: 10,
+                                  color: habitat.colorAcento,
+                                ),
                                 const SizedBox(width: 3),
                                 Text(
                                   'Trazar',

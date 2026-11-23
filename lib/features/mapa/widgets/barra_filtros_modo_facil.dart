@@ -41,7 +41,11 @@ class BarraFiltrosModoFacil extends StatelessWidget {
                     SoundService.instance.playButtonTap();
                     onVolverMenuFacil!();
                   },
-                  icon: const Icon(Icons.arrow_back_rounded, size: 24, color: Colors.white),
+                  icon: const Icon(
+                    Icons.arrow_back_rounded,
+                    size: 24,
+                    color: Colors.white,
+                  ),
                   label: Text(
                     'volver_al_menu'.tr,
                     style: GoogleFonts.urbanist(

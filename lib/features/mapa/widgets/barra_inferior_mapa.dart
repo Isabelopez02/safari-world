@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/accesibilidad_service.dart';
@@ -74,7 +75,10 @@ class BarraInferiorMapa extends StatelessWidget {
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
                     key: keyAnimales,
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: a11yActivo
                           ? const Color(0xFF0F172A)
@@ -105,7 +109,10 @@ class BarraInferiorMapa extends StatelessWidget {
                             begin: const Offset(0, 0.12),
                             end: Offset.zero,
                           ).animate(animation),
-                          child: FadeTransition(opacity: animation, child: child),
+                          child: FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          ),
                         );
                       },
                       child: KeyedSubtree(
@@ -133,23 +140,29 @@ class BarraInferiorMapa extends StatelessWidget {
     final a11y = AccesibilidadService.instance;
     final bool a11yActivo = a11y.accesibilidadVisualActiva;
 
-    final Color chevronColor =
-        a11yActivo ? const Color(0xFFFDE047) : AppColors.verdeAzulado;
-    final Color iconColor =
-        a11yActivo ? const Color(0xFFFDE047) : AppColors.verdeAzulado;
-    final Color tituloColor =
-        a11yActivo ? Colors.white : const Color(0xFF1E293B);
-    final Color subtituloColor =
-        a11yActivo ? const Color(0xFFCBD5E1) : AppColors.verdeAzulado;
-    final Color progressBarColor =
-        a11yActivo ? const Color(0xFFFDE047) : AppColors.verdeAzulado;
+    final Color chevronColor = a11yActivo
+        ? const Color(0xFFFDE047)
+        : AppColors.verdeAzulado;
+    final Color iconColor = a11yActivo
+        ? const Color(0xFFFDE047)
+        : AppColors.verdeAzulado;
+    final Color tituloColor = a11yActivo
+        ? Colors.white
+        : const Color(0xFF1E293B);
+    final Color subtituloColor = a11yActivo
+        ? const Color(0xFFCBD5E1)
+        : AppColors.verdeAzulado;
+    final Color progressBarColor = a11yActivo
+        ? const Color(0xFFFDE047)
+        : AppColors.verdeAzulado;
     final Color progressBgColor = a11yActivo
         ? Colors.white24
         : AppColors.verdeAzulado.withValues(alpha: 0.15);
 
     final int visitados = marcadores.where((m) => m.visitado).length;
-    final double pct =
-        marcadores.isEmpty ? 0.0 : (visitados / marcadores.length);
+    final double pct = marcadores.isEmpty
+        ? 0.0
+        : (visitados / marcadores.length);
 
     return GestureDetector(
       onTap: onTapExploraciones,
@@ -179,11 +192,7 @@ class BarraInferiorMapa extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.explore_rounded,
-                          size: 18,
-                          color: iconColor,
-                        ),
+                        Icon(Icons.explore_rounded, size: 18, color: iconColor),
                         const SizedBox(width: 6),
                         Text(
                           'Tus Exploraciones',
@@ -295,8 +304,8 @@ class BarraInferiorMapa extends StatelessWidget {
     final Color colorAcento = esCalma
         ? const Color(0xFF10B981)
         : (sel.esBanio
-            ? const Color(0xFF0284C7)
-            : (sel.colorZona ?? AppColors.verdeAzulado));
+              ? const Color(0xFF0284C7)
+              : (sel.colorZona ?? AppColors.verdeAzulado));
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -316,7 +325,9 @@ class BarraInferiorMapa extends StatelessWidget {
         ),
 
         // 1.1 CARRUSEL MULTIPLE SERVICIOS (Ej: Baño 1 de 4 con flechas)
-        if (totalServicios != null && totalServicios! > 1 && indiceServicio != null) ...[
+        if (totalServicios != null &&
+            totalServicios! > 1 &&
+            indiceServicio != null) ...[
           Container(
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -401,30 +412,30 @@ class BarraInferiorMapa extends StatelessWidget {
                         size: 28,
                       )
                     : (sel.esBanio
-                        ? const Icon(
-                            Icons.wc_rounded,
-                            color: Color(0xFF0284C7),
-                            size: 28,
-                          )
-                        : (sel.imagen != null
-                            ? Image.asset(sel.imagen!, fit: BoxFit.cover)
-                            : Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      colorAcento.withValues(alpha: 0.15),
-                                      colorAcento.withValues(alpha: 0.3),
-                                    ],
-                                  ),
-                                ),
-                                child: Icon(
-                                  sel.icono,
-                                  color: colorAcento,
-                                  size: 28,
-                                ),
-                              ))),
+                          ? const Icon(
+                              Icons.wc_rounded,
+                              color: Color(0xFF0284C7),
+                              size: 28,
+                            )
+                          : (sel.imagen != null
+                                ? Image.asset(sel.imagen!, fit: BoxFit.cover)
+                                : Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          colorAcento.withValues(alpha: 0.15),
+                                          colorAcento.withValues(alpha: 0.3),
+                                        ],
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      sel.icono,
+                                      color: colorAcento,
+                                      size: 28,
+                                    ),
+                                  ))),
               ),
             ),
             const SizedBox(width: 12),
@@ -461,8 +472,8 @@ class BarraInferiorMapa extends StatelessWidget {
                           esCalma
                               ? '${sel.nivelRuido ?? "Silencioso"} · $minutos min ($metros m)'
                               : (sel.esBanio
-                                  ? '${sel.habitat} · $minutos min ($metros m)'
-                                  : '${sel.habitat} · $minutos min ($metros m)'),
+                                    ? '${sel.habitat} · $minutos min ($metros m)'
+                                    : '${sel.habitat} · $minutos min ($metros m)'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.urbanist(
@@ -496,20 +507,20 @@ class BarraInferiorMapa extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: a11yActivo
                         ? (sel.visitado
-                            ? const Color(0xFF14532D)
-                            : const Color(0xFF1E293B))
+                              ? const Color(0xFF14532D)
+                              : const Color(0xFF1E293B))
                         : (sel.visitado
-                            ? const Color(0xFFE8F5E9)
-                            : Colors.grey.shade100),
+                              ? const Color(0xFFE8F5E9)
+                              : Colors.grey.shade100),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: a11yActivo
                           ? (sel.visitado
-                              ? const Color(0xFF4ADE80)
-                              : const Color(0xFF475569))
+                                ? const Color(0xFF4ADE80)
+                                : const Color(0xFF475569))
                           : (sel.visitado
-                              ? const Color(0xFF4CAF50)
-                              : Colors.grey.shade300),
+                                ? const Color(0xFF4CAF50)
+                                : Colors.grey.shade300),
                       width: 1.2,
                     ),
                   ),
@@ -523,11 +534,11 @@ class BarraInferiorMapa extends StatelessWidget {
                         size: 15,
                         color: a11yActivo
                             ? (sel.visitado
-                                ? const Color(0xFF4ADE80)
-                                : const Color(0xFFFDE047))
+                                  ? const Color(0xFF4ADE80)
+                                  : const Color(0xFFFDE047))
                             : (sel.visitado
-                                ? const Color(0xFF2E7D32)
-                                : Colors.grey.shade700),
+                                  ? const Color(0xFF2E7D32)
+                                  : Colors.grey.shade700),
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -537,11 +548,11 @@ class BarraInferiorMapa extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                           color: a11yActivo
                               ? (sel.visitado
-                                  ? const Color(0xFF4ADE80)
-                                  : Colors.white)
+                                    ? const Color(0xFF4ADE80)
+                                    : Colors.white)
                               : (sel.visitado
-                                  ? const Color(0xFF2E7D32)
-                                  : Colors.grey.shade800),
+                                    ? const Color(0xFF2E7D32)
+                                    : Colors.grey.shade800),
                         ),
                       ),
                     ],
@@ -643,8 +654,8 @@ class BarraInferiorMapa extends StatelessWidget {
                   esCalma
                       ? '${'filtro_calma'.tr} ($metros m)'
                       : (sel.esBanio
-                          ? '${'filtro_banios'.tr} ($metros m)'
-                          : '${'iniciar_guia'.tr} ($metros m)'),
+                            ? '${'filtro_banios'.tr} ($metros m)'
+                            : '${'iniciar_guia'.tr} ($metros m)'),
                   style: GoogleFonts.urbanist(
                     color: Colors.white,
                     fontWeight: FontWeight.w900,
@@ -655,8 +666,10 @@ class BarraInferiorMapa extends StatelessWidget {
                   backgroundColor: esCalma
                       ? const Color(0xFF10B981)
                       : (sel.esBanio
-                          ? const Color(0xFF0284C7)
-                          : (a11yActivo ? const Color(0xFF0284C7) : AppColors.verdeAzulado)),
+                            ? const Color(0xFF0284C7)
+                            : (a11yActivo
+                                  ? const Color(0xFF0284C7)
+                                  : AppColors.verdeAzulado)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(22),
                   ),
@@ -730,7 +743,11 @@ class BarraInferiorMapa extends StatelessWidget {
                   color: Colors.red.shade50,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.close_rounded, color: Colors.red, size: 20),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: Colors.red,
+                  size: 20,
+                ),
               ),
               onPressed: onCancelarNavegacion,
             ),

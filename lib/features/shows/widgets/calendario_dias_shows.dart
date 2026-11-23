@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+
 import '../utils/shows_date_utils.dart';
 
 /// Selector horizontal de días tipo cartelera Cineplanet (Hoy, Mañana, Días del mes)
@@ -30,7 +31,10 @@ class CalendarioDiasShows extends StatelessWidget {
         itemBuilder: (context, index) {
           final fecha = diasCalendario[index];
           final bool seleccionado = diaSeleccionadoIndex == index;
-          final String diaSemana = ShowsDateUtils.obtenerNombreDia(fecha, index);
+          final String diaSemana = ShowsDateUtils.obtenerNombreDia(
+            fecha,
+            index,
+          );
           final String numeroDia = fecha.day.toString();
 
           return InkWell(
@@ -83,7 +87,9 @@ class CalendarioDiasShows extends StatelessWidget {
                       fontSize: 22,
                       fontWeight: FontWeight.w900,
                       height: 1.0,
-                      color: seleccionado ? Colors.white : AppColors.textoOscuro,
+                      color: seleccionado
+                          ? Colors.white
+                          : AppColors.textoOscuro,
                     ),
                   ),
                 ],

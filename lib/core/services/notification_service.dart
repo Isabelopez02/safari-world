@@ -16,8 +16,9 @@ class NotificationService {
     if (_inicializado) return;
 
     try {
-      const androidSettings =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidSettings = AndroidInitializationSettings(
+        '@mipmap/ic_launcher',
+      );
 
       const iosSettings = DarwinInitializationSettings(
         requestAlertPermission: true,
@@ -34,8 +35,10 @@ class NotificationService {
 
       // Solicitar permisos en Android 13+ (API 33+)
       if (defaultTargetPlatform == TargetPlatform.android) {
-        final androidImpl = _notificationsPlugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+        final androidImpl = _notificationsPlugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
         await androidImpl?.requestNotificationsPermission();
       }
 

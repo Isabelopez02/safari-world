@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui';
+
 import 'package:flutter/services.dart';
 import 'package:path_drawing/path_drawing.dart';
 
@@ -67,10 +68,22 @@ class DatosTrazosSvg {
       Float64List? matrix4;
       if (parts.length >= 6 && parts.every((p) => p != null)) {
         matrix4 = Float64List.fromList([
-          parts[0]!, parts[1]!, 0.0, 0.0,
-          parts[2]!, parts[3]!, 0.0, 0.0,
-          0.0, 0.0, 1.0, 0.0,
-          parts[4]!, parts[5]!, 0.0, 1.0,
+          parts[0]!,
+          parts[1]!,
+          0.0,
+          0.0,
+          parts[2]!,
+          parts[3]!,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          parts[4]!,
+          parts[5]!,
+          0.0,
+          1.0,
         ]);
       }
 
@@ -146,7 +159,8 @@ class DatosTrazosSvg {
   }
 
   /// Contenido SVG de assets/images/trazo.svg embebido para disponibilidad síncrona
-  static const String rawSvg = r'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+  static const String rawSvg =
+      r'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 1920 1080" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:affinity="https://www.affinity.studio/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
     <path d="M1471.443,493.012L1513.658,500.695" style="fill:none;stroke:black;stroke-width:1px;"/>

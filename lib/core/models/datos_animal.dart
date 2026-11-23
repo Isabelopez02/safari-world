@@ -47,4 +47,3 @@ class DatosAnimal {
     return trad != key ? trad : narracionAudioguia;
   }
 }
-

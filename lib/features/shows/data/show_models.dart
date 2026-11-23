@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Secciones principales disponibles para los shows
-enum SeccionShows {
-  horarios,
-  reglas,
-  escenarios,
-}
+enum SeccionShows { horarios, reglas, escenarios }
 
 /// Modelo de datos para un show de la cartelera
 class ShowItemData {

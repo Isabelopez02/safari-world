@@ -58,10 +58,7 @@ class AnimalQrFacil {
 class PantallaModoFacil extends StatefulWidget {
   final VoidCallback onSalirModoFacil;
 
-  const PantallaModoFacil({
-    super.key,
-    required this.onSalirModoFacil,
-  });
+  const PantallaModoFacil({super.key, required this.onSalirModoFacil});
 
   @override
   State<PantallaModoFacil> createState() => _PantallaModoFacilState();
@@ -156,10 +153,16 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Row(
             children: [
-              const Icon(Icons.phone_in_talk_rounded, color: Color(0xFFC62828), size: 28),
+              const Icon(
+                Icons.phone_in_talk_rounded,
+                color: Color(0xFFC62828),
+                size: 28,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -175,7 +178,10 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
             children: [
               Text(
                 'Número de $nombreDestino:',
-                style: GoogleFonts.urbanist(fontSize: 15, fontWeight: FontWeight.w700),
+                style: GoogleFonts.urbanist(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const SizedBox(height: 10),
               Container(
@@ -200,17 +206,25 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
               const SizedBox(height: 10),
               Text(
                 'Puede marcar directamente este número desde cualquier teléfono o pedir auxilio a un guardaparques.',
-                style: GoogleFonts.urbanist(fontSize: 13, color: Colors.grey.shade700),
+                style: GoogleFonts.urbanist(
+                  fontSize: 13,
+                  color: Colors.grey.shade700,
+                ),
               ),
             ],
           ),
           actions: [
             ElevatedButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC62828)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFC62828),
+              ),
               child: Text(
                 'Entendido',
-                style: GoogleFonts.urbanist(fontWeight: FontWeight.w900, color: Colors.white),
+                style: GoogleFonts.urbanist(
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
               ),
             ),
           ],
@@ -270,9 +284,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
     final historia = narracion.trim().isNotEmpty
         ? narracion
         : (datos.getCuriosidad(m.nombre).trim().isNotEmpty
-            ? datos.getCuriosidad(m.nombre)
-            : '${m.nombre.tr} • ${m.habitat.tr}');
-    final dieta = datos.dieta.trim().isNotEmpty ? datos.dieta.tr : 'Alimentación balanceada';
+              ? datos.getCuriosidad(m.nombre)
+              : '${m.nombre.tr} • ${m.habitat.tr}');
+    final dieta = datos.dieta.trim().isNotEmpty
+        ? datos.dieta.tr
+        : 'Alimentación balanceada';
 
     return AnimalQrFacil(
       id: 'qr_${m.id.toLowerCase()}',
@@ -333,7 +349,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
       });
 
       // Narración por voz inmediata y clara
-      AudioGuiaService.instance.reproducir('${animal.nombre.tr}. ${animal.historiaVozActiva}');
+      AudioGuiaService.instance.reproducir(
+        '${animal.nombre.tr}. ${animal.historiaVozActiva}',
+      );
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -382,7 +400,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
       decoration: BoxDecoration(
         color: const Color(0xFFF3E5F5),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFF7B1FA2).withValues(alpha: 0.3)),
+        border: Border.all(
+          color: const Color(0xFF7B1FA2).withValues(alpha: 0.3),
+        ),
       ),
       child: IconButton(
         icon: const Icon(Icons.mic_rounded, color: Color(0xFF7B1FA2), size: 18),
@@ -399,7 +419,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
       decoration: BoxDecoration(
         color: const Color(0xFFFFEBEE),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFC62828).withValues(alpha: 0.4)),
+        border: Border.all(
+          color: const Color(0xFFC62828).withValues(alpha: 0.4),
+        ),
       ),
       child: IconButton(
         icon: const Icon(Icons.sos_rounded, color: Color(0xFFC62828), size: 18),
@@ -431,7 +453,8 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                 try {
                   speechDisponible = await _speechToText.initialize(
                     onStatus: (status) => debugPrint('STT Status: $status'),
-                    onError: (error) => debugPrint('STT Error: ${error.errorMsg}'),
+                    onError: (error) =>
+                        debugPrint('STT Error: ${error.errorMsg}'),
                   );
                   _speechInitialized = speechDisponible;
                 } catch (e) {
@@ -451,14 +474,17 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                       setModalState(() {
                         textoReconocido = result.recognizedWords;
                       });
-                      if (result.finalResult && textoReconocido.trim().isNotEmpty) {
+                      if (result.finalResult &&
+                          textoReconocido.trim().isNotEmpty) {
                         _procesarResultadoVoz(textoReconocido, modalContext);
                       }
                     },
                     listenOptions: stt.SpeechListenOptions(
                       listenMode: stt.ListenMode.search,
                       pauseFor: const Duration(seconds: 3),
-                      localeId: IdiomaService.instance.idioma == AppIdioma.en ? 'en_US' : 'es_PE',
+                      localeId: IdiomaService.instance.idioma == AppIdioma.en
+                          ? 'en_US'
+                          : 'es_PE',
                     ),
                   );
                 } catch (e) {
@@ -468,7 +494,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                 setModalState(() {
                   textoReconocido = 'Toque una opción de abajo:';
                 });
-                AudioGuiaService.instance.reproducir('Diga o seleccione el lugar que busca.');
+                AudioGuiaService.instance.reproducir(
+                  'Diga o seleccione el lugar que busca.',
+                );
               }
             }
 
@@ -506,10 +534,15 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                             Container(
                               padding: const EdgeInsets.all(7),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF7B1FA2).withValues(alpha: 0.12),
+                                color: const Color(0xFF7B1FA2)
+                                    .withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Icon(Icons.mic_rounded, color: Color(0xFF7B1FA2), size: 24),
+                              child: const Icon(
+                                Icons.mic_rounded,
+                                color: Color(0xFF7B1FA2),
+                                size: 24,
+                              ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
@@ -550,12 +583,17 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                       width: 90,
                       height: 90,
                       decoration: BoxDecoration(
-                        color: escuchando ? const Color(0xFFC62828) : const Color(0xFF7B1FA2),
+                        color: escuchando
+                            ? const Color(0xFFC62828)
+                            : const Color(0xFF7B1FA2),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: (escuchando ? const Color(0xFFC62828) : const Color(0xFF7B1FA2))
-                                .withValues(alpha: 0.4),
+                            color:
+                                (escuchando
+                                        ? const Color(0xFFC62828)
+                                        : const Color(0xFF7B1FA2))
+                                    .withValues(alpha: 0.4),
                             blurRadius: 18,
                             spreadRadius: 4,
                           ),
@@ -570,17 +608,24 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    escuchando ? '🎙️ Escuchando... Hable ahora' : 'Toque el micrófono para hablar',
+                    escuchando
+                        ? '🎙️ Escuchando... Hable ahora'
+                        : 'Toque el micrófono para hablar',
                     style: GoogleFonts.urbanist(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: escuchando ? const Color(0xFFC62828) : const Color(0xFF7B1FA2),
+                      color: escuchando
+                          ? const Color(0xFFC62828)
+                          : const Color(0xFF7B1FA2),
                     ),
                   ),
                   const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(16),
@@ -594,7 +639,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                       style: GoogleFonts.urbanist(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
-                        color: textoReconocido.isEmpty ? Colors.grey.shade600 : AppColors.textoOscuro,
+                        color: textoReconocido.isEmpty
+                            ? Colors.grey.shade600
+                            : AppColors.textoOscuro,
                       ),
                     ),
                   ),
@@ -605,8 +652,15 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () => _procesarResultadoVoz(textoReconocido, modalContext),
-                        icon: const Icon(Icons.navigation_rounded, color: Colors.white, size: 20),
+                        onPressed: () => _procesarResultadoVoz(
+                          textoReconocido,
+                          modalContext,
+                        ),
+                        icon: const Icon(
+                          Icons.navigation_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                         label: Text(
                           'Ir a: "$textoReconocido"',
                           maxLines: 1,
@@ -620,7 +674,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF7B1FA2),
                           padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                           elevation: 3,
                         ),
                       ),
@@ -644,7 +700,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                     runSpacing: 8,
                     children: [
                       _buildChipVozRapida('🦁 Leones', 'Leones', modalContext),
-                      _buildChipVozRapida('🐧 Pingüinos', 'Pingüinos', modalContext),
+                      _buildChipVozRapida(
+                        '🐧 Pingüinos',
+                        'Pingüinos',
+                        modalContext,
+                      ),
                       _buildChipVozRapida('🦅 Cóndor', 'Cóndor', modalContext),
                       _buildChipVozRapida('🦒 Jirafa', 'Jirafa', modalContext),
                       _buildChipVozRapida('🚻 Baño', 'Baño', modalContext),
@@ -661,9 +721,17 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
     );
   }
 
-  Widget _buildChipVozRapida(String etiqueta, String consulta, BuildContext modalContext) {
+  Widget _buildChipVozRapida(
+    String etiqueta,
+    String consulta,
+    BuildContext modalContext,
+  ) {
     return ActionChip(
-      avatar: const Icon(Icons.search_rounded, size: 16, color: Color(0xFF7B1FA2)),
+      avatar: const Icon(
+        Icons.search_rounded,
+        size: 16,
+        color: Color(0xFF7B1FA2),
+      ),
       label: Text(
         etiqueta,
         style: GoogleFonts.urbanist(
@@ -690,14 +758,22 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
     // 1. Búsqueda inteligente universal sobre todos los 76 pines del zoológico
     final pin = AnimalService.instance.buscarPinInteligente(consulta);
     if (pin != null) {
-      AudioGuiaService.instance.reproducir('Encontrado: ${pin.nombre.tr}. Trazando sendero en el mapa.');
+      AudioGuiaService.instance.reproducir(
+        'Encontrado: ${pin.nombre.tr}. Trazando sendero en el mapa.',
+      );
       _irAlMapaConRuta(animalId: pin.id);
       return;
     }
 
     // 2. Búsqueda por hábitats
     final qNorm = AnimalService.normalizarTexto(consulta);
-    for (final habitat in ['Zona Costa', 'Zona Sierra', 'Zona Selva', 'Zona Internacional', 'Granja Interactiva']) {
+    for (final habitat in [
+      'Zona Costa',
+      'Zona Sierra',
+      'Zona Selva',
+      'Zona Internacional',
+      'Granja Interactiva',
+    ]) {
       if (qNorm.contains(AnimalService.normalizarTexto(habitat))) {
         AudioGuiaService.instance.reproducir('Mostrando $habitat en el mapa.');
         _irAlMapaConRuta(habitat: habitat);
@@ -711,7 +787,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
 
   /// Barra superior fija que jamás desaparece al hacer scroll
   Widget _buildEncabezadoSuperior() {
-    final esMenu = _vistaActual == SubVistaModoFacil.menuPrincipal && _animalEscaneado == null;
+    final esMenu =
+        _vistaActual == SubVistaModoFacil.menuPrincipal &&
+        _animalEscaneado == null;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -791,7 +869,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                         _vistaActual = SubVistaModoFacil.menuPrincipal;
                       });
                     },
-                    icon: const Icon(Icons.arrow_back_rounded, size: 20, color: Colors.white),
+                    icon: const Icon(
+                      Icons.arrow_back_rounded,
+                      size: 20,
+                      color: Colors.white,
+                    ),
                     label: Text(
                       'volver_al_menu'.tr,
                       maxLines: 1,
@@ -807,7 +889,10 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: Color(0xFF334155), width: 1.5),
+                        side: const BorderSide(
+                          color: Color(0xFF334155),
+                          width: 1.5,
+                        ),
                       ),
                       elevation: 2,
                     ),
@@ -850,7 +935,10 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: AppColors.verdePrincipal.withValues(alpha: 0.25), width: 1.8),
+            border: Border.all(
+              color: AppColors.verdePrincipal.withValues(alpha: 0.25),
+              width: 1.8,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.04),
@@ -934,8 +1022,10 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
           icono: Icons.language_rounded,
           colorFondo: const Color(0xFFE0F2FE),
           colorIcono: const Color(0xFF0284C7),
-          titulo: '${'cambiar_idioma'.tr} (${IdiomaService.instance.banderaIdioma})',
-          subtitulo: '${IdiomaService.instance.nombreIdioma} • Tap to switch language',
+          titulo:
+              '${'cambiar_idioma'.tr} (${IdiomaService.instance.banderaIdioma})',
+          subtitulo:
+              '${IdiomaService.instance.nombreIdioma} • Tap to switch language',
           onTap: () => _mostrarModalIdiomaFacil(context),
         ),
         const SizedBox(height: 16),
@@ -972,7 +1062,10 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: colorIcono.withValues(alpha: 0.35), width: 1.8),
+          border: Border.all(
+            color: colorIcono.withValues(alpha: 0.35),
+            width: 1.8,
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
@@ -1043,11 +1136,18 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
           decoration: BoxDecoration(
             color: const Color(0xFFF3E5F5),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFF7B1FA2).withValues(alpha: 0.3), width: 1.5),
+            border: Border.all(
+              color: const Color(0xFF7B1FA2).withValues(alpha: 0.3),
+              width: 1.5,
+            ),
           ),
           child: Row(
             children: [
-              const Icon(Icons.center_focus_strong_rounded, color: Color(0xFF7B1FA2), size: 30),
+              const Icon(
+                Icons.center_focus_strong_rounded,
+                color: Color(0xFF7B1FA2),
+                size: 30,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -1099,7 +1199,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.videocam_off_rounded, color: Colors.white70, size: 48),
+                              const Icon(
+                                Icons.videocam_off_rounded,
+                                color: Colors.white70,
+                                size: 48,
+                              ),
                               const SizedBox(height: 12),
                               Text(
                                 'Cámara en espera o no disponible.\nPuede seleccionar cualquier animal con los botones de abajo.',
@@ -1148,7 +1252,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                               color: Colors.white,
                               fontSize: 13,
                               fontWeight: FontWeight.w900,
-                              shadows: const [Shadow(color: Colors.black, blurRadius: 4)],
+                              shadows: const [
+                                Shadow(color: Colors.black, blurRadius: 4),
+                              ],
                             ),
                           ),
                         ),
@@ -1167,12 +1273,18 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                         backgroundColor: Colors.black54,
                         child: IconButton(
                           icon: Icon(
-                            _linternaEncendida ? Icons.flash_on_rounded : Icons.flash_off_rounded,
-                            color: _linternaEncendida ? Colors.amber : Colors.white,
+                            _linternaEncendida
+                                ? Icons.flash_on_rounded
+                                : Icons.flash_off_rounded,
+                            color: _linternaEncendida
+                                ? Colors.amber
+                                : Colors.white,
                           ),
                           onPressed: () {
                             _scannerController?.toggleTorch();
-                            setState(() => _linternaEncendida = !_linternaEncendida);
+                            setState(
+                              () => _linternaEncendida = !_linternaEncendida,
+                            );
                           },
                         ),
                       ),
@@ -1180,7 +1292,10 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                       CircleAvatar(
                         backgroundColor: Colors.black54,
                         child: IconButton(
-                          icon: const Icon(Icons.flip_camera_android_rounded, color: Colors.white),
+                          icon: const Icon(
+                            Icons.flip_camera_android_rounded,
+                            color: Colors.white,
+                          ),
                           onPressed: () => _scannerController?.switchCamera(),
                         ),
                       ),
@@ -1198,7 +1313,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: () => _mostrarModalCatalogoCompleto(context),
-            icon: const Icon(Icons.format_list_bulleted_rounded, size: 24, color: Colors.white),
+            icon: const Icon(
+              Icons.format_list_bulleted_rounded,
+              size: 24,
+              color: Colors.white,
+            ),
             label: Text(
               'catalogo_animales'.tr,
               style: GoogleFonts.urbanist(
@@ -1210,7 +1329,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF7B1FA2),
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               elevation: 4,
             ),
           ),
@@ -1291,7 +1412,10 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 10,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1344,7 +1468,10 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                                   width: 60,
                                   height: 60,
                                   color: Colors.grey.shade300,
-                                  child: const Icon(Icons.pets, color: Colors.grey),
+                                  child: const Icon(
+                                    Icons.pets,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
                             ),
@@ -1372,7 +1499,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                                 ],
                               ),
                             ),
-                            const Icon(Icons.volume_up_rounded, color: Color(0xFF7B1FA2), size: 28),
+                            const Icon(
+                              Icons.volume_up_rounded,
+                              color: Color(0xFF7B1FA2),
+                              size: 28,
+                            ),
                           ],
                         ),
                       ),
@@ -1426,7 +1557,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
             const SizedBox(height: 4),
             Row(
               children: [
-                const Icon(Icons.location_on_rounded, color: AppColors.verdePrincipal, size: 20),
+                const Icon(
+                  Icons.location_on_rounded,
+                  color: AppColors.verdePrincipal,
+                  size: 20,
+                ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
@@ -1449,13 +1584,20 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                 onPressed: () {
                   SoundService.instance.playButtonTap();
                   HapticFeedback.mediumImpact();
-                  AnimalService.instance.marcarVisitado(animal.marcadorId, !visitado);
+                  AnimalService.instance.marcarVisitado(
+                    animal.marcadorId,
+                    !visitado,
+                  );
 
                   if (!visitado) {
-                    AudioGuiaService.instance.reproducir('${'felicitaciones_visitado'.tr} ${animal.nombre.tr}.');
+                    AudioGuiaService.instance.reproducir(
+                      '${'felicitaciones_visitado'.tr} ${animal.nombre.tr}.',
+                    );
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('✅ ${animal.nombre.tr} • ${'marcar_visitado'.tr}'),
+                        content: Text(
+                          '✅ ${animal.nombre.tr} • ${'marcar_visitado'.tr}',
+                        ),
                         backgroundColor: Colors.green.shade800,
                         duration: const Duration(seconds: 2),
                       ),
@@ -1463,7 +1605,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                   }
                 },
                 icon: Icon(
-                  visitado ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
+                  visitado
+                      ? Icons.check_circle_rounded
+                      : Icons.check_circle_outline_rounded,
                   size: 28,
                   color: Colors.white,
                 ),
@@ -1476,9 +1620,13 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: visitado ? const Color(0xFF2E7D32) : const Color(0xFF1565C0),
+                  backgroundColor: visitado
+                      ? const Color(0xFF2E7D32)
+                      : const Color(0xFF1565C0),
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   elevation: 4,
                 ),
               ),
@@ -1515,10 +1663,16 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.volume_up_rounded, color: Color(0xFF7B1FA2), size: 30),
+                        icon: const Icon(
+                          Icons.volume_up_rounded,
+                          color: Color(0xFF7B1FA2),
+                          size: 30,
+                        ),
                         tooltip: 'repetir_narracion'.tr,
                         onPressed: () {
-                          AudioGuiaService.instance.reproducir('${animal.nombre.tr}. ${animal.historiaVozActiva}');
+                          AudioGuiaService.instance.reproducir(
+                            '${animal.nombre.tr}. ${animal.historiaVozActiva}',
+                          );
                         },
                       ),
                     ],
@@ -1542,7 +1696,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.restaurant_rounded, color: Colors.orange, size: 22),
+                        const Icon(
+                          Icons.restaurant_rounded,
+                          color: Colors.orange,
+                          size: 22,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -1567,10 +1725,16 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  AudioGuiaService.instance.reproducir('Trazando sendero hacia ${animal.nombre.tr} en el mapa.');
+                  AudioGuiaService.instance.reproducir(
+                    'Trazando sendero hacia ${animal.nombre.tr} en el mapa.',
+                  );
                   _irAlMapaConRuta(animalId: animal.marcadorId);
                 },
-                icon: const Icon(Icons.navigation_rounded, size: 24, color: Colors.white),
+                icon: const Icon(
+                  Icons.navigation_rounded,
+                  size: 24,
+                  color: Colors.white,
+                ),
                 label: Text(
                   '${'trazar_en_mapa_real'.tr} 🗺️',
                   style: GoogleFonts.urbanist(
@@ -1582,7 +1746,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF0284C7),
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   elevation: 4,
                 ),
               ),
@@ -1599,7 +1765,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                   _iniciarScanner();
                   setState(() => _animalEscaneado = null);
                 },
-                icon: const Icon(Icons.qr_code_scanner_rounded, size: 24, color: Color(0xFF7B1FA2)),
+                icon: const Icon(
+                  Icons.qr_code_scanner_rounded,
+                  size: 24,
+                  color: Color(0xFF7B1FA2),
+                ),
                 label: Text(
                   'escanear_otra_placa'.tr,
                   style: GoogleFonts.urbanist(
@@ -1611,7 +1781,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   side: const BorderSide(color: Color(0xFF7B1FA2), width: 2),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
             ),
@@ -1685,7 +1857,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: horarioSeleccionado != null ? const Color(0xFF2E7D32) : Colors.black12,
+          color: horarioSeleccionado != null
+              ? const Color(0xFF2E7D32)
+              : Colors.black12,
           width: horarioSeleccionado != null ? 2.5 : 1.5,
         ),
         boxShadow: [
@@ -1726,7 +1900,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.location_on_rounded, size: 16, color: AppColors.verdePrincipal),
+                    const Icon(
+                      Icons.location_on_rounded,
+                      size: 16,
+                      color: AppColors.verdePrincipal,
+                    ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
@@ -1743,7 +1921,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.timer_outlined, size: 16, color: AppColors.textoGris),
+                    const Icon(
+                      Icons.timer_outlined,
+                      size: 16,
+                      color: AppColors.textoGris,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       duracion,
@@ -1781,7 +1963,8 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                         boxShadow: estaGuardado
                             ? [
                                 BoxShadow(
-                                  color: const Color(0xFF4CAF50).withValues(alpha: 0.45),
+                                  color: const Color(0xFF4CAF50)
+                                      .withValues(alpha: 0.45),
                                   blurRadius: 10,
                                   offset: const Offset(0, 3),
                                 ),
@@ -1805,12 +1988,16 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                           );
 
                           // Confirmación por voz
-                          AudioGuiaService.instance.reproducir('Asiento guardado para $titulo a las $h. Le avisaremos con tiempo.');
+                          AudioGuiaService.instance.reproducir(
+                            'Asiento guardado para $titulo a las $h. Le avisaremos con tiempo.',
+                          );
                         },
                         icon: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
                           child: Icon(
-                            estaGuardado ? Icons.check_circle_rounded : Icons.access_time_rounded,
+                            estaGuardado
+                                ? Icons.check_circle_rounded
+                                : Icons.access_time_rounded,
                             key: ValueKey(estaGuardado),
                             size: 20,
                             color: Colors.white,
@@ -1825,12 +2012,19 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: estaGuardado ? const Color(0xFF1B5E20) : AppColors.verdePrincipal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          backgroundColor: estaGuardado
+                              ? const Color(0xFF1B5E20)
+                              : AppColors.verdePrincipal,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                             side: BorderSide(
-                              color: estaGuardado ? const Color(0xFF69F0AE) : Colors.transparent,
+                              color: estaGuardado
+                                  ? const Color(0xFF69F0AE)
+                                  : Colors.transparent,
                               width: estaGuardado ? 2.5 : 0,
                             ),
                           ),
@@ -1849,11 +2043,18 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                     decoration: BoxDecoration(
                       color: const Color(0xFFE8F5E9),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFF4CAF50), width: 1.5),
+                      border: Border.all(
+                        color: const Color(0xFF4CAF50),
+                        width: 1.5,
+                      ),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.task_alt_rounded, color: Color(0xFF2E7D32), size: 24),
+                        const Icon(
+                          Icons.task_alt_rounded,
+                          color: Color(0xFF2E7D32),
+                          size: 24,
+                        ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -1937,7 +2138,10 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () => _irAlMapaConRuta(animalId: 'AYUDA_02'),
-                    icon: const Icon(Icons.navigation_rounded, color: Color(0xFFB71C1C)),
+                    icon: const Icon(
+                      Icons.navigation_rounded,
+                      color: Color(0xFFB71C1C),
+                    ),
                     label: Text(
                       '🗺️ Trazar sendero al Tópico en el Mapa',
                       style: GoogleFonts.urbanist(
@@ -1949,7 +2153,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 13),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                   ),
                 ),
@@ -1957,7 +2163,8 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () => _realizarLlamada('014445555', 'Tópico Médico Central'),
+                    onPressed: () =>
+                        _realizarLlamada('014445555', 'Tópico Médico Central'),
                     icon: const Icon(Icons.phone_rounded, color: Colors.white),
                     label: Text(
                       '📞 Llamar de inmediato al Tópico (01-444-5555)',
@@ -1970,7 +2177,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFD32F2F),
                       padding: const EdgeInsets.symmetric(vertical: 13),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                   ),
                 ),
@@ -1979,7 +2188,10 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: _desactivarAlertaSos,
-                    icon: const Icon(Icons.check_circle_rounded, color: Colors.white),
+                    icon: const Icon(
+                      Icons.check_circle_rounded,
+                      color: Colors.white,
+                    ),
                     label: Text(
                       'desactivar_sos'.tr,
                       style: GoogleFonts.urbanist(
@@ -1991,7 +2203,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Colors.white, width: 2),
                       padding: const EdgeInsets.symmetric(vertical: 13),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                   ),
                 ),
@@ -2017,7 +2231,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.sos_rounded, color: Colors.white, size: 36),
+                    const Icon(
+                      Icons.sos_rounded,
+                      color: Colors.white,
+                      size: 36,
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(
@@ -2049,7 +2267,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: _activarAlertaSos,
-                    icon: const Icon(Icons.warning_amber_rounded, color: Color(0xFFB71C1C), size: 26),
+                    icon: const Icon(
+                      Icons.warning_amber_rounded,
+                      color: Color(0xFFB71C1C),
+                      size: 26,
+                    ),
                     label: Text(
                       '¡ACTIVAR ALERTA SOS AHORA!',
                       style: GoogleFonts.urbanist(
@@ -2061,7 +2283,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                       elevation: 3,
                     ),
                   ),
@@ -2086,7 +2310,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.health_and_safety_rounded, color: Color(0xFFC62828), size: 30),
+                  const Icon(
+                    Icons.health_and_safety_rounded,
+                    color: Color(0xFFC62828),
+                    size: 30,
+                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -2113,16 +2341,25 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () => _realizarLlamada('014445555', 'Tópico Central del Parque'),
+                  onPressed: () => _realizarLlamada(
+                    '014445555',
+                    'Tópico Central del Parque',
+                  ),
                   icon: const Icon(Icons.phone_rounded, color: Colors.white),
                   label: Text(
                     '${'llamar_topico'.tr} (01-444-5555)',
-                    style: GoogleFonts.urbanist(fontSize: 15, fontWeight: FontWeight.w900, color: Colors.white),
+                    style: GoogleFonts.urbanist(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFC62828),
                     padding: const EdgeInsets.symmetric(vertical: 13),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                 ),
               ),
@@ -2130,16 +2367,29 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () => _realizarLlamada('106', 'Ambulancia SAMU (106)'),
-                  icon: const Icon(Icons.local_hospital_rounded, color: Color(0xFFC62828)),
+                  onPressed: () =>
+                      _realizarLlamada('106', 'Ambulancia SAMU (106)'),
+                  icon: const Icon(
+                    Icons.local_hospital_rounded,
+                    color: Color(0xFFC62828),
+                  ),
                   label: Text(
                     'llamar_samu'.tr,
-                    style: GoogleFonts.urbanist(fontSize: 14.5, fontWeight: FontWeight.w900, color: const Color(0xFFC62828)),
+                    style: GoogleFonts.urbanist(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFFC62828),
+                    ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFFC62828), width: 1.5),
+                    side: const BorderSide(
+                      color: Color(0xFFC62828),
+                      width: 1.5,
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                 ),
               ),
@@ -2151,7 +2401,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                   icon: const Icon(Icons.map_rounded, color: Color(0xFFC62828)),
                   label: Text(
                     '🗺️ Ver Tópico en el Mapa Real con Sendero',
-                    style: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w800, color: const Color(0xFFC62828)),
+                    style: GoogleFonts.urbanist(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFFC62828),
+                    ),
                   ),
                 ),
               ),
@@ -2175,7 +2429,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.support_agent_rounded, color: Color(0xFF1565C0), size: 30),
+                  const Icon(
+                    Icons.support_agent_rounded,
+                    color: Color(0xFF1565C0),
+                    size: 30,
+                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -2202,16 +2460,28 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () => _realizarLlamada('014445556', 'Guardaparques y Orientadores'),
-                  icon: const Icon(Icons.phone_in_talk_rounded, color: Colors.white),
+                  onPressed: () => _realizarLlamada(
+                    '014445556',
+                    'Guardaparques y Orientadores',
+                  ),
+                  icon: const Icon(
+                    Icons.phone_in_talk_rounded,
+                    color: Colors.white,
+                  ),
                   label: Text(
                     '${'llamar_guardaparques'.tr} (01-444-5556)',
-                    style: GoogleFonts.urbanist(fontSize: 15, fontWeight: FontWeight.w900, color: Colors.white),
+                    style: GoogleFonts.urbanist(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1565C0),
                     padding: const EdgeInsets.symmetric(vertical: 13),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                 ),
               ),
@@ -2219,16 +2489,29 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () => _realizarLlamada('105', 'Central de Emergencias 105'),
-                  icon: const Icon(Icons.local_police_rounded, color: Color(0xFF1565C0)),
+                  onPressed: () =>
+                      _realizarLlamada('105', 'Central de Emergencias 105'),
+                  icon: const Icon(
+                    Icons.local_police_rounded,
+                    color: Color(0xFF1565C0),
+                  ),
                   label: Text(
                     'Llamar a Emergencias (105)',
-                    style: GoogleFonts.urbanist(fontSize: 14.5, fontWeight: FontWeight.w900, color: const Color(0xFF1565C0)),
+                    style: GoogleFonts.urbanist(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFF1565C0),
+                    ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF1565C0), width: 1.5),
+                    side: const BorderSide(
+                      color: Color(0xFF1565C0),
+                      width: 1.5,
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                 ),
               ),
@@ -2240,7 +2523,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                   icon: const Icon(Icons.map_rounded, color: Color(0xFF1565C0)),
                   label: Text(
                     '🗺️ Ver Módulo de Guardaparques en el Mapa',
-                    style: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w800, color: const Color(0xFF1565C0)),
+                    style: GoogleFonts.urbanist(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF1565C0),
+                    ),
                   ),
                 ),
               ),
@@ -2277,7 +2564,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                       color: const Color(0xFFC62828).withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.exit_to_app_rounded, color: Color(0xFFC62828), size: 26),
+                    child: const Icon(
+                      Icons.exit_to_app_rounded,
+                      color: Color(0xFFC62828),
+                      size: 26,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -2311,7 +2602,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                     AudioGuiaService.instance.detener();
                     widget.onSalirModoFacil();
                   },
-                  icon: const Icon(Icons.exit_to_app_rounded, color: Colors.white, size: 22),
+                  icon: const Icon(
+                    Icons.exit_to_app_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
                   label: Text(
                     '${'salir'.tr} al Modo Normal',
                     style: GoogleFonts.urbanist(
@@ -2323,7 +2618,9 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFC62828),
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     elevation: 3,
                   ),
                 ),
@@ -2395,7 +2692,8 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                 icono: Icons.pets_rounded,
                 etiqueta: 'nav_animales'.tr,
                 onTap: () {
-                  if (_vistaActual == SubVistaModoFacil.escanearQrAnimal && _animalEscaneado != null) {
+                  if (_vistaActual == SubVistaModoFacil.escanearQrAnimal &&
+                      _animalEscaneado != null) {
                     setState(() => _animalEscaneado = null);
                   }
                   _cambiarVista(SubVistaModoFacil.escanearQrAnimal);
@@ -2451,17 +2749,15 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: activo ? colorBase.withValues(alpha: 0.12) : Colors.transparent,
+            color: activo
+                ? colorBase.withValues(alpha: 0.12)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icono,
-                size: activo ? 28 : 24,
-                color: colorTexto,
-              ),
+              Icon(icono, size: activo ? 28 : 24, color: colorTexto),
               const SizedBox(height: 3),
               Text(
                 etiqueta,
@@ -2520,7 +2816,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                         color: const Color(0xFFE0F2FE),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.language_rounded, color: Color(0xFF0284C7), size: 26),
+                      child: const Icon(
+                        Icons.language_rounded,
+                        color: Color(0xFF0284C7),
+                        size: 26,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -2611,10 +2911,14 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: seleccionado ? AppColors.verdePrincipal.withValues(alpha: 0.12) : Colors.white,
+          color: seleccionado
+              ? AppColors.verdePrincipal.withValues(alpha: 0.12)
+              : Colors.white,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: seleccionado ? AppColors.verdePrincipal : Colors.grey.shade300,
+            color: seleccionado
+                ? AppColors.verdePrincipal
+                : Colors.grey.shade300,
             width: seleccionado ? 2.5 : 1.5,
           ),
           boxShadow: [

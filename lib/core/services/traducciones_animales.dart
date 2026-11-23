@@ -198,7 +198,8 @@ final Map<String, String> traduccionesAnimalesEn = {
   '🐟 Anchovetas y sardinas': '🐟 Anchovies and sardines',
   '🐟 Arenques y lisas': '🐟 Herrings and mullets',
   '🐟 Larvas': '🐟 Larvae',
-  '🐟 Peces amazónicos (bocachico, paco)': '🐟 Amazonian fish (bocachico, paco)',
+  '🐟 Peces amazónicos (bocachico, paco)':
+      '🐟 Amazonian fish (bocachico, paco)',
   '🐟 Peces de río': '🐟 River fish',
   '🐟 Peces grandes': '🐟 Large fish',
   '🐟 Pescado de río': '🐟 River fish',
@@ -248,11 +249,13 @@ final Map<String, String> traduccionesAnimalesQu = {
   'Rinoceronte_curiosidad': 'Waqranqa manam tulluchu, aswanpas kikin k\'aspa kiratina nisqam, silunchik hina chukchanchik hina.',
   'Rinoceronte_comportamiento': 'Hawka ichaqa manchay hatun. T\'uru yakupi bañakuyta munan intipata kurunta amachanapaq.',
   'Rinoceronte_audioguia': 'Yuraq rinusiruntiqa teqsimuyuntinpi aswan hatun uywam. Phisqa chunka kilumitrukama kallpayta atin.',
-  'Leones_curiosidad': 'Liyunpa qapariyninqa pusaq kilumitrukama uyarikun k\'itikunapi.',
+  'Leones_curiosidad':
+      'Liyunpa qapariyninqa pusaq kilumitrukama uyarikun k\'itikunapi.',
   'Leones_comportamiento': 'Ayllupuralla tiyanku. Iskay chunka urastam puñunku kallpata waqaychaspa.',
   'Leones_audioguia': 'Hawamanta K\'itipi liyunkunaman chayamurqanki. Urqu liyunpa sapranqa kunkatam amachan awqanakuypi.',
   'Avestruz_curiosidad': 'Teqsimuyuntinpi aswan hatun llumpay llasaq pisqum. Ñawinkunaqa ñutq\'unmantapas aswan hatunraqmi.',
-  'Avestruz_comportamiento': 'Yachay munaq, rikch\'arisqa. Hatun chakinkunawanmi k\'antikuspa ayqin.',
+  'Avestruz_comportamiento':
+      'Yachay munaq, rikch\'arisqa. Hatun chakinkunawanmi k\'antikuspa ayqin.',
   'Avestruz_audioguia': 'Suriqa qanchis chunka kilumitrukama kallpan, teqsimuyuntinpi iskay chakiwan aswan utqaylla phawaq.',
   'Búfalos de agua_curiosidad': 'Kinray sillunkunaqa mana t\'uruman chinkaykunankupaqmi yanapan mayu patakunapi.',
   'Búfalos de agua_comportamiento': 'P\'unchaw chawpita quchakunapi t\'urukunapi yaku ukupi kawsanku chiriyanankupaq.',
@@ -267,7 +270,8 @@ final Map<String, String> traduccionesAnimalesQu = {
   'Tigre de Bengala_comportamiento': 'Sapallan puriq k\'acha hap\'iq, yakupi k\'acha tuytuq mayukunapipas kawsan.',
   'Tigre de Bengala_audioguia': 'Bengala tikriqa Asya sach\'a sach\'akunapa qhapaq apunmi, q\'illu yana sirk\'ayuq aycha mikhuq.',
   'Oso de Anteojos (Zona Internacional)_curiosidad': 'Urin Awya Yalapi sapallan ukumarim. Ñawinpa muyuriqninpim yuraq llimp\'i unanchayuq.',
-  'Oso de Anteojos (Zona Internacional)_comportamiento': 'P\'enqakuq, allin sonqu. Mallkikunaman q\'isachaspa wichariyta munan.',
+  'Oso de Anteojos (Zona Internacional)_comportamiento':
+      'P\'enqakuq, allin sonqu. Mallkikunaman q\'isachaspa wichariyta munan.',
   'Oso de Anteojos (Zona Internacional)_audioguia': 'Ukumariqa Antikunapa sumaq uywanmi. Sach\'akunata ch\'iqichispa kawsayta allichan.',
   'Cebra de Grant_curiosidad': 'Yana yuraq sirk\'ankunaqa hap\'iq uywakunata ñawsayarqachinmi phawachkaptinku.',
   'Cebra de Grant_comportamiento': 'Ayllupim qhawanakuspa kawsanku, wakinkuna puñuptin wakinkunam rikch\'aspa qhawanku.',
@@ -279,7 +283,8 @@ final Map<String, String> traduccionesAnimalesQu = {
   'Tigre Blanco_comportamiento': 'Ch\'inlla puriq, manchana k\'anchaq. Tukuy rikch\'aq kuyuykunata allinta qhawan.',
   'Tigre Blanco_audioguia': 'Yuraq tikriqa parkipa k\'anchayninmi, anqas ñawinwan qhawarispa sonqoykita kuyuchin.',
   'Jirafa_curiosidad': 'Anqas qallunqa pichqa chunka sintimitru sunim, kichka raprakunatapas mana k\'irispa mikhun.',
-  'Jirafa_comportamiento': 'Hawka, k\'acha suni kunkankuwan sayaspallam asllata puñuykukunku.',
+  'Jirafa_comportamiento':
+      'Hawka, k\'acha suni kunkankuwan sayaspallam asllata puñuykukunku.',
   'Jirafa_audioguia': 'Jirafakunaqa teqsimuyuntinpi aswan hanaq sayaq uywakunam, suni kunkankunawan mallkikunata mikhunku.',
   'Canguros_curiosidad': 'Chupanqa kimsa kaq chakin hinam takyachin, sinchita ch\'inkispa kallpawan k\'umpinapaq.',
   'Canguros_comportamiento': 'Mana sayk\'uspa p\'itinku. Mamanqa wiksan bolsapi wawankunata apanku chuchuchispa.',
@@ -288,7 +293,8 @@ final Map<String, String> traduccionesAnimalesQu = {
   'Suricatas_comportamiento': 'Tukuy ayllu kuskalla kawsanku. Chulla surikatam sayaqlla qhawan hanapachata pisqukunamanta.',
   'Suricatas_audioguia': 'Kusisqa surikatakunaqa allpa ukhu wayq\'ukunapim tiyanku, sapa kutim ayllunta amachanku.',
   'Gallos (Villa Carmelo)_curiosidad': 'Paqarinpa qapariyninqa kanchantam willan, llapa k\'ank\'akunata yachachispa paqariymanta.',
-  'Gallos (Villa Carmelo)_comportamiento': 'Kanchanta sinchita amachaq, wallpakunata pusariq k\'anka.',
+  'Gallos (Villa Carmelo)_comportamiento':
+      'Kanchanta sinchita amachaq, wallpakunata pusariq k\'anka.',
   'Gallos (Villa Carmelo)_audioguia': 'Villa Carmeloqa Piruw mama quchapa unay chakrankunatam yuyarichiwanchik, k\'ank\'apa kunkanta uyarispa.',
   'Pavo Real (Villa Carmelo)_curiosidad': 'Chupanpi llimp\'i ñawikunaqa k\'anchaywanmi t\'ikrakun, k\'acha t\'ikakunatam rikurichin.',
   'Pavo Real (Villa Carmelo)_comportamiento': 'Sumaq chupanpa llimp\'inkunata kicharispam tusuq hina purin china pawuta munachispa.',
@@ -297,14 +303,16 @@ final Map<String, String> traduccionesAnimalesQu = {
   'Pelícanos / Aves Guaneras_comportamiento': 'Mama qucha wayrapi k\'acha phawaqkuna, yakuman chinkaykuspa challwata k\'utunku.',
   'Pelícanos / Aves Guaneras_audioguia': 'Wanu pisqukunaqa Piruw suyupa qhapaq kawsaynintam mama quchapi waqaychanku.',
   'Peces (Acuario)_curiosidad': 'Wasanpi sirk\'ankunawanmi yaku kuyuriyninta ratulla musyanku, awqakunamanta ayqinankupaq.',
-  'Peces (Acuario)_comportamiento': 'Kuskalla kusisqa tuytunku, inti k\'anchaypi qullqi hina llipipispa.',
+  'Peces (Acuario)_comportamiento':
+      'Kuskalla kusisqa tuytunku, inti k\'anchaypi qullqi hina llipipispa.',
   'Peces (Acuario)_audioguia': 'Challwawasi ukupiqa mama quchapa hinaspa mayukunapa sumaq kawsaynintam riqsinki.',
   'Lobos de Mar_curiosidad': 'Llasaq wira qaranwanmi chiri yakuta aguantanku, mama qucha ukhuman challwa maskaq chinkaykuspa.',
   'Lobos de Mar_comportamiento': 'Yakupi k\'acha tuytuqkuna. Allqu hina qaparispa rumikunapa hawanpi intita hap\'inku.',
   'Lobos de Mar_audioguia': 'Mamaqucha allqukunaqa Piruwpa chala suyuntam sumaqta riqsichinku rumikunapa chawpinpi.',
   'Cocodrilo de Tumbes_curiosidad': 'Piruw suyupi sapallan hatun kaymanmi, Tumpis suyupa kachi yakunkunapi kawsan.',
   'Cocodrilo de Tumbes_comportamiento': 'Chakisqa sach\'a kurpa hina yakupi mana kuyuspa shuyayan challwakuna hapiyta.',
-  'Cocodrilo de Tumbes_audioguia': 'Tumpis kaymanqa chincha suyupa sumaq amachasqa unay uywanmi.',
+  'Cocodrilo de Tumbes_audioguia':
+      'Tumpis kaymanqa chincha suyupa sumaq amachasqa unay uywanmi.',
   'Flamencos_curiosidad': 'Puka llimp\'inqa mikhuyninmantam paqarin, quchapi puka kurukunata suysuspa mikhusqankurayku.',
   'Flamencos_comportamiento': 'Huk chakillapi sayaspa puñunku qucha patapi, k\'umu sinqanta rapran ukuman churaykuspa.',
   'Flamencos_audioguia': 'Pariwanakunaqa Piruw suyupa unanchanpa puka yuraq llimp\'inkunatam paqarichirqa.',
@@ -312,7 +320,8 @@ final Map<String, String> traduccionesAnimalesQu = {
   'Pingüinos de Humboldt_comportamiento': 'Huk warmillawan tukuy kawsayninku purinku. Wanu kanchakunapi q\'isachanku.',
   'Pingüinos de Humboldt_audioguia': 'Humboldt pikuynikunaqa Piruwpa chiri mama quchanpim kawsanku, ancha munakusqa uywakunam.',
   'Caballos (Caballeriza)_curiosidad': 'Piruwpa Paso Kawallunqa k\'acha takyasqallam purin mana kuyurispa, sillaqninpaq ancha hawkalla.',
-  'Caballos (Caballeriza)_comportamiento': 'K\'acha allin sonqu, yachayniyuq. Qollana kayninwan takyaspa purin.',
+  'Caballos (Caballeriza)_comportamiento':
+      'K\'acha allin sonqu, yachayniyuq. Qollana kayninwan takyaspa purin.',
   'Caballos (Caballeriza)_audioguia': 'Antikunapa kanchankunapi Piruwpa Paso Kawallunta qhaway, Mama Llaqtapa Kawsaynin nispa unanchasqam.',
   'Venados_curiosidad': 'Urqu tarukakunaqa sapa watam waqranta wit\'unku, aswan hatunraqmi wiñapun llamp\'u qarayuq.',
   'Venados_comportamiento': 'P\'enqakuq, p\'itiq chaki. Hatun k\'asikunatapas p\'itispa ayqin atuqkunamanta.',
@@ -320,20 +329,25 @@ final Map<String, String> traduccionesAnimalesQu = {
   'Cóndor Andino_curiosidad': 'Kimsa mitrukama rapran mast\'arikun, teqsimuyuntinpi aswan hatun phawaq pisqum.',
   'Cóndor Andino_comportamiento': 'Wayrapa kallpanwan hanaqpachapi muyun, mana raprankunata kuyuchispalla unayta.',
   'Cóndor Andino_audioguia': 'Antikunapa apun kunturwan kashanki. Urqukunapa k\'anchaynin hinaspa chinkana urqukunapa amachaqnin.',
-  'Alpacas_curiosidad': 'Millwanqa llanllallam hinaspa q\'uñilla, pachantinpi ancha munakusqam.',
-  'Alpacas_comportamiento': 'Hawka ayllupi kawsanku, sumaq kunkayuq kuskalla purinku.',
+  'Alpacas_curiosidad':
+      'Millwanqa llanllallam hinaspa q\'uñilla, pachantinpi ancha munakusqam.',
+  'Alpacas_comportamiento':
+      'Hawka ayllupi kawsanku, sumaq kunkayuq kuskalla purinku.',
   'Alpacas_audioguia': 'Allpakaqa unay watakunamanta piruw suyupi uywasqam. Sumaq millwanta qhaway.',
   'Zorro Andino_curiosidad': 'Urin Awya Yalapi iskay kaq hatun allqu ayllum, chala suyumanta puna suyukama allinta kawsan.',
   'Zorro Andino_comportamiento': 'Yachaysapa, sapallan puriq. Ninrinwanmi allpa ukupi huk\'uchapa kuyuyninta musyan.',
-  'Zorro Andino_audioguia': 'Antikuna atuqqa simi willakuykunapi ancha yachaysapa kawsayniyuq uywam.',
+  'Zorro Andino_audioguia':
+      'Antikuna atuqqa simi willakuykunapi ancha yachaysapa kawsayniyuq uywam.',
   'Puma_curiosidad': 'Hatunkaray kaspapas manam liyun hinachu qaparin; mici hina ñawpan, k\'askaspa qaparkachan.',
   'Puma_comportamiento': 'Rumi patakunapa ch\'in amachaqnin. Suqta mitrumanta astawan p\'itispa aychata hap\'in.',
-  'Puma_audioguia': 'Pumaqa Kay Pachapa kallpantam rikuchirqa, ñankunapa sumaq amachaqninmi.',
+  'Puma_audioguia':
+      'Pumaqa Kay Pachapa kallpantam rikuchirqa, ñankunapa sumaq amachaqninmi.',
   'Águila Mora_curiosidad': 'Ñawinqa runapamantapas pusaq kutita aswan k\'anchaqtam qhawan, iskay kilumitru hanaqmanta huk\'uchata rikun.',
   'Águila Mora_comportamiento': 'Hanaqpacha hap\'iq, rikch\'arisqa ñawiyuq. Wayq\'ukunapa hawanpim muyupayan.',
   'Águila Mora_audioguia': 'Ankaqa Antikunapa hanan pachanpi kamachiq pisqum, ñawinpa k\'anchayninwan tukuyta rikun.',
   'Vicuñas_curiosidad': 'Teqsimuyuntinpi aswan llamp\'u millwayuq uywam, Chaku nisqallawanmi millwanta rutunku mana k\'irispa.',
-  'Vicuñas_comportamiento': 'Salqa, utqaylla puriq. Tawa waranqa mitru hanaqpi ayllunwan kawsanku.',
+  'Vicuñas_comportamiento':
+      'Salqa, utqaylla puriq. Tawa waranqa mitru hanaqpi ayllunwan kawsanku.',
   'Vicuñas_audioguia': 'Wik\'uñaqa Piruw suyupa unanchanpi kashan, qhapaq kawsayninchikpa sumaq k\'anchayninmi.',
   'Reptiles / Serpientes (Herpetario)_curiosidad': 'Wiñanankupaqqa qarankutam llik\'ispa chinkachinku, iskay chakisqa qallunwanmi wayrata musyanku.',
   'Reptiles / Serpientes (Herpetario)_comportamiento': 'Chiri yawarniyuq, ch\'inlla. Tuta pachapi k\'ala q\'uñi kurkunata musyaspa hap\'inku.',
@@ -348,16 +362,20 @@ final Map<String, String> traduccionesAnimalesQu = {
   'Isla de Monos_comportamiento': 'Kusisqa, qaparkachaspa k\'allmakunapi p\'itinku. Ayllunwan sumaqta kawsanku.',
   'Isla de Monos_audioguia': 'K\'usillukuna Islaqa parkipa aswan k\'uchi kitiñanmi, k\'usillukunapa pukllayninta qhawaspa kusikunki.',
   'Otorongo_curiosidad': 'Tukuy michi rikch\'aqkunamanta aswan sinchi kiruyuqmi, charapapa qarantapas p\'akiyta atin.',
-  'Otorongo_comportamiento': 'Sapallan puriq, sumaq tuytuq yaku mayukunapi puriq.',
+  'Otorongo_comportamiento':
+      'Sapallan puriq, sumaq tuytuq yaku mayukunapi puriq.',
   'Otorongo_audioguia': 'Uturunkuqa Amasunya sach\'a sach\'akunapa qhapaq apunmi. Quri q\'illu t\'ikachasqa qarantam qhaway.',
   'Nutria Gigante (Lobo de río)_curiosidad': 'Huk mitru pusaq chunka sintimitrukama suni kanman, kunkampi yuraq unanchanqa sapallanmi mana kaqllachu.',
-  'Nutria Gigante (Lobo de río)_comportamiento': 'Kusisqa pukllaqkuna. Aylluntin kuska mayu challwakunata k\'utunku.',
+  'Nutria Gigante (Lobo de río)_comportamiento':
+      'Kusisqa pukllaqkuna. Aylluntin kuska mayu challwakunata k\'utunku.',
   'Nutria Gigante (Lobo de río)_audioguia': 'Hatun mayu allquqa Amasunyapa quchankunapi qhapaq apum, challwakunata hap\'iq.',
   'Anaconda_curiosidad': 'Teqsimuyuntinpi aswan llasaq katari, iskay pachak kilutam llasaykunman, yakupi chinkaykuspa.',
-  'Anaconda_comportamiento': 'Yaku ukupi kawsan. Qonqayllamanta aychata k\'uyuspa p\'anichin.',
+  'Anaconda_comportamiento':
+      'Yaku ukupi kawsan. Qonqayllamanta aychata k\'uyuspa p\'anichin.',
   'Anaconda_audioguia': 'Yaku Mamaqa Amasunya mayukunapa qhapaq kawsayninmi, unay willakuykunapi yupaychasqa.',
   'Sajino_curiosidad': 'Kunkampi yuraq wallqaynin kashan, wasanpi q\'apariq glandulanwan ayllunkunata unanchan.',
-  'Sajino_comportamiento': 'Qaparispa aylluntin kawsanku, wawankunata sinchita amachanku k\'irispa.',
+  'Sajino_comportamiento':
+      'Qaparispa aylluntin kawsanku, wawankunata sinchita amachanku k\'irispa.',
   'Sajino_audioguia': 'Sach\'akuchiqa Amasunyapa k\'ita kuchinmi, mujukunata sach\'a sach\'api ch\'iqichispa kawsachiq.',
   'Oso Perezoso / Mamíferos menores_curiosidad': 'Millwanpa ukhunpi q\'umer qura wiñan, chayraykum mallkikunapa raphinwan pantanankupaq allin.',
   'Oso Perezoso / Mamíferos menores_comportamiento': 'Alli-allillamanta puriq. Mallkikunapi wiksayuq warkusqallam tukuy kawsayninku kanku.',
@@ -476,35 +494,42 @@ final Map<String, String> traduccionesAnimalesQu = {
 };
 
 final Map<String, String> traduccionesAnimalesAy = {
-  'Vacas Holstein_curiosidad': 'Pusi purakaniwa, sapa minutuna phisqha tunka kutimpiwa k\'uturapxi.',
+  'Vacas Holstein_curiosidad':
+      'Pusi purakaniwa, sapa minutuna phisqha tunka kutimpiwa k\'uturapxi.',
   'Vacas Holstein_comportamiento': 'K\'uchiki, jaqinakampi sumaki aruskipiri. Mayninakampi sumaki jakasipxi.',
   'Vacas Holstein_audioguia': 'Chiqpacha Chakraru purisïtawa. Janq\'ump ch\'iyarampi wakanakaxa wali uñt\'atawa.',
   'Ovejas_curiosidad': 'Qallu ñak\'utanakapaxa k\'añu k\'uchunakaniwa, pätunka tunka pataka grado uñjaña p\'iq jan kuyt\'ayasawa.',
-  'Ovejas_comportamiento': 'Kusisiñani tama uywanakawa. Tumpirinakampi aruskipasiña munapxi.',
+  'Ovejas_comportamiento':
+      'Kusisiñani tama uywanakawa. Tumpirinakampi aruskipasiña munapxi.',
   'Ovejas_audioguia': 'Aka chakra uwisanakaxa llamp\'u t\'arwapampiwa wali munata. Llamp\'uki luqxatam.',
   'Rinoceronte_curiosidad': 'Waqrapaxa janiwa ch\'akäti, kiratina proteína ukampiwa k\'añurata, silunakasa chukhanakasa kipka.',
   'Rinoceronte_comportamiento': 'Amuki ukhamaraki jach\'a uñnaqani. Ñiq\'i umampiwa janchipa jark\'aqasi intita.',
   'Rinoceronte_audioguia': 'Janq\'u rinusiruntixa uraqpachana wali jach\'a uywawa. Phisqha tunka kilumitru t\'ijtiwa.',
-  'Leones_curiosidad': 'Urqu liyunan warariñapaxa kimsaqallqu kilumitrunakaruwa ist\'asi.',
+  'Leones_curiosidad':
+      'Urqu liyunan warariñapaxa kimsaqallqu kilumitrunakaruwa ist\'asi.',
   'Leones_comportamiento': 'Wila masi p\'iqinchata jakasipxi. Pätunka urasawa ikipxi ch\'ama waqaychañataki.',
   'Leones_audioguia': 'Anqäxa K\'itin liyunnakar uñjañataki purisïtawa. Urqu liyunan sunkhapaxa kunkaparuwa jark\'i ch\'axwawina.',
   'Avestruz_curiosidad': 'Aka uraqpachana jach\'a llasa jamach\'iwa. Ñak\'utanakapaxa p\'iqipat sipansa jach\'awa.',
   'Avestruz_comportamiento': 'Qhantati unxtiri. Jach\'a kayunakapampiwa jark\'aqasi sallqa uywanakatxa.',
   'Avestruz_audioguia': 'Surixa paqallqu tunka kilumitru t\'ijtiwa, pä kayunipura jach\'a t\'ijtiriwa.',
   'Búfalos de agua_curiosidad': 'Sillunakapaxa ancho k\'añuratawa, ñiq\'i umaru jan mantantasiñatakiwa yanapi.',
-  'Búfalos de agua_comportamiento': 'Urunakpacha qutanakana thiyatapxi ch\'uñuri janchipa katusiñataki.',
+  'Búfalos de agua_comportamiento':
+      'Urunakpacha qutanakana thiyatapxi ch\'uñuri janchipa katusiñataki.',
   'Búfalos de agua_audioguia': 'Uma wufalunakaxa Asia markana wali yupaychatawa ch\'amapampi ukhamaraki sumapampi.',
-  'Hipopótamos del Nilo_curiosidad': 'Wila k\'inturu t\'axsayapxi, ukaxa intina lupipata janchipa jark\'i.',
+  'Hipopótamos del Nilo_curiosidad':
+      'Wila k\'inturu t\'axsayapxi, ukaxa intina lupipata janchipa jark\'i.',
   'Hipopótamos del Nilo_comportamiento': 'Uma taypinxa janiwa khits mantayapkiti. Arumanakawa mistupxi ch\'illi manq\'añataki.',
   'Hipopótamos del Nilo_audioguia': 'Hipuputamunakaxa janiwa tuyupkiti, jawira manqhana kayukimpiwa k\'uchiki sarapxi.',
   'Dromedarios_curiosidad': 'Mä lik\'i qulluniwa qhipäxana, ukaxa umaru ch\'amaru tukuwayi wasarana sarnaqañataki.',
   'Dromedarios_comportamiento': 'Amuki ukhamaraki junt\'u pacharu sayt\'asiri. Challwa qhichipranakapampiwa aquta jark\'i.',
   'Dromedarios_audioguia': 'Drumidaryuxa wasaran jach\'a wutapawa. Pataka litru uma mä juk\'a ratuna umt\'i.',
   'Tigre de Bengala_curiosidad': 'Sapa tikrina ch\'iyar sirk\'anakapaxa sapanakakiwa, jaqina luk\'ana chimpupjamawa.',
-  'Tigre de Bengala_comportamiento': 'Sapaki sarnaqiri, suma tuyuri jawiranakana janchipa ch\'uñuri.',
+  'Tigre de Bengala_comportamiento':
+      'Sapaki sarnaqiri, suma tuyuri jawiranakana janchipa ch\'uñuri.',
   'Tigre de Bengala_audioguia': 'Bengala tikrixa Asia muntanyanakan jach\'a awatiripawa, wila q\'illu ch\'iyar chimpunakampi.',
   'Oso de Anteojos (Zona Internacional)_curiosidad': 'Urin Awya Yalanxa mä sapa jukumarikiwa utji. Ñak\'utanakapan janq\'u qallunakapawa utji nayranakapana.',
-  'Oso de Anteojos (Zona Internacional)_comportamiento': 'Amasiri, k\'uchiki. Qala lawaru makatiña munapxi samart\'añataki.',
+  'Oso de Anteojos (Zona Internacional)_comportamiento':
+      'Amasiri, k\'uchiki. Qala lawaru makatiña munapxi samart\'añataki.',
   'Oso de Anteojos (Zona Internacional)_audioguia': 'Jukumarixa Antinakan jach\'a uywapawa. Kawsawi suma qhanañchañatakiwa yanapi.',
   'Cebra de Grant_curiosidad': 'Janq\'u ch\'iyara chimpunakapaxa sallqa uywanakaru chhaqhwayi t\'ijtisinxa.',
   'Cebra de Grant_comportamiento': 'Tama uywanakawa. Mayninakax ikipxi, mayninakaxa uñch\'ukipxi sallqa uywanakaru.',
@@ -513,43 +538,55 @@ final Map<String, String> traduccionesAnimalesAy = {
   'Tortugas_comportamiento': 'K\'achat k\'achat saririnaka. Intiruwa uñch\'ukipxi janchipa junt\'uchañataki.',
   'Tortugas_audioguia': 'Jach\'a asukaranakaxa nayra maranakan jakiripawa, wali ch\'amani kawsawi uñacht\'ayapxistu.',
   'Tigre Blanco_curiosidad': 'Janq\'u janchipaxa larama nayranakaniwa, sapa kutikiwa aka jach\'a tikrixa yuriri.',
-  'Tigre Blanco_comportamiento': 'Amuki sarnaqiri, wali ch\'amani uñnaqani jisk\'a kuyt\'awinakar uñtiri.',
+  'Tigre Blanco_comportamiento':
+      'Amuki sarnaqiri, wali ch\'amani uñnaqani jisk\'a kuyt\'awinakar uñtiri.',
   'Tigre Blanco_audioguia': 'Janq\'u tikrixa parkina suma qhantawipawa, larama nayranakapampiwa taqinitak musphayitu.',
   'Jirafa_curiosidad': 'Larama laxrapaxa phisqha tunka sintimitru jach\'awa, ch\'aphi laphinaka manq\'añataki ch\'amaniwa.',
-  'Jirafa_comportamiento': 'Amuki ukhamaraki sumawa. Sayt\'atawa jisk\'a ratunaka ikipxi uruna.',
+  'Jirafa_comportamiento':
+      'Amuki ukhamaraki sumawa. Sayt\'atawa jisk\'a ratunaka ikipxi uruna.',
   'Jirafa_audioguia': 'Jirafanakaxa taqpach uraqpachana jach\'a sayt\'irinakäpisiwa, kunkapan sumapa uñjam.',
   'Canguros_curiosidad': 'Wich\'inkhapaxa kimsa kayupjamawa yanapi sayt\'asiñataki ukhamaraki thuqhuñataki.',
   'Canguros_comportamiento': 'Jan qarjiri thuqhurinaka. Taykaxa purakapan bolsaruwa wawanakapa imantampi.',
-  'Canguros_audioguia': 'Oceanía markat purinita kankurunakaxa wali muspharkañ thuqhurinakawa.',
+  'Canguros_audioguia':
+      'Oceanía markat purinita kankurunakaxa wali muspharkañ thuqhurinakawa.',
   'Suricatas_curiosidad': 'Wasara katari venom ukhamaraki scorpión venenonakaru jark\'aqataw katuwayapxi.',
   'Suricatas_comportamiento': 'Wali sumaki tama jakasiri. Mä surikatawa sayt\'asisina alayaru unch\'ukiski jamach\'inakatxa.',
   'Suricatas_audioguia': 'K\'uchiki surikatanakaxa uraqi manqhana thakhinakan jakasipxi, wila masiparu jark\'asina.',
-  'Gallos (Villa Carmelo)_curiosidad': 'Qhantati arunakapaxa oraqipa chimpuntañatakiwa arst\'i.',
-  'Gallos (Villa Carmelo)_comportamiento': 'Awatiri ukhamaraki wallpanakaru jark\'aqiri k\'ank\'a.',
+  'Gallos (Villa Carmelo)_curiosidad':
+      'Qhantati arunakapaxa oraqipa chimpuntañatakiwa arst\'i.',
+  'Gallos (Villa Carmelo)_comportamiento':
+      'Awatiri ukhamaraki wallpanakaru jark\'aqiri k\'ank\'a.',
   'Gallos (Villa Carmelo)_audioguia': 'Villa Carmeloxa Peru markana nayra chakra wasinakapa amtayistu, k\'ank\'ana qhantat arupampi.',
   'Pavo Real (Villa Carmelo)_curiosidad': 'Wich\'inkhana nayranakapaxa qhanampiwa saminakapa mayjt\'ayasispa k\'ajantapxi.',
   'Pavo Real (Villa Carmelo)_comportamiento': 'Wich\'inkhapa jach\'aru jist\'arasawa thuqhusispa sarnaqi china pawur uñacht\'ayañataki.',
   'Pavo Real (Villa Carmelo)_audioguia': 'Villa Carmelon pawu riyalpaxa taqinitaki muspharkañ k\'ajantäwipampiwa uñacht\'ayistu.',
   'Pelícanos / Aves Guaneras_curiosidad': 'Laka phukhupaxa tunka mayani litru quta uma katuspawa challwanakaru suysuwayi.',
   'Pelícanos / Aves Guaneras_comportamiento': 'Quta thayanakana suma jalirinaka, umaru mantasawa challwanaka katusipxi.',
-  'Pelícanos / Aves Guaneras_audioguia': 'Wanu jamach\'inakaxa Piruw qutan qhapaq kawsawipawa.',
+  'Pelícanos / Aves Guaneras_audioguia':
+      'Wanu jamach\'inakaxa Piruw qutan qhapaq kawsawipawa.',
   'Peces (Acuario)_curiosidad': 'Qallu sirk\'anakapampiwa uma kuyt\'äwinaka ratuki yatipxi, sallqanakar jark\'aqasiñataki.',
-  'Peces (Acuario)_comportamiento': 'Kusisiñani kuskaki tuyuripxi, quri qullqjam k\'ajantasina.',
+  'Peces (Acuario)_comportamiento':
+      'Kusisiñani kuskaki tuyuripxi, quri qullqjam k\'ajantasina.',
   'Peces (Acuario)_audioguia': 'Challwawasina quta manqhana ukhamaraki jawiranakana challwanakap uñt\'ama.',
   'Lobos de Mar_curiosidad': 'Lik\'i janchipampiwa thaya quta umaru sayt\'asipxi, kalamarinak manq\'añataki mantasisa.',
   'Lobos de Mar_comportamiento': 'Umaru sumaki thuqhurinaka. Allqujam aruchasisa qalanakana intiru uñch\'ukipxi.',
-  'Lobos de Mar_audioguia': 'Quta allqunakaxa Piruw qutanakan wali munat kawsirinakäpisiwa.',
+  'Lobos de Mar_audioguia':
+      'Quta allqunakaxa Piruw qutanakan wali munat kawsirinakäpisiwa.',
   'Cocodrilo de Tumbes_curiosidad': 'Piruw markana mä sapa jach\'a kaymanakiwa, Tumpis k\'itin kachi umanakana jakasiri.',
-  'Cocodrilo de Tumbes_comportamiento': 'Lawa kurpjam umaru mantasinwa amuki suyi sallqa uywanaka katuñataki.',
-  'Cocodrilo de Tumbes_audioguia': 'Tumpis kaymanaxa alay Piruw markana suma jark\'aqat uywapawa.',
+  'Cocodrilo de Tumbes_comportamiento':
+      'Lawa kurpjam umaru mantasinwa amuki suyi sallqa uywanaka katuñataki.',
+  'Cocodrilo de Tumbes_audioguia':
+      'Tumpis kaymanaxa alay Piruw markana suma jark\'aqat uywapawa.',
   'Flamencos_curiosidad': 'Wila samipaxa manq\'atapata purini, qutanakana wila jisk\'a kurunak manq\'asina.',
   'Flamencos_comportamiento': 'Mä kayukillampi sayt\'asisina ikipxi, k\'umu chhunqhupa chhinqhlla manqharu imantasa.',
   'Flamencos_audioguia': 'Pariwananakaxa Piruw markana wila janq\'u wiphala saminakaparu amuyt\'ayawayi.',
   'Pingüinos de Humboldt_curiosidad': 'Uma manqhana kimsa tunka kilumitru jalipxi, chhinqhllanakapampiwa umaru tuyupxi.',
-  'Pingüinos de Humboldt_comportamiento': 'Mä sapa chachampi warmimpi jakasipxi. Wanu qalanakana tapachasipxi.',
+  'Pingüinos de Humboldt_comportamiento':
+      'Mä sapa chachampi warmimpi jakasipxi. Wanu qalanakana tapachasipxi.',
   'Pingüinos de Humboldt_audioguia': 'Humboldt jamach\'inakaxa thaya Humboldt qutan kawsirinakawa, taqinitaki munata.',
   'Caballos (Caballeriza)_curiosidad': 'Piruw markana Paso Kawallupaxa suma k\'acha sarnaqäwiniwa, jan kuyt\'ayasawa jaqir apani.',
-  'Caballos (Caballeriza)_comportamiento': 'Wali suma k\'uchiki uywa. Quri ch\'amani sarnaqäwipampiwa uñt\'ata.',
+  'Caballos (Caballeriza)_comportamiento':
+      'Wali suma k\'uchiki uywa. Quri ch\'amani sarnaqäwipampiwa uñt\'ata.',
   'Caballos (Caballeriza)_audioguia': 'Aka kanchana Piruw Paso Kawalluna sumapa uñjam, Markasan Qillqañapata yupaychatawa.',
   'Venados_curiosidad': 'Chacha tarukanakaxa sapa marawa waqranakapa t\'aqapxi, juk\'amp jach\'aruwa wasitat jilani.',
   'Venados_comportamiento': 'Amasiri, thuqhuri. Jach\'a qalanakaru thuqhusawa qamaqinakat jark\'aqasi.',
@@ -558,7 +595,8 @@ final Map<String, String> traduccionesAnimalesAy = {
   'Cóndor Andino_comportamiento': 'Thayanakampiwa alayaru jali, jan chhinqhllanakapa kuyt\'ayasasa unjtasipxi.',
   'Cóndor Andino_audioguia': 'Antinakan jach\'a kunturipar uñjtasïtawa. Qullunakana awatiri ukhamaraki jark\'aqiriwa.',
   'Alpacas_curiosidad': 'T\'arwapaxa junt\'ukiwa ukhamaraki llamp\'ukiwa, taqpacha markanakan munatawa.',
-  'Alpacas_comportamiento': 'Qhantati jakasiri tama uywanakawa, suma kunkampiwa aruskipapxi.',
+  'Alpacas_comportamiento':
+      'Qhantati jakasiri tama uywanakawa, suma kunkampiwa aruskipapxi.',
   'Alpacas_audioguia': 'Allpakaxa nayra maranakatpacha Piruw markana uywatawa. Llamp\'u t\'arwapa uñjam.',
   'Zorro Andino_curiosidad': 'Urin Awya Yalanxa payïri jach\'a allqu aylluwa, quta thiyata qullukama jakasiri.',
   'Zorro Andino_comportamiento': 'Wali amuyt\'iri, sapaki sarnaqiri. Jinchunakapampiwa uraqi manqhana achakunakar ist\'i.',
@@ -567,7 +605,8 @@ final Map<String, String> traduccionesAnimalesAy = {
   'Puma_comportamiento': 'Qala qullunakana amuki awatiri. Suxta mitru jilawa thuqhusispa aycha katuwayi.',
   'Puma_audioguia': 'Pumaxa Kay Pachana ch\'amapa unanchawayi, thakhinakar suma jark\'aqiriwa.',
   'Águila Mora_curiosidad': 'Nayranakapaxa kimsaqallqu kuti juk\'amp k\'ajantatawa jaqit sipansa, pä kilumitru alayat achakur uñji.',
-  'Águila Mora_comportamiento': 'Alaya awatiri jamach\'iwa. Qullu qalanakana alayaruwa sumaki jalaski.',
+  'Águila Mora_comportamiento':
+      'Alaya awatiri jamach\'iwa. Qullu qalanakana alayaruwa sumaki jalaski.',
   'Águila Mora_audioguia': 'Pakanixa Antinakan alaya kamachiripawa, ch\'amani nayranakapampiwa taqpach uñchi.',
   'Vicuñas_curiosidad': 'Aka uraqpachana wali llamp\'u t\'arwani uywawa, Chaku luräwimpikiwa t\'arwapa yaphapxi.',
   'Vicuñas_comportamiento': 'Sallqa, t\'ijtiri. Pusi waranqa mitru alayana wila masipampiwa jakasipxi.',
@@ -579,9 +618,11 @@ final Map<String, String> traduccionesAnimalesAy = {
   'Guacamayos_comportamiento': 'Aruchasiri, suma amuyt\'iri. Panipura jalipxi muntanya alayana achunak katusina.',
   'Guacamayos_audioguia': 'Wakamayunakaxa muntanya k\'itiru wali k\'ajanta saminakampi phuqt\'ayapxi.',
   'Tapir (Sachavaca)_curiosidad': 'Kuyt\'iri chhunqhupampiwa laphinaka katuwayi, umaru mantasasa aychapar samsuyt\'ayi.',
-  'Tapir (Sachavaca)_comportamiento': 'Uma manqhana suma tuyuri. Ñiq\'i umampiwa janchipa sumachi.',
+  'Tapir (Sachavaca)_comportamiento':
+      'Uma manqhana suma tuyuri. Ñiq\'i umampiwa janchipa sumachi.',
   'Tapir (Sachavaca)_audioguia': 'Sach\'awaka tapiraxa Urin Awya Yalanxa jach\'a allpapi sarnaqiri uywapawa.',
-  'Isla de Monos_curiosidad': 'Wich\'inkhapaxa phisqha amparjamawa lawanakaru katuwayasiñataki yanapi.',
+  'Isla de Monos_curiosidad':
+      'Wich\'inkhapaxa phisqha amparjamawa lawanakaru katuwayasiñataki yanapi.',
   'Isla de Monos_comportamiento': 'K\'uchiki, thuqhurinaka. Lawanakaru katuwayasina wila masipampi anatt\'apxi.',
   'Isla de Monos_audioguia': 'K\'usillu Isla uñacht\'äwinxa wali kusisiñawa, k\'usillunakana anatt\'awinakapa uñjam.',
   'Otorongo_curiosidad': 'Taqpach phisinakat sipansa jach\'a lakar ch\'amaniwa, asukaranakasa laphapxarakiwa.',
@@ -589,15 +630,19 @@ final Map<String, String> traduccionesAnimalesAy = {
   'Otorongo_audioguia': 'Uturunkuxa muntanya k\'itin jach\'a jilaqatawa. Quri samana qalluñaparu uñjam.',
   'Nutria Gigante (Lobo de río)_curiosidad': 'Mä mitru kimsaqallqu tunka sintimitru jach\'awa, kunkapan janq\'u chimpupaxa sapanakakiwa.',
   'Nutria Gigante (Lobo de río)_comportamiento': 'Kusisiñani anatt\'irinaka. Tama uywampiwa jawiranakana challwanaka katusipxi.',
-  'Nutria Gigante (Lobo de río)_audioguia': 'Jach\'a jawira allquxa muntanya qutanakana jach\'a kawsiripawa.',
+  'Nutria Gigante (Lobo de río)_audioguia':
+      'Jach\'a jawira allquxa muntanya qutanakana jach\'a kawsiripawa.',
   'Anaconda_curiosidad': 'Aka uraqpachana jach\'a llasa katariwa, pä pataka kilu jila llasani, uma manqhana imantasiri.',
-  'Anaconda_comportamiento': 'Umana jakasiri katari. Sallqa uywanakar k\'añusina manq\'antawayi.',
-  'Anaconda_audioguia': 'Jach\'a Katari Yacumamaxa muntanya jawiranakana qhapaq kawsawipawa.',
+  'Anaconda_comportamiento':
+      'Umana jakasiri katari. Sallqa uywanakar k\'añusina manq\'antawayi.',
+  'Anaconda_audioguia':
+      'Jach\'a Katari Yacumamaxa muntanya jawiranakana qhapaq kawsawipawa.',
   'Sajino_curiosidad': 'Kunkapana janq\'u k\'añuniwa, qhipäxapana suma q\'aphiñani janchini tama masipar chimpuñchañataki.',
   'Sajino_comportamiento': 'Kuskaki arumampi jakasipxi, wawanakaparuxa sallqa uywanakat jark\'aqapxi.',
   'Sajino_audioguia': 'Sajinu kuchixa muntanyan jakasiri uywawa, jathanaka muntanyaru churañatakiwa yanapi.',
   'Oso Perezoso / Mamíferos menores_curiosidad': 'T\'arwapanxa ch\'uxña jisk\'a quranakawa jili, ukhamata laphinakampi jan uñjkañaru tukuyi.',
-  'Oso Perezoso / Mamíferos menores_comportamiento': 'Wali k\'achat k\'achat unxtiri. Lawanakat warkusitakiwa jakasipxi.',
+  'Oso Perezoso / Mamíferos menores_comportamiento':
+      'Wali k\'achat k\'achat unxtiri. Lawanakat warkusitakiwa jakasipxi.',
   'Oso Perezoso / Mamíferos menores_audioguia': 'K\'ari Jukumarixa samart\'awi kawsawiw yatiyistu, janchipa ch\'amapa suma waqaychasina.',
   '🌱 Brotes frescos': '🌱 Ch\'uxña ch\'ikllinaka',
   '🌱 Microalgas carotenoides': '🌱 Quta ch\'uxñanaka',

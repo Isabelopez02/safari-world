@@ -1,17 +1,12 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
-enum ChipUrgenciaMapa {
-  ninguno,
-  banios,
-  animales,
-  snacks,
-  salidaParking,
-}
+enum ChipUrgenciaMapa { ninguno, banios, animales, snacks, salidaParking }
 
 /// Barra superior híbrida del mapa estilo Google Maps / Disney Parks:
 /// - Selector de capas compacto
@@ -33,7 +28,12 @@ class BarraBusquedaHibridaMapa extends StatelessWidget {
     return SafeArea(
       bottom: false,
       child: Padding(
-        padding: const EdgeInsets.only(top: 14.0, left: 16.0, right: 16.0, bottom: 8.0),
+        padding: const EdgeInsets.only(
+          top: 14.0,
+          left: 16.0,
+          right: 16.0,
+          bottom: 8.0,
+        ),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
@@ -104,9 +104,7 @@ class BarraBusquedaHibridaMapa extends StatelessWidget {
             decoration: BoxDecoration(
               color: colorFondo,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.black.withValues(alpha: 0.08),
-              ),
+              border: Border.all(color: Colors.black.withValues(alpha: 0.08)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.06),
@@ -145,9 +143,7 @@ class BarraBusquedaHibridaMapa extends StatelessWidget {
             duration: const Duration(milliseconds: 180),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              color: activo
-                  ? colorTema
-                  : Colors.white.withValues(alpha: 0.90),
+              color: activo ? colorTema : Colors.white.withValues(alpha: 0.90),
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
                 color: activo
@@ -168,11 +164,7 @@ class BarraBusquedaHibridaMapa extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  icono,
-                  size: 15,
-                  color: activo ? Colors.white : colorTema,
-                ),
+                Icon(icono, size: 15, color: activo ? Colors.white : colorTema),
                 const SizedBox(width: 5),
                 Text(
                   etiqueta,

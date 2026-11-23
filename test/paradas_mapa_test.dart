@@ -20,16 +20,26 @@ void main() {
         final expectedX = (m.porcentajeX / 100.0) * mapaAncho;
         final expectedY = (m.porcentajeY / 100.0) * mapaAlto;
 
-        expect(m.x, closeTo(expectedX, 0.01),
-            reason: 'Coordenada X incorrecta para ${m.nombre}');
-        expect(m.y, closeTo(expectedY, 0.01),
-            reason: 'Coordenada Y incorrecta para ${m.nombre}');
+        expect(
+          m.x,
+          closeTo(expectedX, 0.01),
+          reason: 'Coordenada X incorrecta para ${m.nombre}',
+        );
+        expect(
+          m.y,
+          closeTo(expectedY, 0.01),
+          reason: 'Coordenada Y incorrecta para ${m.nombre}',
+        );
       }
     });
 
     test('Verifica paradas de Granja Interactiva (Morado)', () {
-      final vacas = marcadoresZoologico.firstWhere((m) => m.nombre == 'Vacas Holstein');
-      final ovejas = marcadoresZoologico.firstWhere((m) => m.nombre == 'Ovejas');
+      final vacas = marcadoresZoologico.firstWhere(
+        (m) => m.nombre == 'Vacas Holstein',
+      );
+      final ovejas = marcadoresZoologico.firstWhere(
+        (m) => m.nombre == 'Ovejas',
+      );
 
       expect(vacas.porcentajeX, equals(60.0));
       expect(vacas.porcentajeY, equals(14.0));
@@ -41,9 +51,15 @@ void main() {
     });
 
     test('Verifica paradas de Zona Internacional (Rojo)', () {
-      final rino = marcadoresZoologico.firstWhere((m) => m.nombre == 'Rinoceronte');
-      final leones = marcadoresZoologico.firstWhere((m) => m.nombre == 'Leones');
-      final jirafa = marcadoresZoologico.firstWhere((m) => m.nombre == 'Jirafa');
+      final rino = marcadoresZoologico.firstWhere(
+        (m) => m.nombre == 'Rinoceronte',
+      );
+      final leones = marcadoresZoologico.firstWhere(
+        (m) => m.nombre == 'Leones',
+      );
+      final jirafa = marcadoresZoologico.firstWhere(
+        (m) => m.nombre == 'Jirafa',
+      );
 
       expect(rino.porcentajeX, equals(69.0));
       expect(rino.porcentajeY, equals(17.0));
@@ -57,8 +73,12 @@ void main() {
     });
 
     test('Verifica paradas de Zona Costa (Azul)', () {
-      final gallos = marcadoresZoologico.firstWhere((m) => m.nombre == 'Gallos (Villa Carmelo)');
-      final pinguinos = marcadoresZoologico.firstWhere((m) => m.nombre == 'Pingüinos de Humboldt');
+      final gallos = marcadoresZoologico.firstWhere(
+        (m) => m.nombre == 'Gallos (Villa Carmelo)',
+      );
+      final pinguinos = marcadoresZoologico.firstWhere(
+        (m) => m.nombre == 'Pingüinos de Humboldt',
+      );
 
       expect(gallos.porcentajeX, equals(38.0));
       expect(gallos.porcentajeY, equals(38.0));
@@ -69,8 +89,12 @@ void main() {
     });
 
     test('Verifica paradas de Zona Sierra (Marrón)', () {
-      final caballos = marcadoresZoologico.firstWhere((m) => m.nombre == 'Caballos (Caballeriza)');
-      final condor = marcadoresZoologico.firstWhere((m) => m.nombre == 'Cóndor Andino');
+      final caballos = marcadoresZoologico.firstWhere(
+        (m) => m.nombre == 'Caballos (Caballeriza)',
+      );
+      final condor = marcadoresZoologico.firstWhere(
+        (m) => m.nombre == 'Cóndor Andino',
+      );
 
       expect(caballos.porcentajeX, equals(34.0));
       expect(caballos.porcentajeY, equals(27.0));
@@ -81,8 +105,12 @@ void main() {
     });
 
     test('Verifica paradas de Zona Selva (Verde)', () {
-      final otorongo = marcadoresZoologico.firstWhere((m) => m.nombre == 'Otorongo');
-      final anaconda = marcadoresZoologico.firstWhere((m) => m.nombre == 'Anaconda');
+      final otorongo = marcadoresZoologico.firstWhere(
+        (m) => m.nombre == 'Otorongo',
+      );
+      final anaconda = marcadoresZoologico.firstWhere(
+        (m) => m.nombre == 'Anaconda',
+      );
 
       expect(otorongo.porcentajeX, equals(72.0));
       expect(otorongo.porcentajeY, equals(50.0));
@@ -92,12 +120,15 @@ void main() {
       expect(anaconda.porcentajeY, equals(56.0));
     });
 
-    test('AnimalService obtiene fichas detalladas para cada una de las 41 paradas', () {
-      for (final m in marcadoresZoologico) {
-        final datos = AnimalService.instance.obtenerDatos(m.nombre);
-        expect(datos.dieta.isNotEmpty, isTrue);
-        expect(datos.narracionAudioguia.isNotEmpty, isTrue);
-      }
-    });
+    test(
+      'AnimalService obtiene fichas detalladas para cada una de las 41 paradas',
+      () {
+        for (final m in marcadoresZoologico) {
+          final datos = AnimalService.instance.obtenerDatos(m.nombre);
+          expect(datos.dieta.isNotEmpty, isTrue);
+          expect(datos.narracionAudioguia.isNotEmpty, isTrue);
+        }
+      },
+    );
   });
 }

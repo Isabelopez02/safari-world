@@ -10,10 +10,7 @@ import 'package:zoologico_front/core/theme/app_colors.dart';
 class ProgresoCircularAnimales extends StatelessWidget {
   final VoidCallback onVerDetalle;
 
-  const ProgresoCircularAnimales({
-    super.key,
-    required this.onVerDetalle,
-  });
+  const ProgresoCircularAnimales({super.key, required this.onVerDetalle});
 
   @override
   Widget build(BuildContext context) {

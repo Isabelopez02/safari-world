@@ -92,7 +92,10 @@ class SelectorTamanoLetra extends StatelessWidget {
                         children: [
                           const Text(
                             'A',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -112,7 +115,10 @@ class SelectorTamanoLetra extends StatelessWidget {
                         children: [
                           const Text(
                             'A',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -132,7 +138,10 @@ class SelectorTamanoLetra extends StatelessWidget {
                         children: [
                           const Text(
                             'A',
-                            style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -156,9 +165,14 @@ class SelectorTamanoLetra extends StatelessWidget {
                       messenger.showSnackBar(
                         SnackBar(
                           behavior: SnackBarBehavior.floating,
-                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           backgroundColor: const Color(0xFF1E293B),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                           content: Row(
                             children: [
                               Container(
@@ -167,7 +181,11 @@ class SelectorTamanoLetra extends StatelessWidget {
                                   color: Colors.white.withValues(alpha: 0.15),
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.format_size_rounded, color: Colors.white, size: 18),
+                                child: const Icon(
+                                  Icons.format_size_rounded,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -231,17 +249,22 @@ class SelectorTamanoLetra extends StatelessWidget {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
-                            color: AppColors.verdePrincipal.withValues(alpha: 0.1),
+                            color: AppColors.verdePrincipal.withValues(
+                              alpha: 0.1,
+                            ),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             tamanoActual == TamanoTexto.pequeno
                                 ? 'Escala 1.0x (Estándar)'
                                 : tamanoActual == TamanoTexto.mediano
-                                    ? 'Escala 1.15x (+15%)'
-                                    : 'Escala 1.30x (+30%)',
+                                ? 'Escala 1.15x (+15%)'
+                                : 'Escala 1.30x (+30%)',
                             style: GoogleFonts.urbanist(
                               fontSize: 9.5,
                               fontWeight: FontWeight.w800,
@@ -255,9 +278,11 @@ class SelectorTamanoLetra extends StatelessWidget {
                     Text(
                       '«¡Bienvenido al zoológico! Explora los animales, consulta los shows y disfruta de tu expedición.»',
                       style: GoogleFonts.urbanist(
-                        fontSize: 13.0 *
+                        fontSize:
+                            13.0 *
                             AccesibilidadService
-                                .instance.multiplicadorEscalaTexto,
+                                .instance
+                                .multiplicadorEscalaTexto,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textoOscuro,
                         height: 1.3,

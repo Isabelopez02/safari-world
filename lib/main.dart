@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:zoologico_front/core/di/injection_container.dart';
 import 'package:zoologico_front/core/services/accesibilidad_service.dart';
 import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/notification_service.dart';
@@ -9,7 +10,13 @@ import 'package:zoologico_front/features/carga_pagina/pantalla_inicio.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService.instance.init();
+  await initDependencies();
+  runApp(const MiApp());
+
+  // Inicializaciones auxiliares en segundo plano (sin bloquear el hilo principal)
+  sl<NotificationService>().init().catchError(
+    (e) => debugPrint('Notif init: $e'),
+  );
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -20,8 +27,6 @@ void main() async {
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  runApp(const MiApp());
 }
 
 class MiApp extends StatelessWidget {
@@ -31,12 +36,11 @@ class MiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: Listenable.merge([
-        AccesibilidadService.instance,
-        IdiomaService.instance,
+        sl<AccesibilidadService>(),
+        sl<IdiomaService>(),
       ]),
       builder: (context, _) {
-        final escalaTexto =
-            AccesibilidadService.instance.multiplicadorEscalaTexto;
+        final escalaTexto = sl<AccesibilidadService>().multiplicadorEscalaTexto;
 
         return MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -52,9 +56,8 @@ class MiApp extends StatelessWidget {
           ),
           builder: (context, child) {
             return MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                textScaler: TextScaler.linear(escalaTexto),
-              ),
+              data: MediaQuery.of(context)
+                  .copyWith(textScaler: TextScaler.linear(escalaTexto)),
               child: child!,
             );
           },

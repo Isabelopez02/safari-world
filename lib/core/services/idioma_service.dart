@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'traducciones_animales.dart';
 
 /// Idiomas disponibles en la aplicación
@@ -124,8 +125,7 @@ class IdiomaService extends ChangeNotifier {
       // Barra de Shows y Banners
       'cartelera_shows': 'Cartelera de Shows',
       'mira_todo_shows': 'Mira todo esto para tus shows',
-      'banner_shows_sub':
-          'Reserva horarios, consulta normas de convivencia y conoce la ubicación de cada escenario.',
+      'banner_shows_sub': 'Reserva horarios, consulta normas de convivencia y conoce la ubicación de cada escenario.',
       'ver_mis_entradas': 'Mis Entradas',
       'ver_entradas_btn': 'Ver mis entradas',
       'activar_notificaciones': 'Activar notificaciones de shows',
@@ -157,8 +157,7 @@ class IdiomaService extends ChangeNotifier {
       // Tu Ruta
       'rutas_habitats': 'Rutas & Hábitats',
       'conoce_habitats': 'CONOCE LOS HÁBITATS DEL PARQUE',
-      'conoce_habitats_sub':
-          'Elige qué animales deseas visitar hoy y traza el sendero en el mapa.',
+      'conoce_habitats_sub': 'Elige qué animales deseas visitar hoy y traza el sendero en el mapa.',
       'trazar_ruta': 'Trazar ruta hacia esta zona',
       'animales_explorados': 'explorados',
 
@@ -205,10 +204,13 @@ class IdiomaService extends ChangeNotifier {
 
       // Perfil Adicional
       'modo_daltonismo_tit': 'Modo Daltonismo',
-      'modo_daltonismo_sub': 'Paleta de alto contraste adaptada para visión de color',
+      'modo_daltonismo_sub':
+          'Paleta de alto contraste adaptada para visión de color',
       'modo_facil_tit': 'Modo Fácil (Adulto Mayor)',
-      'modo_facil_sub': 'Interfaz simplificada, letras grandes y lectura guiada por voz',
-      'alertas_shows_sub': 'Recordatorios 15 minutos antes de iniciar cada función',
+      'modo_facil_sub':
+          'Interfaz simplificada, letras grandes y lectura guiada por voz',
+      'alertas_shows_sub':
+          'Recordatorios 15 minutos antes de iniciar cada función',
       'sonido_haptica': 'Sonidos y Háptica',
       'sonido_haptica_sub': 'Efectos sonoros y vibración al interactuar',
       'preguntas_frecuentes': 'Preguntas Frecuentes',
@@ -221,14 +223,11 @@ class IdiomaService extends ChangeNotifier {
       'volver_al_menu': 'Volver al Menú',
       'salir_modo_facil': 'Salir del Modo Fácil\n(Modo Normal)',
       'bienvenido_parque': '¡Bienvenido al Parque! 🦁',
-      'bienvenido_sub':
-          'Toque cualquiera de los botones grandes de abajo para usar el parque de forma fácil y sin complicaciones.',
+      'bienvenido_sub': 'Toque cualquiera de los botones grandes de abajo para usar el parque de forma fácil y sin complicaciones.',
       'escanear_placa_guia': 'Escanear Placa QR / Guía',
-      'escanear_camara_sub':
-          'Abra la cámara y apunte al letrero de cualquier animal para escuchar su historia',
+      'escanear_camara_sub': 'Abra la cámara y apunte al letrero de cualquier animal para escuchar su historia',
       'mapa_zoologico': 'Mapa del Zoológico',
-      'mapa_facil_sub':
-          'Mapa interactivo con botones gigantes para Baños, Salida y Zona Tranquila',
+      'mapa_facil_sub': 'Mapa interactivo con botones gigantes para Baños, Salida y Zona Tranquila',
       'shows_hoy': 'Shows de Hoy',
       'shows_facil_sub':
           'Cartelera grande con guardado en 1 toque y efecto de confirmación',
@@ -237,8 +236,7 @@ class IdiomaService extends ChangeNotifier {
           'Contactar a un orientador o asistencia médica del parque',
       'marcar_visitado': '✅ Marcar como Visitado',
       'visitado_listo': 'Visitado ✓ (Toque para desmarcar)',
-      'apunte_camara':
-          'Apunte la cámara a la placa QR o letrero físico de cualquier animal del parque.',
+      'apunte_camara': 'Apunte la cámara a la placa QR o letrero físico de cualquier animal del parque.',
       'catalogo_animales': '🐾 Elegir de la Lista Completa de Animales',
       'historia_animal': '🎙️ Historia del Animal',
       'dieta_alimentacion': 'Alimentación y Dieta',
@@ -296,7 +294,8 @@ class IdiomaService extends ChangeNotifier {
       'Hipopótamos del Nilo': 'Hipopótamos del Nilo',
       'Dromedarios': 'Dromedarios',
       'Tigre de Bengala': 'Tigre de Bengala',
-      'Oso de Anteojos (Zona Internacional)': 'Oso de Anteojos (Zona Internacional)',
+      'Oso de Anteojos (Zona Internacional)':
+          'Oso de Anteojos (Zona Internacional)',
       'Cebra de Grant': 'Cebra de Grant',
       'Tortugas': 'Tortugas',
       'Tigre Blanco': 'Tigre Blanco',
@@ -319,7 +318,8 @@ class IdiomaService extends ChangeNotifier {
       'Puma': 'Puma',
       'Águila Mora': 'Águila Mora',
       'Vicuñas': 'Vicuñas',
-      'Reptiles / Serpientes (Herpetario)': 'Reptiles / Serpientes (Herpetario)',
+      'Reptiles / Serpientes (Herpetario)':
+          'Reptiles / Serpientes (Herpetario)',
       'Guacamayos': 'Guacamayos',
       'Tapir (Sachavaca)': 'Tapir (Sachavaca)',
       'Isla de Monos': 'Isla de Monos',
@@ -359,7 +359,8 @@ class IdiomaService extends ChangeNotifier {
       'Preocupación menor': 'Preocupación menor',
       'En peligro (salvaje)': 'En peligro (salvaje)',
       'En peligro': 'En peligro',
-      'En peligro crítico (en santuarios)': 'En peligro crítico (en santuarios)',
+      'En peligro crítico (en santuarios)':
+          'En peligro crítico (en santuarios)',
       'En peligro crítico en Perú': 'En peligro crítico en Perú',
       'Diversos estados': 'Diversos estados',
       'Patrimonio Cultural de la Nación': 'Patrimonio Cultural de la Nación',
@@ -414,8 +415,7 @@ class IdiomaService extends ChangeNotifier {
       // Your Route
       'rutas_habitats': 'Routes & Habitats',
       'conoce_habitats': 'EXPLORE PARK HABITATS',
-      'conoce_habitats_sub':
-          'Choose the animals you want to visit and trace your trail on the map.',
+      'conoce_habitats_sub': 'Choose the animals you want to visit and trace your trail on the map.',
       'trazar_ruta': 'Trace trail to this zone',
       'animales_explorados': 'explored',
 
@@ -478,24 +478,20 @@ class IdiomaService extends ChangeNotifier {
       'volver_al_menu': 'Back to Menu',
       'salir_modo_facil': 'Exit Easy Mode\n(Normal Mode)',
       'bienvenido_parque': 'Welcome to the Zoo! 🦁',
-      'bienvenido_sub':
-          'Tap any of the big buttons below to explore the zoo easily and comfortably.',
+      'bienvenido_sub': 'Tap any of the big buttons below to explore the zoo easily and comfortably.',
       'escanear_placa_guia': 'Scan QR Sign / Guide',
       'escanear_camara_sub':
           'Open the camera and point at any animal sign to hear its story',
       'mapa_zoologico': 'Zoo Map',
-      'mapa_facil_sub':
-          'Interactive map with giant buttons for Restrooms, Exit, and Calm Zone',
+      'mapa_facil_sub': 'Interactive map with giant buttons for Restrooms, Exit, and Calm Zone',
       'shows_hoy': 'Today\'s Shows',
       'shows_facil_sub':
           'Large billboard with 1-tap save and confirmation feedback',
       'pedir_ayuda': 'Get Help / First Aid',
-      'pedir_ayuda_sub':
-          'Contact a guide or park medical first aid assistance',
+      'pedir_ayuda_sub': 'Contact a guide or park medical first aid assistance',
       'marcar_visitado': '✅ Mark as Visited',
       'visitado_listo': 'Visited ✓ (Tap to unmark)',
-      'apunte_camara':
-          'Point the camera at the physical QR sign or board of any zoo animal.',
+      'apunte_camara': 'Point the camera at the physical QR sign or board of any zoo animal.',
       'catalogo_animales': '🐾 Choose from Full Animal List',
       'historia_animal': '🎙️ Animal Story',
       'dieta_alimentacion': 'Diet & Feeding',
@@ -755,20 +751,16 @@ class IdiomaService extends ChangeNotifier {
       'volver_al_menu': 'Kutiy Muyuman',
       'salir_modo_facil': 'Lluqsiy Ch\'uya Ñanmanta\n(Tukuy Ñan)',
       'bienvenido_parque': '¡Allin hamusqayki Parkiman! 🦁',
-      'bienvenido_sub':
-          'Kay hatun ñit\'inakunata ñit\'iy parkipi mana sasachakuspa purinaykipaq.',
+      'bienvenido_sub': 'Kay hatun ñit\'inakunata ñit\'iy parkipi mana sasachakuspa purinaykipaq.',
       'escanear_placa_guia': 'QR Chipta Qhaway / Pusariq',
-      'escanear_camara_sub':
-          'Kamarata kicharispam uywapa letreronman churay willayninta uyarinaykipaq',
+      'escanear_camara_sub': 'Kamarata kicharispam uywapa letreronman churay willayninta uyarinaykipaq',
       'mapa_zoologico': 'Parkipa Saywitin',
       'mapa_facil_sub':
           'Hisp\'ana Wasi, Lluqsina, Qasikay kanchakuna hatun ñit\'inawan',
       'shows_hoy': 'Kunan Rikuchiykuna',
-      'shows_facil_sub':
-          'Rikuchiykuna huk ñit\'illawan waqaychanapaq',
+      'shows_facil_sub': 'Rikuchiykuna huk ñit\'illawan waqaychanapaq',
       'pedir_ayuda': 'Yanapayta Mañakuy',
-      'pedir_ayuda_sub':
-          'Pusariqta utaq hanpiqta waqyay',
+      'pedir_ayuda_sub': 'Pusariqta utaq hanpiqta waqyay',
       'marcar_visitado': '✅ Watukusqañam',
       'visitado_listo': 'Watukusqañam ✓ (Takyay llipipipananpaq)',
       'apunte_camara':
@@ -901,7 +893,8 @@ class IdiomaService extends ChangeNotifier {
       'Protegido': 'Waqaychasqa',
 
       // Localized Animal Narrations & Curiosities
-      'Leones_curiosidad': 'Liyunpa qapariyninqa pusaq kilumitrukama uyarikun k\'itikunapi.',
+      'Leones_curiosidad':
+          'Liyunpa qapariyninqa pusaq kilumitrukama uyarikun k\'itikunapi.',
       'Leones_comportamiento': 'Ayllupuralla tiyanku. Iskay chunka urastam puñunku kallpata waqaychaspa.',
       'Leones_audioguia': 'Hawamanta K\'itipi liyunkunaman chayamurqanki. Urqu liyunpa sapranqa kunkatam amachan awqanakuypi.',
       'Cóndor Andino_curiosidad': 'Kimsa mitrukama rapran mast\'arikun, teqsimuyuntinpi aswan hatun phawaq pisqum.',
@@ -911,10 +904,12 @@ class IdiomaService extends ChangeNotifier {
       'Vacas Holstein_comportamiento': 'Sampakuna, runawan pukllaqkuna. Wakinkunawan sumaqta munanakuspa tiyanku.',
       'Vacas Holstein_audioguia': 'Kallpa Chakraman allinmi hamusqayki. Yuraq yana millwayuq wakakunam kaypi kawsanku.',
       'Alpacas_curiosidad': 'Millwanqa llanllallam hinaspa q\'uñilla, pachantinpi ancha munakusqam.',
-      'Alpacas_comportamiento': 'Hawka ayllupi kawsanku, sumaq kunkayuq kuskalla purinku.',
+      'Alpacas_comportamiento':
+          'Hawka ayllupi kawsanku, sumaq kunkayuq kuskalla purinku.',
       'Alpacas_audioguia': 'Allpakaqa unay watakunamanta piruw suyupi uywasqam. Sumaq millwanta qhaway.',
       'Otorongo_curiosidad': 'Tukuy michi rikch\'aqkunamanta aswan sinchi kiruyuqmi, charapapa qarantapas p\'akiyta atin.',
-      'Otorongo_comportamiento': 'Sapallan puriq, sumaq tuytuq yaku mayukunapi puriq.',
+      'Otorongo_comportamiento':
+          'Sapallan puriq, sumaq tuytuq yaku mayukunapi puriq.',
       'Otorongo_audioguia': 'Uturunkuqa Amasunya sach\'a sach\'akunapa qhapaq apunmi. Quri q\'illu t\'ikachasqa qarantam qhaway.',
       'Pingüinos de Humboldt_curiosidad': 'Kimsa chunka mitru yakuman chinkaykuyta atinku challwakunata hapispa.',
       'Pingüinos de Humboldt_comportamiento': 'Quchapatapi tiyaq, kusisqa tuytuqkuna rumikunapa chawpinpi q\'isachanku.',
@@ -1035,17 +1030,13 @@ class IdiomaService extends ChangeNotifier {
       'bienvenido_sub':
           'Aka jach’a chimpunakamp parkina suma sarnaqañataki jasaki.',
       'escanear_placa_guia': 'QR Letrero Uñjaña / Irpiri',
-      'escanear_camara_sub':
-          'Kamarata jist’aram uywapa chimpuparu ist’añataki',
+      'escanear_camara_sub': 'Kamarata jist’aram uywapa chimpuparu ist’añataki',
       'mapa_zoologico': 'Parkina Saywitipa',
-      'mapa_facil_sub':
-          'Ikiña Wasi, Mistuña, Samart’awi jach’a chimpunakampi',
+      'mapa_facil_sub': 'Ikiña Wasi, Mistuña, Samart’awi jach’a chimpunakampi',
       'shows_hoy': 'Jichhuru Uñachäwinaka',
-      'shows_facil_sub':
-          'Uñacht’äwinak mä liwxatawimp imantañataki',
+      'shows_facil_sub': 'Uñacht’äwinak mä liwxatawimp imantañataki',
       'pedir_ayuda': 'Yanapt’a Mayisiña',
-      'pedir_ayuda_sub':
-          'Irpiriru jan ukax qulliriru jawsaña',
+      'pedir_ayuda_sub': 'Irpiriru jan ukax qulliriru jawsaña',
       'marcar_visitado': '✅ Uñjatäxiwa',
       'visitado_listo': 'Uñjatäxiwa ✓ (Mayamp liwxatañani)',
       'apunte_camara':
@@ -1063,7 +1054,8 @@ class IdiomaService extends ChangeNotifier {
       'alimentacion_dieta_diaria': 'Uru uruta manq’äwipa',
       'horarios_alimentacion': 'Manq’añ pachanakapa',
       'repetir_narracion': 'Wasitat ist’aña',
-      'felicitaciones_visitado': '¡Kusisiñawa! Aka uywaru uñjatäxiwa sasaw chimpuntata:',
+      'felicitaciones_visitado':
+          '¡Kusisiñawa! Aka uywaru uñjatäxiwa sasaw chimpuntata:',
       'busqueda_por_voz': 'Arupi Thaqhaña',
       'alerta_sos': 'Yanapaña SOS',
       'trazar_en_mapa_real': 'Saywitina Thakhi Uñjaña',
@@ -1178,24 +1170,31 @@ class IdiomaService extends ChangeNotifier {
       'Protegido': 'Waqaychata',
 
       // Localized Animal Narrations & Curiosities
-      'Leones_curiosidad': 'Urqu liyunan warariñapaxa kimsaqallqu kilumitrunakaruwa ist\'asi.',
+      'Leones_curiosidad':
+          'Urqu liyunan warariñapaxa kimsaqallqu kilumitrunakaruwa ist\'asi.',
       'Leones_comportamiento': 'Wila masi p\'iqinchata jakasipxi. Pätunka urasawa ikipxi ch\'ama waqaychañataki.',
       'Leones_audioguia': 'Anqäxa K\'itin liyunnakar uñjañataki purisïtawa. Urqu liyunan sunkhapaxa kunkaparuwa jark\'i ch\'axwawina.',
       'Cóndor Andino_curiosidad': 'Chhinqhllapaxa kimsa mitrunakawa, aka uraqpachan jach\'a jaliri jamach\'iwa.',
       'Cóndor Andino_comportamiento': 'Thayanakampiwa alayaru jali, jan chhinqhllanakapa kuyt\'ayasasa unjtasipxi.',
       'Cóndor Andino_audioguia': 'Antinakan jach\'a kunturipar uñjtasïtawa. Qullunakana awatiri ukhamaraki jark\'aqiriwa.',
-      'Vacas Holstein_curiosidad': 'Pusi purakaniwa, sapa minutuna phisqha tunka kutimpiwa k\'uturapxi.',
+      'Vacas Holstein_curiosidad':
+          'Pusi purakaniwa, sapa minutuna phisqha tunka kutimpiwa k\'uturapxi.',
       'Vacas Holstein_comportamiento': 'K\'uchiki, jaqinakampi sumaki aruskipiri. Mayninakampi sumaki jakasipxi.',
       'Vacas Holstein_audioguia': 'Chiqpacha Chakraru purisïtawa. Janq\'ump ch\'iyarampi wakanakaxa wali uñt\'atawa.',
       'Alpacas_curiosidad': 'T\'arwapaxa junt\'ukiwa ukhamaraki llamp\'ukiwa, taqpacha markanakan munatawa.',
-      'Alpacas_comportamiento': 'Qhantati jakasiri tama uywanakawa, suma kunkampiwa aruskipapxi.',
+      'Alpacas_comportamiento':
+          'Qhantati jakasiri tama uywanakawa, suma kunkampiwa aruskipapxi.',
       'Alpacas_audioguia': 'Allpakaxa nayra maranakatpacha Piruw markana uywatawa. Llamp\'u t\'arwapa uñjam.',
       'Otorongo_curiosidad': 'Taqpach phisinakat sipansa jach\'a lakar ch\'amaniwa, asukaranakasa laphapxarakiwa.',
-      'Otorongo_comportamiento': 'Sapaki sarnaqiri, jawiranakana sumaki tuyuri.',
+      'Otorongo_comportamiento':
+          'Sapaki sarnaqiri, jawiranakana sumaki tuyuri.',
       'Otorongo_audioguia': 'Uturunkuxa muntanya k\'itin jach\'a jilaqatawa. Quri samana qalluñaparu uñjam.',
-      'Pingüinos de Humboldt_curiosidad': 'Kimsa tunka mitrunaka umaru mantasawa challwanaka katusipxi.',
-      'Pingüinos de Humboldt_comportamiento': 'Quta thiyana kusisita tuyuripxi, qalanak taypina tapachasipxi.',
-      'Pingüinos de Humboldt_audioguia': 'Aka munata jamach\'inakaxa thaya Humboldt qutan jakasipxi.',
+      'Pingüinos de Humboldt_curiosidad':
+          'Kimsa tunka mitrunaka umaru mantasawa challwanaka katusipxi.',
+      'Pingüinos de Humboldt_comportamiento':
+          'Quta thiyana kusisita tuyuripxi, qalanak taypina tapachasipxi.',
+      'Pingüinos de Humboldt_audioguia':
+          'Aka munata jamach\'inakaxa thaya Humboldt qutan jakasipxi.',
     },
   };
 }

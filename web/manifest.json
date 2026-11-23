@@ -1,11 +1,11 @@
 {
-    "name": "zoologico_front",
-    "short_name": "zoologico_front",
-    "start_url": ".",
+    "name": "Parque de las Leyendas · Safari Interactivo",
+    "short_name": "ParqueLeyendas",
+    "start_url": "./",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F8FAF8",
+    "theme_color": "#2D6A4F",
+    "description": "Aplicativo móvil interactivo de geolocalización y audioguía para el Parque de las Leyendas (Sede San Miguel).",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

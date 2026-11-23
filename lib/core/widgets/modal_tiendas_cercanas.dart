@@ -25,10 +25,7 @@ class TiendaItem {
 class ModalTiendasCercanas extends StatelessWidget {
   final VoidCallback onAbrirEnMapa;
 
-  const ModalTiendasCercanas({
-    super.key,
-    required this.onAbrirEnMapa,
-  });
+  const ModalTiendasCercanas({super.key, required this.onAbrirEnMapa});
 
   static const List<TiendaItem> _tiendas = [
     TiendaItem(
@@ -65,7 +62,10 @@ class ModalTiendasCercanas extends StatelessWidget {
     ),
   ];
 
-  static void mostrar(BuildContext context, {required VoidCallback onAbrirEnMapa}) {
+  static void mostrar(
+    BuildContext context, {
+    required VoidCallback onAbrirEnMapa,
+  }) {
     SoundService.instance.playButtonTap();
     showModalBottomSheet(
       context: context,
@@ -156,7 +156,9 @@ class ModalTiendasCercanas extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFFFBFBFB),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+                    border: Border.all(
+                      color: Colors.black.withValues(alpha: 0.05),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -166,7 +168,11 @@ class ModalTiendasCercanas extends StatelessWidget {
                           color: tienda.color.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(tienda.icono, color: tienda.color, size: 22),
+                        child: Icon(
+                          tienda.icono,
+                          color: tienda.color,
+                          size: 22,
+                        ),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -233,7 +239,11 @@ class ModalTiendasCercanas extends StatelessWidget {
                 Navigator.pop(context);
                 onAbrirEnMapa();
               },
-              icon: const Icon(Icons.map_rounded, size: 18, color: Colors.white),
+              icon: const Icon(
+                Icons.map_rounded,
+                size: 18,
+                color: Colors.white,
+              ),
               label: Text(
                 'Ver puntos de servicio en el mapa',
                 style: GoogleFonts.urbanist(

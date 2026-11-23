@@ -109,15 +109,16 @@ class CanvasMapaInteractivo extends StatelessWidget {
     final bool isDimmed = isSelected
         ? false
         : (haySeleccionActiva ||
-            (filtroServicio != FiltroServicioMapa.todos && !matches));
+              (filtroServicio != FiltroServicioMapa.todos && !matches));
 
-    final bool isHighlighted = isSelected ||
+    final bool isHighlighted =
+        isSelected ||
         (!haySeleccionActiva &&
             filtroServicio != FiltroServicioMapa.todos &&
             matches);
 
-    final bool mostrarEtiqueta = isSelected ||
-        (!haySeleccionActiva && mostrarEtiquetaDefecto);
+    final bool mostrarEtiqueta =
+        isSelected || (!haySeleccionActiva && mostrarEtiquetaDefecto);
 
     final double leftOffset;
     final double topOffset;
@@ -168,16 +169,48 @@ class CanvasMapaInteractivo extends StatelessWidget {
                 child: ColorFiltered(
                   colorFilter: a11y.modoAltoContraste
                       ? const ColorFilter.matrix(<double>[
-                          0.38, 0,    0,    0, -15,
-                          0,    0.38, 0,    0, -15,
-                          0,    0,    0.38, 0, -15,
-                          0,    0,    0,    1, 0,
+                          0.38,
+                          0,
+                          0,
+                          0,
+                          -15,
+                          0,
+                          0.38,
+                          0,
+                          0,
+                          -15,
+                          0,
+                          0,
+                          0.38,
+                          0,
+                          -15,
+                          0,
+                          0,
+                          0,
+                          1,
+                          0,
                         ])
                       : const ColorFilter.matrix(<double>[
-                          1, 0, 0, 0, 0,
-                          0, 1, 0, 0, 0,
-                          0, 0, 1, 0, 0,
-                          0, 0, 0, 1, 0,
+                          1,
+                          0,
+                          0,
+                          0,
+                          0,
+                          0,
+                          1,
+                          0,
+                          0,
+                          0,
+                          0,
+                          0,
+                          1,
+                          0,
+                          0,
+                          0,
+                          0,
+                          0,
+                          1,
+                          0,
                         ]),
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
@@ -193,41 +226,49 @@ class CanvasMapaInteractivo extends StatelessWidget {
               // CAPA 2: PINES SECUNDARIOS / NO SELECCIONADOS
               ...marcadores
                   .where((m) => m.id != marcadorSeleccionado?.id)
-                  .map((marcador) => _buildMarcadorPosicionado(
-                        marcador: marcador,
-                        isSelected: false,
-                        haySeleccionActiva: marcadorSeleccionado != null,
-                        mostrarEtiquetaDefecto: mostrarEtiquetasAnimales,
-                      )),
+                  .map(
+                    (marcador) => _buildMarcadorPosicionado(
+                      marcador: marcador,
+                      isSelected: false,
+                      haySeleccionActiva: marcadorSeleccionado != null,
+                      mostrarEtiquetaDefecto: mostrarEtiquetasAnimales,
+                    ),
+                  ),
 
               if (mostrarBanios || filtroServicio == FiltroServicioMapa.banio)
                 ...banios
                     .where((b) => b.id != marcadorSeleccionado?.id)
-                    .map((banio) => _buildMarcadorPosicionado(
-                          marcador: banio,
-                          isSelected: false,
-                          haySeleccionActiva: marcadorSeleccionado != null,
-                          mostrarEtiquetaDefecto: true,
-                        )),
-
-              ...accesos
-                  .where((a) => a.id != marcadorSeleccionado?.id)
-                  .map((acceso) => _buildMarcadorPosicionado(
-                        marcador: acceso,
+                    .map(
+                      (banio) => _buildMarcadorPosicionado(
+                        marcador: banio,
                         isSelected: false,
                         haySeleccionActiva: marcadorSeleccionado != null,
                         mostrarEtiquetaDefecto: true,
-                      )),
+                      ),
+                    ),
+
+              ...accesos
+                  .where((a) => a.id != marcadorSeleccionado?.id)
+                  .map(
+                    (acceso) => _buildMarcadorPosicionado(
+                      marcador: acceso,
+                      isSelected: false,
+                      haySeleccionActiva: marcadorSeleccionado != null,
+                      mostrarEtiquetaDefecto: true,
+                    ),
+                  ),
 
               if (mostrarZonasCalma)
                 ...zonasCalma
                     .where((c) => c.id != marcadorSeleccionado?.id)
-                    .map((calma) => _buildMarcadorPosicionado(
-                          marcador: calma,
-                          isSelected: false,
-                          haySeleccionActiva: marcadorSeleccionado != null,
-                          mostrarEtiquetaDefecto: true,
-                        )),
+                    .map(
+                      (calma) => _buildMarcadorPosicionado(
+                        marcador: calma,
+                        isSelected: false,
+                        haySeleccionActiva: marcadorSeleccionado != null,
+                        mostrarEtiquetaDefecto: true,
+                      ),
+                    ),
 
               // CAPA 3: MODULAR DE TRAZOS Y RUTAS VECTORIALES SVG
               Positioned.fill(
@@ -316,10 +357,7 @@ class CanvasMapaInteractivo extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFF1E293B),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 1.8,
-                        ),
+                        border: Border.all(color: Colors.white, width: 1.8),
                         boxShadow: const [
                           BoxShadow(
                             color: Colors.black45,

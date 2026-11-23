@@ -91,7 +91,8 @@ class ModalAnimalesPorVisitar extends StatefulWidget {
   }
 
   @override
-  State<ModalAnimalesPorVisitar> createState() => _ModalAnimalesPorVisitarState();
+  State<ModalAnimalesPorVisitar> createState() =>
+      _ModalAnimalesPorVisitarState();
 }
 
 class _ModalAnimalesPorVisitarState extends State<ModalAnimalesPorVisitar> {
@@ -301,7 +302,8 @@ class _ModalAnimalesPorVisitarState extends State<ModalAnimalesPorVisitar> {
             separatorBuilder: (context, index) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final habitat = habitats[index];
-              final meta = _metadatosHabitats[habitat] ??
+              final meta =
+                  _metadatosHabitats[habitat] ??
                   _MetaHabitat(
                     nombre: habitat,
                     emoji: '🐾',
@@ -310,11 +312,11 @@ class _ModalAnimalesPorVisitarState extends State<ModalAnimalesPorVisitar> {
                     subtitulo: 'Especies de esta zona',
                   );
 
-              final int visitados =
-                  AnimalService.instance.totalVisitadosEnHabitat(habitat);
+              final int visitados = AnimalService.instance
+                  .totalVisitadosEnHabitat(habitat);
               final int total = AnimalService.instance.totalEnHabitat(habitat);
-              final double progreso =
-                  AnimalService.instance.porcentajeVisitadosEnHabitat(habitat);
+              final double progreso = AnimalService.instance
+                  .porcentajeVisitadosEnHabitat(habitat);
 
               return InkWell(
                 onTap: () => _seleccionarHabitat(habitat),
@@ -392,8 +394,9 @@ class _ModalAnimalesPorVisitarState extends State<ModalAnimalesPorVisitar> {
                               borderRadius: BorderRadius.circular(4),
                               child: LinearProgressIndicator(
                                 value: progreso,
-                                backgroundColor:
-                                    meta.color.withValues(alpha: 0.12),
+                                backgroundColor: meta.color.withValues(
+                                  alpha: 0.12,
+                                ),
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   meta.color,
                                 ),
@@ -452,7 +455,8 @@ class _ModalAnimalesPorVisitarState extends State<ModalAnimalesPorVisitar> {
 
   /// Nivel 2: Animales pertenecientes exclusivamente al hábitat escogido
   Widget _buildVistaHabitatSeleccionado(String habitat) {
-    final meta = _metadatosHabitats[habitat] ??
+    final meta =
+        _metadatosHabitats[habitat] ??
         _MetaHabitat(
           nombre: habitat,
           emoji: '🐾',
@@ -461,8 +465,9 @@ class _ModalAnimalesPorVisitarState extends State<ModalAnimalesPorVisitar> {
           subtitulo: 'Especies de esta zona',
         );
 
-    final int visitados =
-        AnimalService.instance.totalVisitadosEnHabitat(habitat);
+    final int visitados = AnimalService.instance.totalVisitadosEnHabitat(
+      habitat,
+    );
     final int total = AnimalService.instance.totalEnHabitat(habitat);
     final items = AnimalService.instance.obtenerPorHabitat(habitat);
 
@@ -532,16 +537,11 @@ class _ModalAnimalesPorVisitarState extends State<ModalAnimalesPorVisitar> {
               ),
               // BADGE VISITADOS / TOTAL
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 9,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
                   color: meta.color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: meta.color.withValues(alpha: 0.35),
-                  ),
+                  border: Border.all(color: meta.color.withValues(alpha: 0.35)),
                 ),
                 child: Text(
                   '$visitados / $total',
@@ -592,8 +592,9 @@ class _ModalAnimalesPorVisitarState extends State<ModalAnimalesPorVisitar> {
                   itemCount: items.length,
                   itemBuilder: (context, index) {
                     final marcador = items[index];
-                    final bool visitado =
-                        AnimalService.instance.esVisitado(marcador.id);
+                    final bool visitado = AnimalService.instance.esVisitado(
+                      marcador.id,
+                    );
 
                     return GestureDetector(
                       onTap: () {
@@ -610,15 +611,16 @@ class _ModalAnimalesPorVisitarState extends State<ModalAnimalesPorVisitar> {
                                 ? Image.asset(
                                     marcador.imagen!,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        Container(
-                                          color: meta.color,
-                                          child: Icon(
-                                            marcador.icono,
-                                            color: Colors.white,
-                                            size: 44,
-                                          ),
-                                        ),
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Container(
+                                              color: meta.color,
+                                              child: Icon(
+                                                marcador.icono,
+                                                color: Colors.white,
+                                                size: 44,
+                                              ),
+                                            ),
                                   )
                                 : Container(
                                     color: meta.color,

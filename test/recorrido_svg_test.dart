@@ -11,14 +11,17 @@ void main() {
       'M610.691,731.409C610.691,731.409 567.312,690.512 567.196,628.788C567.094,574.777 616.81,511.365 616.81,511.365';
 
   group('Verificación de Trazo SVG con path_drawing y PathMetrics', () {
-    test('Parsea string SVG d="..." a un objeto Path válido con path_drawing', () {
-      final path = parseSvgPathData(trazoSvgTest);
-      expect(path, isNotNull);
+    test(
+      'Parsea string SVG d="..." a un objeto Path válido con path_drawing',
+      () {
+        final path = parseSvgPathData(trazoSvgTest);
+        expect(path, isNotNull);
 
-      final bounds = path.getBounds();
-      expect(bounds.width, greaterThan(0));
-      expect(bounds.height, greaterThan(0));
-    });
+        final bounds = path.getBounds();
+        expect(bounds.width, greaterThan(0));
+        expect(bounds.height, greaterThan(0));
+      },
+    );
 
     test('PathMetrics calcula longitud total y getTangentForOffset extrae coordenadas (x, y)', () {
       final path = parseSvgPathData(trazoSvgTest);
@@ -50,7 +53,6 @@ void main() {
   });
 
   group('Pruebas de Widget y CustomPainter', () {
-
     test('ServicioRutasSvg genera rutas curvas válidas hacia animales de diferentes hábitats', () {
       final chimpance = MarcadorMapa(
         id: 'A01',

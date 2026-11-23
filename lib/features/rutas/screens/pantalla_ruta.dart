@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+
 import '../data/datos_habitats_rutas.dart';
 import '../widgets/tarjeta_habitat_ruta.dart';
 
@@ -11,15 +12,15 @@ import '../widgets/tarjeta_habitat_ruta.dart';
 class PantallaRuta extends StatelessWidget {
   final ValueChanged<String>? onTrazarRuta;
 
-  const PantallaRuta({
-    super.key,
-    this.onTrazarRuta,
-  });
+  const PantallaRuta({super.key, this.onTrazarRuta});
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([AnimalService.instance, IdiomaService.instance]),
+      listenable: Listenable.merge([
+        AnimalService.instance,
+        IdiomaService.instance,
+      ]),
       builder: (context, _) {
         return Scaffold(
           backgroundColor: const Color(0xFFFBF9F6),
@@ -60,7 +61,9 @@ class PantallaRuta extends StatelessWidget {
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 1.2,
-                            color: AppColors.verdePrincipal.withValues(alpha: 0.8),
+                            color: AppColors.verdePrincipal.withValues(
+                              alpha: 0.8,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 3),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+
 import '../data/show_models.dart';
 
 /// Tarjeta individual de espectáculo estilo Cineplanet con selector de alertas por horario
@@ -62,14 +63,20 @@ class TarjetaShowCartelera extends StatelessWidget {
                           width: 88,
                           height: 116,
                           color: Colors.grey.shade200,
-                          child: const Icon(Icons.theater_comedy, color: Colors.grey),
+                          child: const Icon(
+                            Icons.theater_comedy,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                       Positioned(
                         bottom: 4,
                         right: 4,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(alpha: 0.7),
                             borderRadius: BorderRadius.circular(6),
@@ -250,7 +257,8 @@ class TarjetaShowCartelera extends StatelessWidget {
                     boxShadow: notificado
                         ? [
                             BoxShadow(
-                              color: const Color(0xFF22C55E).withValues(alpha: 0.25),
+                              color: const Color(0xFF22C55E)
+                                  .withValues(alpha: 0.25),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -290,7 +298,9 @@ class TarjetaShowCartelera extends StatelessWidget {
                         notificado ? '🔔 ¡Te avisaremos!' : 'Activar aviso',
                         style: GoogleFonts.urbanist(
                           fontSize: 10,
-                          fontWeight: notificado ? FontWeight.w900 : FontWeight.w700,
+                          fontWeight: notificado
+                              ? FontWeight.w900
+                              : FontWeight.w700,
                           color: notificado
                               ? const Color(0xFF166534)
                               : AppColors.textoGris,

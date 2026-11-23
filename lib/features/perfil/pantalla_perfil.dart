@@ -24,10 +24,7 @@ import 'widgets/selector_tamano_letra.dart';
 class PantallaPerfil extends StatefulWidget {
   final VoidCallback? onVolverAlInicio;
 
-  const PantallaPerfil({
-    super.key,
-    this.onVolverAlInicio,
-  });
+  const PantallaPerfil({super.key, this.onVolverAlInicio});
 
   @override
   State<PantallaPerfil> createState() => _PantallaPerfilState();
@@ -88,9 +85,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                   // 2. SECCIÓN IDIOMA GLOBAL
                   SeccionCardGrupo(
                     titulo: 'idioma_titulo'.tr,
-                    children: const [
-                      SelectorIdiomaPerfil(),
-                    ],
+                    children: const [SelectorIdiomaPerfil()],
                   ),
 
                   const SizedBox(height: 22),
@@ -170,7 +165,8 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                       AnimatedBuilder(
                         animation: AnimalService.instance,
                         builder: (context, _) {
-                          final visitados = AnimalService.instance.totalVisitados;
+                          final visitados =
+                              AnimalService.instance.totalVisitados;
                           final total = AnimalService.instance.totalAnimales;
                           return _buildIosNavigationRow(
                             icono: Icons.pets_rounded,
@@ -210,7 +206,8 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                         icono: Icons.volume_up_rounded,
                         colorIcono: const Color(0xFF8D6E63),
                         titulo: 'Efectos de Sonido',
-                        subtitulo: 'Respuesta sonora al interactuar con botones',
+                        subtitulo:
+                            'Respuesta sonora al interactuar con botones',
                         valor: _efectosSonoros,
                         onChanged: (val) {
                           SoundService.instance.playButtonTap();
@@ -224,7 +221,9 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                         titulo: 'Emergencias y Primeros Auxilios',
                         valorTrailing: 'Llamar',
                         onTap: () {
-                          EmergencyService.instance.mostrarModalEmergencia(context);
+                          EmergencyService.instance.mostrarModalEmergencia(
+                            context,
+                          );
                         },
                       ),
                     ],
@@ -280,7 +279,10 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
 
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
                 child: esTablet
                     ? SizedBox(
                         width: double.infinity,
@@ -338,11 +340,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               ],
             ),
             child: const Center(
-              child: Icon(
-                Icons.person_rounded,
-                size: 34,
-                color: Colors.white,
-              ),
+              child: Icon(Icons.person_rounded, size: 34, color: Colors.white),
             ),
           ),
           const SizedBox(width: 14),
@@ -370,7 +368,10 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                 ),
                 const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.verdePrincipal.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),

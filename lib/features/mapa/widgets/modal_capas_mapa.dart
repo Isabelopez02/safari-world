@@ -140,11 +140,19 @@ class ModalCapasMapa extends StatelessWidget {
             runSpacing: 8,
             children: [
               _buildChipHabitat(context, 'Todos los animales', null),
-              _buildChipHabitat(context, 'Zona Internacional (Sabana)', 'Zona Internacional'),
+              _buildChipHabitat(
+                context,
+                'Zona Internacional (Sabana)',
+                'Zona Internacional',
+              ),
               _buildChipHabitat(context, 'Zona Selva', 'Zona Selva'),
               _buildChipHabitat(context, 'Zona Costa', 'Zona Costa'),
               _buildChipHabitat(context, 'Zona Sierra', 'Zona Sierra'),
-              _buildChipHabitat(context, 'Granja Interactiva', 'Granja Interactiva'),
+              _buildChipHabitat(
+                context,
+                'Granja Interactiva',
+                'Granja Interactiva',
+              ),
             ],
           ),
 
@@ -294,7 +302,11 @@ class ModalCapasMapa extends StatelessWidget {
     );
   }
 
-  Widget _buildChipHabitat(BuildContext context, String etiqueta, String? valor) {
+  Widget _buildChipHabitat(
+    BuildContext context,
+    String etiqueta,
+    String? valor,
+  ) {
     final bool seleccionado = habitatSeleccionado == valor;
     return InkWell(
       onTap: () {

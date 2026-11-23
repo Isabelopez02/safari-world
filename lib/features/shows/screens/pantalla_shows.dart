@@ -65,7 +65,10 @@ class _PantallaShowsState extends State<PantallaShows> {
   Future<void> _guardarAlertas() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setStringList(_prefKeyShowsAlertas, _alertasProgramadas.toList());
+      await prefs.setStringList(
+        _prefKeyShowsAlertas,
+        _alertasProgramadas.toList(),
+      );
     } catch (_) {}
   }
 
@@ -91,8 +94,10 @@ class _PantallaShowsState extends State<PantallaShows> {
     _guardarAlertas();
 
     final fechaSeleccionada = _diasCalendario[_diaSeleccionadoIndex];
-    final String diaTexto =
-        ShowsDateUtils.obtenerNombreDia(fechaSeleccionada, _diaSeleccionadoIndex);
+    final String diaTexto = ShowsDateUtils.obtenerNombreDia(
+      fechaSeleccionada,
+      _diaSeleccionadoIndex,
+    );
 
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
@@ -100,18 +105,25 @@ class _PantallaShowsState extends State<PantallaShows> {
       NotificationService.instance.mostrarNotificacion(
         id: (show.id.hashCode + hora.hashCode).abs() % 100000,
         titulo: '🔔 Recordatorio fijado: ${show.titulo}',
-        cuerpo: 'Te avisaremos 15 minutos antes de la función de las $hora ($diaTexto).',
+        cuerpo:
+            'Te avisaremos 15 minutos antes de la función de las $hora ($diaTexto).',
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: const Color(0xFF15803D),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           duration: const Duration(seconds: 2),
           content: Row(
             children: [
-              const Icon(Icons.notifications_active_rounded, color: Colors.white, size: 20),
+              const Icon(
+                Icons.notifications_active_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -131,11 +143,17 @@ class _PantallaShowsState extends State<PantallaShows> {
         SnackBar(
           backgroundColor: Colors.grey.shade800,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           duration: const Duration(seconds: 2),
           content: Row(
             children: [
-              const Icon(Icons.notifications_off_rounded, color: Colors.white, size: 20),
+              const Icon(
+                Icons.notifications_off_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -178,9 +196,7 @@ class _PantallaShowsState extends State<PantallaShows> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. BANNER DESTACADO DE RECORDATORIOS
-            BannerDestacadoShows(
-              cantidadAlertas: _alertasProgramadas.length,
-            ),
+            BannerDestacadoShows(cantidadAlertas: _alertasProgramadas.length),
 
             const SizedBox(height: 18),
 
@@ -198,7 +214,8 @@ class _PantallaShowsState extends State<PantallaShows> {
               CalendarioDiasShows(
                 diasCalendario: _diasCalendario,
                 diaSeleccionadoIndex: _diaSeleccionadoIndex,
-                onSeleccionarDia: (idx) => setState(() => _diaSeleccionadoIndex = idx),
+                onSeleccionarDia: (idx) =>
+                    setState(() => _diaSeleccionadoIndex = idx),
               ),
 
               const SizedBox(height: 20),
@@ -238,7 +255,8 @@ class _PantallaShowsState extends State<PantallaShows> {
                 physics: const NeverScrollableScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 itemCount: DatosCarteleraShows.todosLosShows.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 16),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 16),
                 itemBuilder: (context, index) {
                   final show = DatosCarteleraShows.todosLosShows[index];
                   return TarjetaShowCartelera(
@@ -252,9 +270,7 @@ class _PantallaShowsState extends State<PantallaShows> {
             ] else if (_seccionActiva == SeccionShows.reglas) ...[
               const SeccionReglasShows(),
             ] else ...[
-              SeccionEscenariosShows(
-                onVerEnMapa: widget.onVerEnMapa,
-              ),
+              SeccionEscenariosShows(onVerEnMapa: widget.onVerEnMapa),
             ],
 
             const SizedBox(height: 90),
@@ -296,7 +312,10 @@ class _PantallaShowsState extends State<PantallaShows> {
                   padding: const EdgeInsets.only(right: 14.0),
                   child: Center(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFDCFCE7),
                         borderRadius: BorderRadius.circular(12),
@@ -305,7 +324,11 @@ class _PantallaShowsState extends State<PantallaShows> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.notifications_active_rounded, size: 14, color: Color(0xFF15803D)),
+                          const Icon(
+                            Icons.notifications_active_rounded,
+                            size: 14,
+                            color: Color(0xFF15803D),
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             '${_alertasProgramadas.length}',

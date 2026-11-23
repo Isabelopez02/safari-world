@@ -301,11 +301,7 @@ class _PantallaDetalleShowAcuaticoState
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFE0F2FE),
-            Color(0xFFBAE6FD),
-            Color(0xFFF0F9FF),
-          ],
+          colors: [Color(0xFFE0F2FE), Color(0xFFBAE6FD), Color(0xFFF0F9FF)],
         ),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
       ),
@@ -344,7 +340,10 @@ class _PantallaDetalleShowAcuaticoState
               children: [
                 // Barra superior de navegación en el header
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -360,7 +359,11 @@ class _PantallaDetalleShowAcuaticoState
                             color: Colors.white.withValues(alpha: 0.95),
                             shape: BoxShape.circle,
                             boxShadow: const [
-                              BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
                             ],
                           ),
                           child: const Icon(
@@ -371,12 +374,19 @@ class _PantallaDetalleShowAcuaticoState
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.95),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: const [
-                            BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
                           ],
                         ),
                         child: Row(
@@ -409,8 +419,11 @@ class _PantallaDetalleShowAcuaticoState
                       'assets/images/pantalla_principal/foca.png',
                       height: 195,
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.pets, size: 70, color: Color(0xFF0284C7)),
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.pets,
+                        size: 70,
+                        color: Color(0xFF0284C7),
+                      ),
                     ),
                   ),
                 ),
@@ -625,11 +638,7 @@ class _PantallaDetalleShowAcuaticoState
           width: isPlaying ? 1.5 : 1,
         ),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 2)),
         ],
       ),
       child: Row(
@@ -664,11 +673,13 @@ class _PantallaDetalleShowAcuaticoState
                 ),
                 Text(
                   isPlaying
-                    ? 'Narrando en voz alta por el altavoz 🎧'
-                    : 'Escucha la historia con voz de biólogos',
+                      ? 'Narrando en voz alta por el altavoz 🎧'
+                      : 'Escucha la historia con voz de biólogos',
                   style: GoogleFonts.urbanist(
                     fontSize: 11.5,
-                    color: isPlaying ? AppColors.verdePrincipal : Colors.grey.shade600,
+                    color: isPlaying
+                        ? AppColors.verdePrincipal
+                        : Colors.grey.shade600,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -680,7 +691,9 @@ class _PantallaDetalleShowAcuaticoState
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: isPlaying ? const Color(0xFFD32F2F) : AppColors.verdePrincipal,
+                color: isPlaying
+                    ? const Color(0xFFD32F2F)
+                    : AppColors.verdePrincipal,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -720,9 +733,7 @@ class _PantallaDetalleShowAcuaticoState
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200, width: 1),
-        ),
+        border: Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -743,7 +754,8 @@ class _PantallaDetalleShowAcuaticoState
                   context,
                   MaterialPageRoute(
                     builder: (context) => const PantallaMapa(
-                      animalIdInicial: 'A09', // Dirige directamente al hábitat de las Focas
+                      animalIdInicial:
+                          'A09', // Dirige directamente al hábitat de las Focas
                     ),
                   ),
                 );

@@ -196,7 +196,10 @@ class AccesibilidadService extends ChangeNotifier {
 
   /// Color accesible de alto contraste optimizado para daltonismo
   /// (Evita confusiones entre rojos y verdes)
-  Color getColorZona({required String habitat, required Color colorPorDefecto}) {
+  Color getColorZona({
+    required String habitat,
+    required Color colorPorDefecto,
+  }) {
     if (!_modoDaltonismo && !_modoAltoContraste) {
       return colorPorDefecto;
     }

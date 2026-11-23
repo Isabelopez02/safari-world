@@ -10,10 +10,7 @@ import 'package:zoologico_front/core/theme/app_colors.dart';
 class BannerBonito extends StatelessWidget {
   final VoidCallback onTap;
 
-  const BannerBonito({
-    super.key,
-    required this.onTap,
-  });
+  const BannerBonito({super.key, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

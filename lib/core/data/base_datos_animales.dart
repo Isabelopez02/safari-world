@@ -7,7 +7,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   // ==========================================
   'Vacas Holstein': const DatosAnimal(
     dieta: 'Herbívoro',
-    alimentos: ['🌾 Pasto y alfalfa dulce', '🌽 Forraje enriquecido', '🥕 Zanahorias'],
+    alimentos: [
+      '🌾 Pasto y alfalfa dulce',
+      '🌽 Forraje enriquecido',
+      '🥕 Zanahorias',
+    ],
     horaApertura: '8:00 AM',
     horaCierre: '5:00 PM',
     habitat: 'Granja Interactiva',
@@ -19,7 +23,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Ovejas': const DatosAnimal(
     dieta: 'Herbívoro',
-    alimentos: ['🌾 Trébol y pasto fresco', '🌾 Heno de avena', '🌿 Brotes tiernos'],
+    alimentos: [
+      '🌾 Trébol y pasto fresco',
+      '🌾 Heno de avena',
+      '🌿 Brotes tiernos',
+    ],
     horaApertura: '8:00 AM',
     horaCierre: '5:00 PM',
     habitat: 'Granja Interactiva',
@@ -107,7 +115,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Tigre de Bengala': const DatosAnimal(
     dieta: 'Carnívoro',
-    alimentos: ['🥩 Carne roja magra', '🍗 Pollo y pavo', '🍖 Huesos con médula'],
+    alimentos: [
+      '🥩 Carne roja magra',
+      '🍗 Pollo y pavo',
+      '🍖 Huesos con médula',
+    ],
     horaApertura: '9:00 AM',
     horaCierre: '4:30 PM',
     habitat: 'Zona Internacional',
@@ -119,7 +131,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Oso de Anteojos (Zona Internacional)': const DatosAnimal(
     dieta: 'Frugívoro / Herbívoro',
-    alimentos: ['🍍 Bromelias y frutos', '🎋 Caña de azúcar', '🍯 Miel y vegetales'],
+    alimentos: [
+      '🍍 Bromelias y frutos',
+      '🎋 Caña de azúcar',
+      '🍯 Miel y vegetales',
+    ],
     horaApertura: '9:00 AM',
     horaCierre: '4:30 PM',
     habitat: 'Zona Internacional',
@@ -143,7 +159,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Tortugas': const DatosAnimal(
     dieta: 'Herbívoro',
-    alimentos: ['🥬 Lechugas y verduras', '🍎 Frutas frescas', '🌿 Plantas de hoja verde'],
+    alimentos: [
+      '🥬 Lechugas y verduras',
+      '🍎 Frutas frescas',
+      '🌿 Plantas de hoja verde',
+    ],
     horaApertura: '9:00 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Internacional',
@@ -155,7 +175,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Tigre Blanco': const DatosAnimal(
     dieta: 'Carnívoro',
-    alimentos: ['🥩 Carne seleccionada', '🍗 Presas frescas', '🍖 Suplementos vitamínicos'],
+    alimentos: [
+      '🥩 Carne seleccionada',
+      '🍗 Presas frescas',
+      '🍖 Suplementos vitamínicos',
+    ],
     horaApertura: '9:00 AM',
     horaCierre: '4:30 PM',
     habitat: 'Zona Internacional',
@@ -167,7 +191,12 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Jirafa': const DatosAnimal(
     dieta: 'Herbívoro',
-    alimentos: ['🌿 Hojas de acacia', '🍃 Ramas altas', '🌾 Forraje dulce', '🍎 Frutas'],
+    alimentos: [
+      '🌿 Hojas de acacia',
+      '🍃 Ramas altas',
+      '🌾 Forraje dulce',
+      '🍎 Frutas',
+    ],
     horaApertura: '8:00 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Internacional',
@@ -191,7 +220,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Suricatas': const DatosAnimal(
     dieta: 'Insectívoro / Omnívoro',
-    alimentos: ['🦗 Grillos y gusanos', '🦂 Pequeños artrópodos', '🥚 Huevos y fruta'],
+    alimentos: [
+      '🦗 Grillos y gusanos',
+      '🦂 Pequeños artrópodos',
+      '🥚 Huevos y fruta',
+    ],
     horaApertura: '9:00 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Internacional',
@@ -207,7 +240,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   // ==========================================
   'Gallos (Villa Carmelo)': const DatosAnimal(
     dieta: 'Omnívoro',
-    alimentos: ['🌽 Granos de maíz y trigo', '🌿 Brotes y semillas', '🦗 Insectos'],
+    alimentos: [
+      '🌽 Granos de maíz y trigo',
+      '🌿 Brotes y semillas',
+      '🦗 Insectos',
+    ],
     horaApertura: '8:00 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Costa',
@@ -243,7 +280,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Peces (Acuario)': const DatosAnimal(
     dieta: 'Piscívoro / Herbívoro',
-    alimentos: ['🦐 Krill y algas', '🐟 Alimento balanceado marino', '🌱 Plancton'],
+    alimentos: [
+      '🦐 Krill y algas',
+      '🐟 Alimento balanceado marino',
+      '🌱 Plancton',
+    ],
     horaApertura: '9:00 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Costa',
@@ -267,7 +308,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Cocodrilo de Tumbes': const DatosAnimal(
     dieta: 'Carnívoro',
-    alimentos: ['🥩 Carne vacuna y pollo', '🐟 Peces de río', '🍖 Presas enteras'],
+    alimentos: [
+      '🥩 Carne vacuna y pollo',
+      '🐟 Peces de río',
+      '🍖 Presas enteras',
+    ],
     horaApertura: '9:30 AM',
     horaCierre: '4:30 PM',
     habitat: 'Zona Costa',
@@ -279,7 +324,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Flamencos': const DatosAnimal(
     dieta: 'Filtrador / Planctívoro',
-    alimentos: ['🦐 Pequeños crustáceos', '🌱 Microalgas carotenoides', '🐟 Larvas'],
+    alimentos: [
+      '🦐 Pequeños crustáceos',
+      '🌱 Microalgas carotenoides',
+      '🐟 Larvas',
+    ],
     horaApertura: '8:30 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Costa',
@@ -291,7 +340,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Pingüinos de Humboldt': const DatosAnimal(
     dieta: 'Piscívoro',
-    alimentos: ['🐟 Anchovetas frescas', '🦐 Pequeños calamares', '🐟 Sardinas'],
+    alimentos: [
+      '🐟 Anchovetas frescas',
+      '🦐 Pequeños calamares',
+      '🐟 Sardinas',
+    ],
     horaApertura: '9:00 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Costa',
@@ -307,7 +360,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   // ==========================================
   'Caballos (Caballeriza)': const DatosAnimal(
     dieta: 'Herbívoro',
-    alimentos: ['🌾 Heno selecto', '🌽 Avena y forraje', '🥕 Manzanas y zanahorias'],
+    alimentos: [
+      '🌾 Heno selecto',
+      '🌽 Avena y forraje',
+      '🥕 Manzanas y zanahorias',
+    ],
     horaApertura: '8:00 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Sierra',
@@ -355,7 +412,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Zorro Andino': const DatosAnimal(
     dieta: 'Omnívoro / Carnívoro',
-    alimentos: ['🥩 Carne magra', '🐁 Pequeños roedores', '🫐 Bayas silvestres'],
+    alimentos: [
+      '🥩 Carne magra',
+      '🐁 Pequeños roedores',
+      '🫐 Bayas silvestres',
+    ],
     horaApertura: '9:00 AM',
     horaCierre: '4:30 PM',
     habitat: 'Zona Sierra',
@@ -379,7 +440,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Águila Mora': const DatosAnimal(
     dieta: 'Carnívoro',
-    alimentos: ['🥩 Presas frescas', '🍗 Pollo y roedores', '🍖 Alimento enriquecido'],
+    alimentos: [
+      '🥩 Presas frescas',
+      '🍗 Pollo y roedores',
+      '🍖 Alimento enriquecido',
+    ],
     horaApertura: '9:00 AM',
     horaCierre: '4:30 PM',
     habitat: 'Zona Sierra',
@@ -419,7 +484,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Guacamayos': const DatosAnimal(
     dieta: 'Frugívoro / Granívoro',
-    alimentos: ['🥜 Frutos secos y nueces duras', '🍌 Frutas tropicales', '🌾 Semillas'],
+    alimentos: [
+      '🥜 Frutos secos y nueces duras',
+      '🍌 Frutas tropicales',
+      '🌾 Semillas',
+    ],
     horaApertura: '8:30 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Selva',
@@ -431,7 +500,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Tapir (Sachavaca)': const DatosAnimal(
     dieta: 'Herbívoro',
-    alimentos: ['🌿 Hojas tiernas', '🍌 Frutas amazónicas', '🌾 Brotes acuáticos'],
+    alimentos: [
+      '🌿 Hojas tiernas',
+      '🍌 Frutas amazónicas',
+      '🌾 Brotes acuáticos',
+    ],
     horaApertura: '8:30 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Selva',
@@ -443,7 +516,12 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Isla de Monos': const DatosAnimal(
     dieta: 'Frugívoro / Omnívoro',
-    alimentos: ['🍌 Plátanos y papayas', '🌿 Hojas verdes', '🥜 Semillas', '🦗 Insectos'],
+    alimentos: [
+      '🍌 Plátanos y papayas',
+      '🌿 Hojas verdes',
+      '🥜 Semillas',
+      '🦗 Insectos',
+    ],
     horaApertura: '8:30 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Selva',
@@ -455,7 +533,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Otorongo': const DatosAnimal(
     dieta: 'Carnívoro',
-    alimentos: ['🥩 Carne roja fresca', '🐟 Pescado de río', '🍗 Presas enteras'],
+    alimentos: [
+      '🥩 Carne roja fresca',
+      '🐟 Pescado de río',
+      '🍗 Presas enteras',
+    ],
     horaApertura: '9:00 AM',
     horaCierre: '4:30 PM',
     habitat: 'Zona Selva',
@@ -467,7 +549,10 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Nutria Gigante (Lobo de río)': const DatosAnimal(
     dieta: 'Piscívoro / Carnívoro',
-    alimentos: ['🐟 Peces amazónicos (bocachico, paco)', '🦀 Crustáceos de río'],
+    alimentos: [
+      '🐟 Peces amazónicos (bocachico, paco)',
+      '🦀 Crustáceos de río',
+    ],
     horaApertura: '9:00 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Selva',
@@ -479,7 +564,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Anaconda': const DatosAnimal(
     dieta: 'Carnívoro',
-    alimentos: ['🍗 Presas enteras', '🥩 Alimento especializado', '🐟 Peces grandes'],
+    alimentos: [
+      '🍗 Presas enteras',
+      '🥩 Alimento especializado',
+      '🐟 Peces grandes',
+    ],
     horaApertura: '9:30 AM',
     horaCierre: '4:30 PM',
     habitat: 'Zona Selva',
@@ -491,7 +580,11 @@ final Map<String, DatosAnimal> baseDatosAnimales = {
   ),
   'Sajino': const DatosAnimal(
     dieta: 'Omnívoro / Frugívoro',
-    alimentos: ['🥔 Raíces y tubérculos', '🍎 Frutos caídos', '🌿 Hierbas y semillas'],
+    alimentos: [
+      '🥔 Raíces y tubérculos',
+      '🍎 Frutos caídos',
+      '🌿 Hierbas y semillas',
+    ],
     horaApertura: '8:30 AM',
     horaCierre: '5:00 PM',
     habitat: 'Zona Selva',

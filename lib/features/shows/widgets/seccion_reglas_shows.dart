@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
+
 import '../data/datos_cartelera_shows.dart';
 
 /// Sección visual que lista las normas de convivencia y bienestar animal
@@ -82,63 +83,65 @@ class SeccionReglasShows extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          ...DatosCarteleraShows.reglas.map((regla) => Padding(
-                padding: const EdgeInsets.only(bottom: 10.0),
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.black.withValues(alpha: 0.06),
-                      width: 1.2,
-                    ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(9),
-                        decoration: BoxDecoration(
-                          color: regla.colorIcono.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          regla.icono,
-                          color: regla.colorIcono,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              regla.titulo,
-                              style: GoogleFonts.urbanist(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w900,
-                                color: AppColors.textoOscuro,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              regla.descripcion,
-                              style: GoogleFonts.urbanist(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textoGris,
-                                height: 1.3,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+          ...DatosCarteleraShows.reglas.map(
+            (regla) => Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Colors.black.withValues(alpha: 0.06),
+                    width: 1.2,
                   ),
                 ),
-              )),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(9),
+                      decoration: BoxDecoration(
+                        color: regla.colorIcono.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        regla.icono,
+                        color: regla.colorIcono,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            regla.titulo,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textoOscuro,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            regla.descripcion,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textoGris,
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

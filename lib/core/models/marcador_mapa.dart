@@ -41,8 +41,8 @@ class MarcadorMapa {
     this.descripcionCalma,
     double? porcentajeX,
     double? porcentajeY,
-  })  : porcentajeX = porcentajeX ?? (x / mapaAnchoPorDefecto * 100.0),
-        porcentajeY = porcentajeY ?? (y / mapaAltoPorDefecto * 100.0);
+  }) : porcentajeX = porcentajeX ?? (x / mapaAnchoPorDefecto * 100.0),
+       porcentajeY = porcentajeY ?? (y / mapaAltoPorDefecto * 100.0);
 
   /// Constructor de conveniencia a partir de porcentajes directos (x%, y%)
   factory MarcadorMapa.desdePorcentaje({
@@ -76,7 +76,8 @@ class MarcadorMapa {
       imagen: imagen,
       esBanio: esBanio,
       colorZona: colorZona,
-      tipoServicio: tipoServicio ?? (esBanio ? 'banio' : (esZonaCalma ? 'calma' : null)),
+      tipoServicio:
+          tipoServicio ?? (esBanio ? 'banio' : (esZonaCalma ? 'calma' : null)),
       esZonaCalma: esZonaCalma,
       nivelRuido: nivelRuido,
       descripcionCalma: descripcionCalma,
