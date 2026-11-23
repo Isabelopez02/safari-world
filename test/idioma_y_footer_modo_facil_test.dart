@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
+import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/features/mapa/screens/pantalla_detalle_animal.dart';
 import 'package:zoologico_front/features/modo_facil/pantalla_modo_facil.dart';
@@ -427,6 +428,60 @@ void main() {
       // Verificar que se encuentra en la vista del mapa con navegación activa
       expect(find.text('Volver al Menú'), findsOneWidget);
       expect(find.textContaining('Leones'), findsWidgets);
+    });
+
+    test('Buscador inteligente de pines resuelve lenguaje natural sin limitaciones', () {
+      final service = AnimalService.instance;
+
+      // 1. Lenguaje natural para animales con plurales y artículos
+      final resLeon1 = service.buscarPinInteligente('quiero ir a un leon');
+      expect(resLeon1, isNotNull);
+      expect(resLeon1!.id, equals('I02')); // Leones
+
+      final resLeon2 = service.buscarPinInteligente('llevame a los leones');
+      expect(resLeon2, isNotNull);
+      expect(resLeon2!.id, equals('I02'));
+
+      final resJirafa = service.buscarPinInteligente('donde esta la jirafa');
+      expect(resJirafa, isNotNull);
+      expect(resJirafa!.id, equals('I12'));
+
+      final resPinguino = service.buscarPinInteligente('quiero ver pingüinos');
+      expect(resPinguino, isNotNull);
+      expect(resPinguino!.id, equals('C08'));
+
+      final resCondor = service.buscarPinInteligente('condor andino');
+      expect(resCondor, isNotNull);
+      expect(resCondor!.id, equals('S03'));
+
+      // 2. Servicios críticos y accesos
+      final resBano = service.buscarPinInteligente('como voy al bano');
+      expect(resBano, isNotNull);
+      expect(resBano!.id, equals('B01'));
+
+      final resSalida = service.buscarPinInteligente('llevame a la salida');
+      expect(resSalida, isNotNull);
+      expect(resSalida!.id, equals('SAL_01'));
+
+      final resEntrada = service.buscarPinInteligente('donde esta la boleteria');
+      expect(resEntrada, isNotNull);
+      expect(resEntrada!.id, equals('ENT_01'));
+
+      final resTopico = service.buscarPinInteligente('primeros auxilios y medico');
+      expect(resTopico, isNotNull);
+      expect(resTopico!.id, equals('AYUDA_02'));
+
+      final resJuegos = service.buscarPinInteligente('zona de juegos para ninos');
+      expect(resJuegos, isNotNull);
+      expect(resJuegos!.id, equals('JUE_01'));
+
+      final resCalma = service.buscarPinInteligente('un lugar de calma y silencio');
+      expect(resCalma, isNotNull);
+      expect(resCalma!.id, equals('CALMA_01'));
+
+      final resEstacionamiento = service.buscarPinInteligente('estacionamiento');
+      expect(resEstacionamiento, isNotNull);
+      expect(resEstacionamiento!.id, equals('EST_01'));
     });
   });
 }

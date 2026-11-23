@@ -162,7 +162,46 @@ class _PantallaMapaState extends State<PantallaMapa>
   void _enfocarYTrazarDestino(String destino) {
     final destLower = destino.toLowerCase().trim();
 
-    // 0. Puntos de encuentro y auxilio (desde ¿Te perdiste?, Tópico Médico o SOS)
+    // 0. Búsqueda inteligente universal sobre los 76 pines del parque (animales, baños, accesos, calma)
+    final pinInteligente = AnimalService.instance.buscarPinInteligente(destino);
+    if (pinInteligente != null) {
+      setState(() {
+        if (pinInteligente.esBanio) {
+          _mostrarBanios = true;
+          _chipUrgencia = ChipUrgenciaMapa.banios;
+          _filtroServicio = FiltroServicioMapa.banio;
+          _habitatFiltro = null;
+        } else if (pinInteligente.esZonaCalma) {
+          _mostrarZonasCalma = true;
+          _chipUrgencia = ChipUrgenciaMapa.ninguno;
+          _filtroServicio = FiltroServicioMapa.calma;
+          _habitatFiltro = null;
+        } else if (pinInteligente.tipoServicio == 'ayuda' || pinInteligente.id.startsWith('AYUDA')) {
+          _habitatFiltro = null;
+          _chipUrgencia = ChipUrgenciaMapa.ninguno;
+          _filtroServicio = FiltroServicioMapa.todos;
+        } else if (pinInteligente.tipoServicio == 'salida' ||
+                   pinInteligente.tipoServicio == 'boleteria' ||
+                   pinInteligente.tipoServicio == 'estacionamiento' ||
+                   pinInteligente.tipoServicio == 'juegos') {
+          _habitatFiltro = null;
+          _chipUrgencia = ChipUrgenciaMapa.ninguno;
+          _filtroServicio = FiltroServicioMapa.todos;
+        } else {
+          _habitatFiltro = pinInteligente.habitat;
+          _chipUrgencia = ChipUrgenciaMapa.ninguno;
+          _filtroServicio = FiltroServicioMapa.todos;
+        }
+      });
+      _mostrarInfoMarcador(pinInteligente);
+      setState(() {
+        _isNavigating = true;
+      });
+      _routeProgressController.forward(from: 0);
+      return;
+    }
+
+    // 0.1 Puntos de encuentro y auxilio (desde ¿Te perdiste?, Tópico Médico o SOS)
     if (destLower.contains('encuentro') ||
         destLower.contains('ayuda') ||
         destLower.contains('perdiste') ||

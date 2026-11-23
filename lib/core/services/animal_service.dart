@@ -191,6 +191,167 @@ class AnimalService extends ChangeNotifier {
     return List.unmodifiable(zonasCalmaZoologico);
   }
 
+  /// Retorna la lista consolidada de absolutamente todos los marcadores y pines del mapa
+  /// (animales, baños, accesos, salidas, estacionamientos, tópico médico, juegos y zonas de calma).
+  List<MarcadorMapa> obtenerTodosLosPines() {
+    return [
+      ...marcadoresZoologico,
+      ...baniosZoologico,
+      ...accesosZoologico,
+      ...zonasCalmaZoologico,
+    ];
+  }
+
+  /// Normaliza texto para búsqueda insensible a acentos, mayúsculas y caracteres especiales.
+  static String normalizarTexto(String s) {
+    return s
+        .toLowerCase()
+        .replaceAll('á', 'a')
+        .replaceAll('é', 'e')
+        .replaceAll('í', 'i')
+        .replaceAll('ó', 'o')
+        .replaceAll('ú', 'u')
+        .replaceAll('ü', 'u')
+        .replaceAll('ñ', 'n')
+        .replaceAll(RegExp(r'[^\w\s]'), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
+
+  /// Extrae la raíz simplificada de palabras en español e inglés (manejo de plurales y singulares).
+  static String extraerRaiz(String palabra) {
+    if (palabra.length > 4 && palabra.endsWith('es')) {
+      return palabra.substring(0, palabra.length - 2);
+    }
+    if (palabra.length > 3 && palabra.endsWith('s')) {
+      return palabra.substring(0, palabra.length - 1);
+    }
+    return palabra;
+  }
+
+  /// Busca de manera inteligente y flexible cualquier pin del zoológico a partir de lenguaje natural
+  /// por audio o texto (ej. "quiero ir a un leon", "llevame a los leones", "donde esta el baño", "salida", "jirafa").
+  MarcadorMapa? buscarPinInteligente(String consulta) {
+    final qNorm = normalizarTexto(consulta);
+    if (qNorm.isEmpty) return null;
+
+    final todosLosPines = obtenerTodosLosPines();
+
+    // 1. Coincidencia directa por ID (ej. 'i02', 'g01', 'b01', 'sal_01', 'calma_01')
+    for (final p in todosLosPines) {
+      final pIdNorm = normalizarTexto(p.id);
+      if (pIdNorm == qNorm || p.id.toLowerCase() == qNorm) {
+        return p;
+      }
+    }
+
+    final tokens = qNorm.split(' ').where((t) => t.isNotEmpty).toList();
+    const palabrasRelleno = {
+      'quiero', 'quisiera', 'deseo', 'ir', 'a', 'al', 'un', 'una', 'unos', 'unas',
+      'el', 'la', 'los', 'las', 'del', 'de', 'en', 'por', 'favor',
+      'llevame', 'guiame', 'orientame', 'conduceme', 'donde', 'esta', 'estan',
+      'queda', 'quedan', 'como', 'llego', 'voy', 'ver', 'buscar', 'busca',
+      'mostrar', 'muestrame', 'dime', 'necesito', 'saber', 'conocer', 'hacia',
+      'camino', 'sendero', 'ruta', 'para', 'hasta', 'cerca',
+      // Inglés
+      'i', 'want', 'to', 'go', 'take', 'me', 'where', 'is', 'are', 'find', 'show',
+      // Quechua
+      'munani', 'rinayta', 'maypim', 'kashan',
+    };
+
+    final tokensLimpios = tokens.where((t) => !palabrasRelleno.contains(t)).toList();
+    final tokensBusqueda = tokensLimpios.isNotEmpty ? tokensLimpios : tokens;
+
+    // 2. Mapeos prioritarios por sinónimos directos para servicios críticos y traducciones
+    final sinonimosDirectos = <List<String>, String>{
+      // Baños
+      ['bano', 'banos', 'sshh', 'wc', 'sanitario', 'sanitarios', 'inodoro', 'toilet', 'restroom', 'hispana']: 'B01',
+      // Tópico / Salud / SOS
+      ['topico', 'medico', 'doctor', 'enfermeria', 'auxilio', 'primeros auxilios', 'herida', 'accidente', 'ambulancia', 'salud', 'first aid']: 'AYUDA_02',
+      // Salida
+      ['salida', 'salir', 'retorno', 'exit']: 'SAL_01',
+      // Entrada / Boletería
+      ['entrada', 'entrar', 'boleteria', 'boletos', 'tickets', 'ingreso', 'ticket', 'entrance']: 'ENT_01',
+      // Estacionamiento
+      ['estacionamiento', 'estacionar', 'parqueo', 'cochera', 'parking', 'auto', 'carro', 'vehiculo']: 'EST_01',
+      // Juegos infantiles
+      ['juego', 'juegos', 'carrusel', 'infantil', 'columpios', 'ninos', 'playground']: 'JUE_01',
+      // Zonas de Calma / Silencio
+      ['calma', 'silencio', 'descanso', 'tranquilo', 'tranquila', 'sensorial', 'relajo', 'quiet']: 'CALMA_01',
+      // Guardaparques / Punto de encuentro
+      ['guardaparque', 'guardaparques', 'guardia', 'guia', 'informes', 'orientador']: 'AYUDA_01',
+      // Traducciones y alias de animales frecuentes en inglés
+      ['lion', 'lions']: 'I02',
+      ['giraffe', 'giraffes']: 'I12',
+      ['penguin', 'penguins']: 'C08',
+      ['condor']: 'S03',
+      ['tiger', 'tigers']: 'I07',
+      ['bear', 'bears']: 'I08',
+      ['monkey', 'monkeys']: 'V04',
+      ['rhino', 'rhinoceros']: 'I01',
+      ['hippo', 'hippopotamus']: 'I05',
+    };
+
+    for (final entry in sinonimosDirectos.entries) {
+      final palabrasClave = entry.key;
+      final targetId = entry.value;
+      if (palabrasClave.any((clave) =>
+          qNorm.contains(clave) ||
+          tokensBusqueda.any((t) => t == clave || extraerRaiz(t) == extraerRaiz(clave)))) {
+        for (final p in todosLosPines) {
+          if (p.id == targetId) return p;
+        }
+      }
+    }
+
+    // 3. Puntuación inteligente sobre todos los pines del parque
+    MarcadorMapa? mejorMarcador;
+    int mejorPuntaje = 0;
+
+    for (final pin in todosLosPines) {
+      int score = 0;
+      final pId = normalizarTexto(pin.id);
+      final pNom = normalizarTexto(pin.nombre);
+      final pTokens = pNom.split(' ').where((t) => t.isNotEmpty).toList();
+      final pStems = pTokens.map(extraerRaiz).toList();
+
+      // Coincidencia exacta o contenida del nombre
+      if (qNorm == pNom) {
+        score += 1000;
+      } else if (pNom.contains(qNorm) || qNorm.contains(pNom)) {
+        score += 400;
+      }
+
+      for (final t in tokensBusqueda) {
+        final tStem = extraerRaiz(t);
+        if (t == pId) {
+          score += 500;
+        } else if (pTokens.contains(t)) {
+          score += 200;
+        } else if (pStems.contains(tStem)) {
+          score += 180;
+        } else if (pTokens.any((pt) => (pt.startsWith(t) || t.startsWith(pt)) && pt.length >= 3 && t.length >= 3)) {
+          score += 120;
+        } else if (pStems.any((ps) => (ps.startsWith(tStem) || tStem.startsWith(ps)) && ps.length >= 3 && tStem.length >= 3)) {
+          score += 100;
+        } else if (pNom.contains(t) || pNom.contains(tStem)) {
+          score += 60;
+        }
+      }
+
+      if (score > mejorPuntaje) {
+        mejorPuntaje = score;
+        mejorMarcador = pin;
+      }
+    }
+
+    if (mejorPuntaje >= 60) {
+      return mejorMarcador;
+    }
+
+    return null;
+  }
+
   /// Busca animales por nombre o hábitat.
   List<MarcadorMapa> buscarAnimales(String query) {
     final q = query.trim().toLowerCase();

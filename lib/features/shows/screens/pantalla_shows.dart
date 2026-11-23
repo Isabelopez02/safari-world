@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/notification_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
@@ -40,11 +41,32 @@ class _PantallaShowsState extends State<PantallaShows> {
 
   // Claves de horarios con recordatorio activo: 'showId_hora_diaIndex'
   final Set<String> _alertasProgramadas = {};
+  static const String _prefKeyShowsAlertas = 'shows_alertas_programadas';
 
   @override
   void initState() {
     super.initState();
     _diasCalendario = ShowsDateUtils.generarProximosDias(14);
+    _cargarAlertasGuardadas();
+  }
+
+  Future<void> _cargarAlertasGuardadas() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final guardadas = prefs.getStringList(_prefKeyShowsAlertas);
+      if (guardadas != null && mounted) {
+        setState(() {
+          _alertasProgramadas.addAll(guardadas);
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _guardarAlertas() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_prefKeyShowsAlertas, _alertasProgramadas.toList());
+    } catch (_) {}
   }
 
   String _construirClaveAlerta(String showId, String hora) {
@@ -66,6 +88,7 @@ class _PantallaShowsState extends State<PantallaShows> {
         _alertasProgramadas.add(key);
       }
     });
+    _guardarAlertas();
 
     final fechaSeleccionada = _diasCalendario[_diaSeleccionadoIndex];
     final String diaTexto =

@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:zoologico_front/core/data/datos_marcadores.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/services/audioguia_service.dart';
@@ -228,6 +227,7 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
   @override
   void dispose() {
     _scannerController?.dispose();
+    _speechToText.stop();
     AudioGuiaService.instance.detener();
     super.dispose();
   }
@@ -312,19 +312,12 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
       }
     }
 
-    // 4. Por palabras clave principales
-    for (final m in todos) {
-      for (final palabra in m.nombre.toLowerCase().split(' ')) {
-        if (palabra.length > 3 && clean.contains(palabra)) {
-          return _convertirMarcadorAFacil(m);
-        }
-      }
+    // 4. Búsqueda inteligente universal
+    final pin = AnimalService.instance.buscarPinInteligente(clean);
+    if (pin != null && !pin.esBanio && !pin.esZonaCalma) {
+      return _convertirMarcadorAFacil(pin);
     }
 
-    // Si no coincide exactamente, toma el primer animal del parque como respaldo seguro
-    if (todos.isNotEmpty) {
-      return _convertirMarcadorAFacil(todos.first);
-    }
     return null;
   }
 
@@ -341,6 +334,17 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
 
       // Narración por voz inmediata y clara
       AudioGuiaService.instance.reproducir('${animal.nombre.tr}. ${animal.historiaVozActiva}');
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Código QR no reconocido. Pruebe enfocando la placa del animal o selecciónelo del catálogo.',
+            style: GoogleFonts.urbanist(fontWeight: FontWeight.w700),
+          ),
+          backgroundColor: const Color(0xFF7B1FA2),
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -452,7 +456,8 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                       }
                     },
                     listenOptions: stt.SpeechListenOptions(
-                      listenMode: stt.ListenMode.confirmation,
+                      listenMode: stt.ListenMode.search,
+                      pauseFor: const Duration(seconds: 3),
                       localeId: IdiomaService.instance.idioma == AppIdioma.en ? 'en_US' : 'es_PE',
                     ),
                   );
@@ -593,6 +598,34 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
                       ),
                     ),
                   ),
+                  if (textoReconocido.isNotEmpty &&
+                      textoReconocido != 'Escuchando...' &&
+                      textoReconocido != 'Toque una opción de abajo:') ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _procesarResultadoVoz(textoReconocido, modalContext),
+                        icon: const Icon(Icons.navigation_rounded, color: Colors.white, size: 20),
+                        label: Text(
+                          'Ir a: "$textoReconocido"',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.urbanist(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF7B1FA2),
+                          padding: const EdgeInsets.symmetric(vertical: 13),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          elevation: 3,
+                        ),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 18),
                   Align(
                     alignment: Alignment.centerLeft,
@@ -648,68 +681,24 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
     );
   }
 
-  String _quitarAcentos(String s) {
-    return s
-        .toLowerCase()
-        .replaceAll('á', 'a')
-        .replaceAll('é', 'e')
-        .replaceAll('í', 'i')
-        .replaceAll('ó', 'o')
-        .replaceAll('ú', 'u')
-        .replaceAll('ü', 'u');
-  }
-
   void _procesarResultadoVoz(String consulta, BuildContext modalContext) {
     if (Navigator.of(modalContext).canPop()) {
       Navigator.of(modalContext).pop();
     }
-    final q = _quitarAcentos(consulta.trim());
+    _speechToText.stop();
 
-    // 1. Caso Baños
-    if (q.contains('bano') || q.contains('servicio') || q.contains('sshh') || q.contains('sanitario') || q.contains('wc')) {
-      AudioGuiaService.instance.reproducir('Localizando baños en el mapa real.');
-      _irAlMapaConRuta(animalId: 'B01');
+    // 1. Búsqueda inteligente universal sobre todos los 76 pines del zoológico
+    final pin = AnimalService.instance.buscarPinInteligente(consulta);
+    if (pin != null) {
+      AudioGuiaService.instance.reproducir('Encontrado: ${pin.nombre.tr}. Trazando sendero en el mapa.');
+      _irAlMapaConRuta(animalId: pin.id);
       return;
     }
 
-    // 2. Caso Tópico / Médico / Auxilio
-    if (q.contains('topico') || q.contains('medico') || q.contains('auxilio') || q.contains('primeros auxilios')) {
-      AudioGuiaService.instance.reproducir('Trazando sendero hacia el Tópico Médico.');
-      _irAlMapaConRuta(animalId: 'AYUDA_02');
-      return;
-    }
-
-    // 3. Caso Salida / Entrada / Puerta
-    if (q.contains('salida') || q.contains('salir') || q.contains('puerta')) {
-      AudioGuiaService.instance.reproducir('Trazando sendero hacia la Salida Principal.');
-      _irAlMapaConRuta(animalId: 'SAL_01');
-      return;
-    }
-
-    // 4. Buscar animal por nombre en marcadoresZoologico
-    for (final m in marcadoresZoologico) {
-      final nom = _quitarAcentos(m.nombre);
-      if (nom.contains(q) || q.contains(nom)) {
-        AudioGuiaService.instance.reproducir('Encontrado: ${m.nombre.tr}. Trazando sendero en el mapa.');
-        _irAlMapaConRuta(animalId: m.id);
-        return;
-      }
-    }
-
-    // Por palabra clave de animal
-    for (final m in marcadoresZoologico) {
-      for (final palabra in _quitarAcentos(m.nombre).split(' ')) {
-        if (palabra.length > 3 && (q.contains(palabra) || palabra.contains(q))) {
-          AudioGuiaService.instance.reproducir('Encontrado: ${m.nombre.tr}. Trazando sendero en el mapa.');
-          _irAlMapaConRuta(animalId: m.id);
-          return;
-        }
-      }
-    }
-
-    // Por hábitats
+    // 2. Búsqueda por hábitats
+    final qNorm = AnimalService.normalizarTexto(consulta);
     for (final habitat in ['Zona Costa', 'Zona Sierra', 'Zona Selva', 'Zona Internacional', 'Granja Interactiva']) {
-      if (q.contains(_quitarAcentos(habitat))) {
+      if (qNorm.contains(AnimalService.normalizarTexto(habitat))) {
         AudioGuiaService.instance.reproducir('Mostrando $habitat en el mapa.');
         _irAlMapaConRuta(habitat: habitat);
         return;
@@ -1045,8 +1034,6 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
       return _buildFichaAnimalEscaneado(_animalEscaneado!);
     }
 
-    _iniciarScanner();
-
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 30),
       children: [
@@ -1246,11 +1233,11 @@ class _PantallaModoFacilState extends State<PantallaModoFacil> {
           runSpacing: 10,
           children: [
             _buildChipPlacaRapida('🦁 León (I02)', 'I02'),
-            _buildChipPlacaRapida('🐬 Lobo de Mar (C02)', 'C02'),
-            _buildChipPlacaRapida('🐧 Pingüino (C03)', 'C03'),
-            _buildChipPlacaRapida('🦅 Cóndor (S01)', 'S01'),
-            _buildChipPlacaRapida('🦒 Jirafa (I04)', 'I04'),
-            _buildChipPlacaRapida('🐅 Tigre (I03)', 'I03'),
+            _buildChipPlacaRapida('🐬 Lobo de Mar (C05)', 'C05'),
+            _buildChipPlacaRapida('🐧 Pingüino (C08)', 'C08'),
+            _buildChipPlacaRapida('🦅 Cóndor (S03)', 'S03'),
+            _buildChipPlacaRapida('🦒 Jirafa (I12)', 'I12'),
+            _buildChipPlacaRapida('🐅 Tigre (I07)', 'I07'),
           ],
         ),
       ],

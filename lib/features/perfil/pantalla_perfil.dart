@@ -95,30 +95,11 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
 
                   const SizedBox(height: 22),
 
-                  // 3. SECCIÓN VISUALIZACIÓN & DALTONISMO
+                  // 3. SECCIÓN VISUALIZACIÓN & ACCESIBILIDAD
                   SeccionCardGrupo(
                     titulo: 'tamano_texto'.tr,
                     children: [
                       const SelectorTamanoLetra(),
-                      const Divider(height: 1, indent: 56),
-                      AnimatedBuilder(
-                        animation: AccesibilidadService.instance,
-                        builder: (context, _) {
-                          final daltonismoActivo =
-                              AccesibilidadService.instance.modoDaltonismo;
-                          return _buildIosSwitchRow(
-                            icono: Icons.visibility_rounded,
-                            colorIcono: AppColors.verdeAzulado,
-                            titulo: 'modo_daltonismo_tit'.tr,
-                            subtitulo: 'modo_daltonismo_sub'.tr,
-                            valor: daltonismoActivo,
-                            onChanged: (val) {
-                              SoundService.instance.playButtonTap();
-                              AccesibilidadService.instance.setModoDaltonismo(val);
-                            },
-                          );
-                        },
-                      ),
                       const Divider(height: 1, indent: 56),
                       AnimatedBuilder(
                         animation: AccesibilidadService.instance,
