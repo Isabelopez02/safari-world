@@ -183,7 +183,7 @@ class DetalleAnimalTablet extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Ficha de Explorador · ${theme.nombreHabitat}',
+                '${'ficha_explorador'.tr} · ${theme.nombreHabitat.tr}',
                 style: GoogleFonts.urbanist(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
@@ -202,7 +202,7 @@ class DetalleAnimalTablet extends StatelessWidget {
               ),
             ),
             child: Text(
-              'Parada #${animal.id}',
+              '${'parada_num'.tr} #${animal.id}',
               style: GoogleFonts.urbanist(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
@@ -352,7 +352,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Audioguía del Explorador',
+                      'audioguia_explorador'.tr,
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
                         fontWeight: FontWeight.w900,
@@ -360,7 +360,9 @@ class DetalleAnimalTablet extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      isPlayingAudio ? 'Reproduciendo narración en vivo' : 'Narración guiada por expertos',
+                      isPlayingAudio
+                          ? 'reproduciendo_narracion'.tr
+                          : 'narracion_guiada'.tr,
                       style: GoogleFonts.urbanist(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -443,7 +445,9 @@ class DetalleAnimalTablet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      esVisitado ? '¡Animal Descubierto!' : 'Pasaporte de Visitas',
+                      esVisitado
+                          ? 'animal_descubierto'.tr
+                          : 'pasaporte_visitas'.tr,
                       style: GoogleFonts.urbanist(
                         fontSize: 15,
                         fontWeight: FontWeight.w900,
@@ -454,8 +458,8 @@ class DetalleAnimalTablet extends StatelessWidget {
                     ),
                     Text(
                       esVisitado
-                          ? 'Sello oficial registrado en tu álbum safari'
-                          : 'Registra tu visita al observar a esta especie',
+                          ? 'sello_registrado_sub'.tr
+                          : 'registra_visita_sub'.tr,
                       style: GoogleFonts.urbanist(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -578,7 +582,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Horarios de observación',
+                    'horarios_visualizacion'.tr,
                     style: GoogleFonts.urbanist(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -631,7 +635,7 @@ class DetalleAnimalTablet extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      datos.alimentos.join(', '),
+                      datos.alimentos.map((a) => a.tr).join(', '),
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,

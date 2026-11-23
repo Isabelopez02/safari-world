@@ -4,6 +4,7 @@ import 'package:zoologico_front/core/models/datos_animal.dart';
 import 'package:zoologico_front/core/models/marcador_mapa.dart';
 import 'package:zoologico_front/core/services/animal_service.dart';
 import 'package:zoologico_front/core/services/audioguia_service.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'detalle_animal_movil.dart';
 import 'detalle_animal_tablet.dart';
@@ -261,8 +262,8 @@ class _PantallaDetalleAnimalState extends State<PantallaDetalleAnimal>
             Expanded(
               child: Text(
                 nuevoEstado
-                    ? '¡${widget.animal.nombre} sellado en tu pasaporte! 🎉'
-                    : '${widget.animal.nombre} desmarcado de visitas',
+                    ? '¡${widget.animal.nombre.tr} ${'sellado_en_pasaporte'.tr}'
+                    : '${widget.animal.nombre.tr} ${'desmarcado_pasaporte'.tr}',
                 style: GoogleFonts.urbanist(
                   fontWeight: FontWeight.w800,
                   color: Colors.white,

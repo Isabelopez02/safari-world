@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'traducciones_animales.dart';
 
 /// Idiomas disponibles en la aplicación
 enum AppIdioma {
@@ -15,7 +16,14 @@ class IdiomaService extends ChangeNotifier {
   static const String _prefKeyIdioma = 'idioma_seleccionado_app';
 
   IdiomaService._() {
+    _inicializarDiccionarios();
     _cargarPreferencia();
+  }
+
+  static void _inicializarDiccionarios() {
+    _diccionario[AppIdioma.en]!.addAll(traduccionesAnimalesEn);
+    _diccionario[AppIdioma.qu]!.addAll(traduccionesAnimalesQu);
+    _diccionario[AppIdioma.ay]!.addAll(traduccionesAnimalesAy);
   }
 
   static final IdiomaService instance = IdiomaService._();
@@ -253,6 +261,31 @@ class IdiomaService extends ChangeNotifier {
       'llamar_samu': 'Llamar a Ambulancia (106)',
       'desactivar_sos': 'Desactivar Alerta SOS',
 
+      // Alertas de Ajustes
+      'alerta_idioma_cambiado': '¡Idioma cambiado con éxito!',
+      'idioma_activo': 'Idioma activo',
+      'alerta_letra_cambiada': '¡Tamaño de letra actualizado!',
+      'tamano_actual': 'Tamaño actual',
+      'letra_pequeno': 'Normal (1.0x)',
+      'letra_mediano': 'Medio (1.15x)',
+      'letra_grande': 'Grande (1.30x)',
+
+      // Ficha de animal & Pasaporte
+      'horarios_visualizacion': 'Horarios de visualización',
+      'narracion_audioguia': 'Narración de la Audioguía',
+      'audioguia_explorador': 'Audioguía del Explorador',
+      'reproduciendo_narracion': 'Reproduciendo narración en vivo',
+      'narracion_guiada': 'Narración guiada por expertos',
+      'ficha_explorador': 'Ficha de Explorador',
+      'parada_num': 'Parada',
+      'visitado_sello': 'VISITADO 🐾',
+      'pasaporte_visitas': 'Pasaporte de Visitas',
+      'animal_descubierto': '¡Animal Descubierto!',
+      'sello_registrado_sub': 'Sello oficial registrado en tu álbum safari',
+      'registra_visita_sub': 'Registra tu visita al observar a esta especie',
+      'sellado_en_pasaporte': 'sellado en tu pasaporte! 🎉',
+      'desmarcado_pasaporte': 'desmarcado de visitas',
+
       // Nombres de Animales
       'Vacas Holstein': 'Vacas Holstein',
       'Ovejas': 'Ovejas',
@@ -484,6 +517,31 @@ class IdiomaService extends ChangeNotifier {
       'llamar_guardaparques': 'Call Park Rangers',
       'llamar_samu': 'Call Ambulance (106)',
       'desactivar_sos': 'Disable SOS Alert',
+
+      // Settings Alerts
+      'alerta_idioma_cambiado': 'Language changed successfully!',
+      'idioma_activo': 'Active language',
+      'alerta_letra_cambiada': 'Font size updated successfully!',
+      'tamano_actual': 'Current size',
+      'letra_pequeno': 'Normal (1.0x)',
+      'letra_mediano': 'Medium (1.15x)',
+      'letra_grande': 'Large (1.30x)',
+
+      // Animal Sheet & Passport
+      'horarios_visualizacion': 'Viewing schedules',
+      'narracion_audioguia': 'Audio Guide Narration',
+      'audioguia_explorador': 'Explorer Audio Guide',
+      'reproduciendo_narracion': 'Playing live narration',
+      'narracion_guiada': 'Expert guided narration',
+      'ficha_explorador': 'Explorer Sheet',
+      'parada_num': 'Stop',
+      'visitado_sello': 'VISITED 🐾',
+      'pasaporte_visitas': 'Visits Passport',
+      'animal_descubierto': 'Animal Discovered!',
+      'sello_registrado_sub': 'Official stamp recorded in your safari album',
+      'registra_visita_sub': 'Record your visit when observing this species',
+      'sellado_en_pasaporte': 'stamped in your passport! 🎉',
+      'desmarcado_pasaporte': 'removed from visits',
 
       // Animal Names
       'Vacas Holstein': 'Holstein Cows',
@@ -737,6 +795,31 @@ class IdiomaService extends ChangeNotifier {
       'llamar_samu': 'Ambulansiyaman Qayay (106)',
       'desactivar_sos': 'SOS Yanapayta Sayachiy',
 
+      // Simikuna & Sananpakuna Allichay
+      'alerta_idioma_cambiado': '¡Simiqa allinmi allichasqa!',
+      'idioma_activo': 'Kunan simi',
+      'alerta_letra_cambiada': '¡Sananpakuna sayaynin allichasqa!',
+      'tamano_actual': 'Kunan sayaynin',
+      'letra_pequeno': 'Huch\'uy (1.0x)',
+      'letra_mediano': 'Chawpi (1.15x)',
+      'letra_grande': 'Hatun (1.30x)',
+
+      // Uywakuna & Pasapurti
+      'horarios_visualizacion': 'Qhawanapaq pachakuna',
+      'narracion_audioguia': 'Uyariq Pusariqpa Willaynin',
+      'audioguia_explorador': 'Puriqpa Uyariq Pusariqnin',
+      'reproduciendo_narracion': 'Kunan uyarichkanmi willakuyta',
+      'narracion_guiada': 'Yachaqkunapa pusasqan willakuy',
+      'ficha_explorador': 'Puriqpa Uñacht’äwin',
+      'parada_num': 'Sayana',
+      'visitado_sello': 'WATUKUSQA 🐾',
+      'pasaporte_visitas': 'Watukuykuna Pasapurtin',
+      'animal_descubierto': '¡Uywa Riqsisqa!',
+      'sello_registrado_sub': 'Takyasqa unanchasqa parkipa pasapurtinpi',
+      'registra_visita_sub': 'Kay uywata qhawaspayki churay watukusqata',
+      'sellado_en_pasaporte': 'pasapurtikipi unanchasqañam! 🎉',
+      'desmarcado_pasaporte': 'watukusqamanta qullusqa',
+
       // Nombres de Animales
       'Vacas Holstein': 'Holstein Wakakuna',
       'Ovejas': 'Uwijakuna',
@@ -988,6 +1071,31 @@ class IdiomaService extends ChangeNotifier {
       'llamar_guardaparques': 'Parkina Awatirir Jawst\'aña',
       'llamar_samu': 'Ambulansiyaru Jawst\'aña (106)',
       'desactivar_sos': 'SOS Yanapa Sayt\'ayaña',
+
+      // Arunakampi & Qillqanakampi Mayjt\'ayawi
+      'alerta_idioma_cambiado': '¡Arux sumawa mayjt’ayata!',
+      'idioma_activo': 'Jichha aru',
+      'alerta_letra_cambiada': '¡Qillqanakan jach’apa mayjt’ayata!',
+      'tamano_actual': 'Jichha jach’apa',
+      'letra_pequeno': 'Jisk\'a (1.0x)',
+      'letra_mediano': 'Taypi (1.15x)',
+      'letra_grande': 'Jach’a (1.30x)',
+
+      // Uywawasi & Pasaporti
+      'horarios_visualizacion': 'Uñjañ pachanakapa',
+      'narracion_audioguia': 'Ist’iri Irpirina Arupa',
+      'audioguia_explorador': 'Sartiririn Ist’iri Irpiripa',
+      'reproduciendo_narracion': 'Jichhuruwa ist’asiskixa',
+      'narracion_guiada': 'Yatirinakan arst’atawa',
+      'ficha_explorador': 'Sartiririn Pankapa',
+      'parada_num': 'Sayt’awi',
+      'visitado_sello': 'UÑJATA 🐾',
+      'pasaporte_visitas': 'Uñjatana Pasaportepa',
+      'animal_descubierto': '¡Uywa Uñt’ata!',
+      'sello_registrado_sub': 'Suma chimpu qillqata safari pankamana',
+      'registra_visita_sub': 'Aka uywaru uñjasina chimpuntam',
+      'sellado_en_pasaporte': 'pasaporteman chimpuntatañawa! 🎉',
+      'desmarcado_pasaporte': 'uñjatat apaqata',
 
       // Nombres de Animales
       'Vacas Holstein': 'Holstein Wakanaka',

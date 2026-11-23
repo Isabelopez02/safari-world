@@ -8,6 +8,7 @@ import 'package:zoologico_front/features/mapa/screens/pantalla_detalle_animal.da
 import 'package:zoologico_front/features/modo_facil/pantalla_modo_facil.dart';
 import 'package:zoologico_front/features/pantalla_principal/widgets/footer_navegacion.dart';
 import 'package:zoologico_front/features/perfil/widgets/selector_idioma_perfil.dart';
+import 'package:zoologico_front/features/perfil/widgets/selector_tamano_letra.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -130,6 +131,67 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(IdiomaService.instance.idioma, equals(AppIdioma.ay));
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.text('¡Arux sumawa mayjt’ayata!'), findsOneWidget);
+    });
+
+    test('Todas las palabras de la ficha de animales y alimentos se traducen al cambiar idioma', () async {
+      // 1. Probar en Inglés
+      await IdiomaService.instance.cambiarIdioma(AppIdioma.en);
+      final datosLeonesEn = AnimalService.instance.obtenerDatos('Leones');
+      expect('Leones'.tr, equals('Lions'));
+      expect(datosLeonesEn.getCuriosidad('Leones'), contains('more than 8 kilometers'));
+      expect(datosLeonesEn.getComportamiento('Leones'), contains('family prides'));
+      expect(datosLeonesEn.getNarracion('Leones'), contains('African Savannah'));
+      expect('horarios_visualizacion'.tr, equals('Viewing schedules'));
+      expect('🌾 Pasto y alfalfa dulce'.tr, equals('🌾 Grass and sweet alfalfa'));
+      expect('🥩 Carne vacuna fresca'.tr, equals('🥩 Fresh beef'));
+
+      // 2. Probar en Quechua
+      await IdiomaService.instance.cambiarIdioma(AppIdioma.qu);
+      final datosLeonesQu = AnimalService.instance.obtenerDatos('Leones');
+      expect('Leones'.tr, equals('Liyunkuna'));
+      expect(datosLeonesQu.getCuriosidad('Leones'), contains('pusaq kilumitrukama'));
+      expect(datosLeonesQu.getComportamiento('Leones'), contains('Ayllupuralla tiyanku'));
+      expect(datosLeonesQu.getNarracion('Leones'), contains('Hawamanta K\'itipi'));
+      expect('horarios_visualizacion'.tr, equals('Qhawanapaq pachakuna'));
+      expect('🌾 Pasto y alfalfa dulce'.tr, equals('🌾 Pastu hinaspa misk\'i alfalpa'));
+      expect('🥩 Carne vacuna fresca'.tr, equals('🥩 Waka musuq aycha'));
+
+      // 3. Probar en Aimara
+      await IdiomaService.instance.cambiarIdioma(AppIdioma.ay);
+      final datosLeonesAy = AnimalService.instance.obtenerDatos('Leones');
+      expect('Leones'.tr, equals('Liyunnaka'));
+      expect(datosLeonesAy.getCuriosidad('Leones'), contains('kimsaqallqu kilumitrunakaruwa'));
+      expect(datosLeonesAy.getComportamiento('Leones'), contains('Wila masi p\'iqinchata'));
+      expect(datosLeonesAy.getNarracion('Leones'), contains('Anqäxa K\'itin'));
+      expect('horarios_visualizacion'.tr, equals('Uñjañ pachanakapa'));
+      expect('🌾 Pasto y alfalfa dulce'.tr, equals('🌾 Ch\'illi ukhamaraki muxsa alfalpa'));
+      expect('🥩 Carne vacuna fresca'.tr, equals('🥩 Waka machaq aycha'));
+    });
+
+    testWidgets('SelectorTamanoLetra muestra alerta SnackBar al cambiar de tamaño de letra',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SelectorTamanoLetra(),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('Normal'), findsOneWidget);
+      expect(find.text('Grande'), findsOneWidget);
+
+      // Tocar en "Grande"
+      await tester.tap(find.text('Grande'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.text('¡Tamaño de letra actualizado!'), findsOneWidget);
     });
   });
 

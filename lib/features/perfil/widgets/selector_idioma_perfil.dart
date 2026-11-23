@@ -8,6 +8,68 @@ import 'package:zoologico_front/core/theme/app_colors.dart';
 class SelectorIdiomaPerfil extends StatelessWidget {
   const SelectorIdiomaPerfil({super.key});
 
+  void _seleccionarIdioma(
+    BuildContext context,
+    AppIdioma nuevoIdioma,
+    String titulo,
+    String bandera,
+  ) {
+    SoundService.instance.playButtonTap();
+    final idiomaActual = IdiomaService.instance.idioma;
+    if (idiomaActual == nuevoIdioma) return;
+
+    IdiomaService.instance.cambiarIdioma(nuevoIdioma);
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        backgroundColor: AppColors.verdePrincipal,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        content: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Text(bandera, style: const TextStyle(fontSize: 18)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'alerta_idioma_cambiado'.tr,
+                    style: GoogleFonts.urbanist(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    '${'idioma_activo'.tr}: $titulo',
+                    style: GoogleFonts.urbanist(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -21,10 +83,12 @@ class SelectorIdiomaPerfil extends StatelessWidget {
               subtitulo: 'Predeterminado (Perú)',
               bandera: '🇵🇪',
               seleccionado: idiomaActual == AppIdioma.es,
-              onTap: () {
-                SoundService.instance.playButtonTap();
-                IdiomaService.instance.cambiarIdioma(AppIdioma.es);
-              },
+              onTap: () => _seleccionarIdioma(
+                context,
+                AppIdioma.es,
+                'Español',
+                '🇵🇪',
+              ),
             ),
             const Divider(height: 1, indent: 56),
             _buildOpcionIdioma(
@@ -32,10 +96,12 @@ class SelectorIdiomaPerfil extends StatelessWidget {
               subtitulo: 'International tourists',
               bandera: '🇺🇸',
               seleccionado: idiomaActual == AppIdioma.en,
-              onTap: () {
-                SoundService.instance.playButtonTap();
-                IdiomaService.instance.cambiarIdioma(AppIdioma.en);
-              },
+              onTap: () => _seleccionarIdioma(
+                context,
+                AppIdioma.en,
+                'English',
+                '🇺🇸',
+              ),
             ),
             const Divider(height: 1, indent: 56),
             _buildOpcionIdioma(
@@ -43,10 +109,12 @@ class SelectorIdiomaPerfil extends StatelessWidget {
               subtitulo: 'Piruwpa paqarisqa simin',
               bandera: '🏔️',
               seleccionado: idiomaActual == AppIdioma.qu,
-              onTap: () {
-                SoundService.instance.playButtonTap();
-                IdiomaService.instance.cambiarIdioma(AppIdioma.qu);
-              },
+              onTap: () => _seleccionarIdioma(
+                context,
+                AppIdioma.qu,
+                'Runasimi / Quechua',
+                '🏔️',
+              ),
             ),
             const Divider(height: 1, indent: 56),
             _buildOpcionIdioma(
@@ -54,10 +122,12 @@ class SelectorIdiomaPerfil extends StatelessWidget {
               subtitulo: 'Qullasuyu jaqinakan arupa',
               bandera: '☀️',
               seleccionado: idiomaActual == AppIdioma.ay,
-              onTap: () {
-                SoundService.instance.playButtonTap();
-                IdiomaService.instance.cambiarIdioma(AppIdioma.ay);
-              },
+              onTap: () => _seleccionarIdioma(
+                context,
+                AppIdioma.ay,
+                'Aymar aru / Aimara',
+                '☀️',
+              ),
             ),
           ],
         );

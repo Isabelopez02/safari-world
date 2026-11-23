@@ -2,12 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zoologico_front/core/services/accesibilidad_service.dart';
+import 'package:zoologico_front/core/services/idioma_service.dart';
 import 'package:zoologico_front/core/services/sound_service.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
 
 /// Selector segmentado de tamaño de letra (Normal | Medio | Grande) con vista previa en vivo
 class SelectorTamanoLetra extends StatelessWidget {
   const SelectorTamanoLetra({super.key});
+
+  String _obtenerNombreTamano(TamanoTexto tamano) {
+    switch (tamano) {
+      case TamanoTexto.pequeno:
+        return 'letra_pequeno'.tr;
+      case TamanoTexto.mediano:
+        return 'letra_mediano'.tr;
+      case TamanoTexto.grande:
+        return 'letra_grande'.tr;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,9 +147,58 @@ class SelectorTamanoLetra extends StatelessWidget {
                     ),
                   },
                   onValueChanged: (TamanoTexto? nuevoTamano) {
-                    if (nuevoTamano != null) {
+                    if (nuevoTamano != null && nuevoTamano != tamanoActual) {
                       SoundService.instance.playButtonTap();
                       AccesibilidadService.instance.setTamanoTexto(nuevoTamano);
+
+                      final messenger = ScaffoldMessenger.of(context);
+                      messenger.hideCurrentSnackBar();
+                      messenger.showSnackBar(
+                        SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          backgroundColor: const Color(0xFF1E293B),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          content: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.15),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.format_size_rounded, color: Colors.white, size: 18),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'alerta_letra_cambiada'.tr,
+                                      style: GoogleFonts.urbanist(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${'tamano_actual'.tr}: ${_obtenerNombreTamano(nuevoTamano)}',
+                                      style: GoogleFonts.urbanist(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
                     }
                   },
                 ),

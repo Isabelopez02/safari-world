@@ -286,7 +286,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                                   ),
                                 ),
                                 child: Text(
-                                  'VISITADO 🐾',
+                                  'visitado_sello'.tr,
                                   style: GoogleFonts.urbanist(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w900,
@@ -481,7 +481,7 @@ class DetalleAnimalMovil extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Narración de la Audioguía',
+                'narracion_audioguia'.tr,
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.w900,
@@ -571,7 +571,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Horarios de visualización',
+                      'horarios_visualizacion'.tr,
                       style: GoogleFonts.urbanist(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
@@ -625,7 +625,7 @@ class DetalleAnimalMovil extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      datos.alimentos.join(', '),
+                      datos.alimentos.map((a) => a.tr).join(', '),
                       style: GoogleFonts.urbanist(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w800,
