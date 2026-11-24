@@ -1,46 +1,304 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="Aplicativo móvil interactivo de geolocalización y audioguía para el Parque de las Leyendas (Sede San Miguel).">
+  <meta name="theme-color" content="#2D6A4F">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="zoologico_front">
+  <meta name="apple-mobile-web-app-title" content="Parque de las Leyendas">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>zoologico_front</title>
+  <!-- Preconnect y Preload para optimizar tiempos de conexión -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="flutter_bootstrap.js" as="script">
+
+  <title>Parque de las Leyendas · Safari Interactivo</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #F8FAF8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    #app-loading-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #F4F7F4;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      transition: opacity 0.35s ease-out;
+      pointer-events: none;
+    }
+
+    .sk-container {
+      width: 100%;
+      max-width: clamp(320px, 92vw, 480px);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 0.75rem 1rem;
+      position: relative;
+    }
+
+    /* Efecto Shimmer ultra fluido */
+    .shimmer {
+      background: #E5EBE5;
+      background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.65) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      background-size: 200% 100%;
+      animation: sk-shimmer 1.4s infinite ease-in-out;
+      border-radius: 0.5rem;
+    }
+
+    @keyframes sk-shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* Header Skeleton */
+    .sk-header {
+      padding: 0.75rem 0 0.5rem 0;
+    }
+
+    .sk-header-top {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .sk-avatar {
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .sk-header-titles {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .sk-pill-bar {
+      display: flex;
+      gap: 0.5rem;
+      overflow: hidden;
+    }
+
+    .sk-pill {
+      height: 1.85rem;
+      width: 4.5rem;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    /* Cards Skeleton */
+    .sk-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      padding-top: 0.5rem;
+      overflow: hidden;
+    }
+
+    .sk-card {
+      background: #FFFFFF;
+      border-radius: 1rem;
+      padding: 0.85rem;
+      display: flex;
+      gap: 0.85rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(45, 106, 79, 0.08);
+    }
+
+    .sk-card-thumb {
+      width: clamp(4.5rem, 20vw, 5.5rem);
+      height: clamp(4.5rem, 20vw, 5.5rem);
+      border-radius: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .sk-card-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.45rem;
+    }
+
+    .sk-line {
+      height: 0.85rem;
+      border-radius: 0.35rem;
+    }
+
+    .sk-w-75 { width: 75%; }
+    .sk-w-50 { width: 50%; }
+    .sk-w-35 { width: 35%; }
+
+    /* Floating Status Badge */
+    .sk-floating-status {
+      position: absolute;
+      bottom: 4.8rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(27, 67, 50, 0.94);
+      color: #FFFFFF;
+      padding: 0.5rem 1.1rem;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      white-space: nowrap;
+      backdrop-filter: blur(4px);
+    }
+
+    .sk-status-dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      background: #52B788;
+      border-radius: 50%;
+      animation: sk-pulse 1.2s infinite ease-in-out;
+    }
+
+    @keyframes sk-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.6; }
+    }
+
+    /* Bottom Nav Skeleton */
+    .sk-bottom-nav {
+      height: 3.5rem;
+      background: #FFFFFF;
+      border-radius: 1.25rem 1.25rem 0 0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 0 0.5rem;
+    }
+
+    .sk-nav-btn {
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 0.6rem;
+    }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+  <div id="app-loading-indicator" role="status" aria-busy="true" aria-label="Cargando Parque de las Leyendas">
+    <div class="sk-container">
+      <!-- Encabezado Skeleton Semántico -->
+      <header class="sk-header">
+        <div class="sk-header-top">
+          <div class="sk-avatar shimmer"></div>
+          <div class="sk-header-titles">
+            <div class="sk-line sk-w-75 shimmer"></div>
+            <div class="sk-line sk-w-50 shimmer"></div>
+          </div>
+        </div>
+        <div class="sk-pill-bar">
+          <div class="sk-pill shimmer"></div>
+          <div class="sk-pill shimmer"></div>
+          <div class="sk-pill shimmer"></div>
+          <div class="sk-pill shimmer"></div>
+        </div>
+      </header>
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+      <!-- Lista de Tarjetas Skeleton -->
+      <main class="sk-main">
+        <div class="sk-card">
+          <div class="sk-card-thumb shimmer"></div>
+          <div class="sk-card-content">
+            <div class="sk-line sk-w-75 shimmer"></div>
+            <div class="sk-line sk-w-50 shimmer"></div>
+            <div class="sk-line sk-w-35 shimmer"></div>
+          </div>
+        </div>
+
+        <div class="sk-card">
+          <div class="sk-card-thumb shimmer"></div>
+          <div class="sk-card-content">
+            <div class="sk-line sk-w-75 shimmer"></div>
+            <div class="sk-line sk-w-50 shimmer"></div>
+            <div class="sk-line sk-w-35 shimmer"></div>
+          </div>
+        </div>
+
+        <div class="sk-card">
+          <div class="sk-card-thumb shimmer"></div>
+          <div class="sk-card-content">
+            <div class="sk-line sk-w-75 shimmer"></div>
+            <div class="sk-line sk-w-50 shimmer"></div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Indicador Flotante -->
+      <div class="sk-floating-status">
+        <div class="sk-status-dot"></div>
+        <span>🦁 Safari Interactivo · Cargando...</span>
+      </div>
+
+      <!-- Barra Inferior de Navegación Skeleton -->
+      <nav class="sk-bottom-nav">
+        <div class="sk-nav-btn shimmer"></div>
+        <div class="sk-nav-btn shimmer"></div>
+        <div class="sk-nav-btn shimmer"></div>
+        <div class="sk-nav-btn shimmer"></div>
+      </nav>
+    </div>
+  </div>
+
+  <script>
+    // Transición suave: se desvanece y retira del DOM al pintar el primer frame de Flutter
+    window.addEventListener('flutter-first-frame', function () {
+      var splash = document.getElementById('app-loading-indicator');
+      if (splash) {
+        splash.style.opacity = '0';
+        setTimeout(function() {
+          if (splash && splash.parentNode) {
+            splash.parentNode.removeChild(splash);
+          }
+        }, 380);
+      }
+    });
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

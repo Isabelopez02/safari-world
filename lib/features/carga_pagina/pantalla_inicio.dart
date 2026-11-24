@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zoologico_front/core/theme/app_colors.dart';
-import 'package:zoologico_front/features/pantalla_principal/pantalla_principal.dart';
+import 'package:zoologico_front/features/pantalla_principal/screens/pantalla_principal.dart';
 
 class PantallaInicio extends StatefulWidget {
   const PantallaInicio({super.key});
