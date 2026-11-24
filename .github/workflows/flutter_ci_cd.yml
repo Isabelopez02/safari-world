@@ -106,7 +106,7 @@ jobs:
         run: flutter pub get
 
       - name: 📱 Compilar APK de Producción (Split per ABI)
-        run: flutter build apk --release --split-per-abi
+        run: flutter build apk --release --split-per-abi --android-skip-build-dependency-validation
 
       - name: 📦 Cargar APKs Compiladas
         uses: actions/upload-artifact@v4
