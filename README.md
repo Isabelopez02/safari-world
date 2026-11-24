@@ -1,186 +1,255 @@
-# 🐾 ZooExplorer · Guía Interactiva & Expedición Safari
+# 🐾 Parque de las Leyendas · Safari Interactivo (Frontend Móvil & Web)
 
 <p align="center">
-  <img src="assets/images/logo_zoologico.png" alt="Logo Zoológico" width="180"/>
+  <img src="assets/images/logo_zoologico.png" alt="Logo Parque de las Leyendas" width="170"/>
 </p>
 
 <p align="center">
-  <strong>Aplicación móvil interactiva para la exploración, educación ambiental y navegación inteligente en el zoológico.</strong>
+  <strong>Aplicación móvil y web interactiva de exploración, educación biológica, geolocalización, accesibilidad universal y navegación inteligente para el Parque de las Leyendas.</strong>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter"/>
-  <img src="https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart"/>
-  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Platforms"/>
-  <img src="https://img.shields.io/badge/Design-Urbanist%20%26%20Safari%20UI-2E7D32?style=for-the-badge" alt="Design"/>
-  <img src="https://img.shields.io/badge/Audio-Text--To--Speech-E65100?style=for-the-badge&logo=soundcharts&logoColor=white" alt="TTS"/>
+  <img src="https://img.shields.io/badge/Flutter-3.47+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter"/>
+  <img src="https://img.shields.io/badge/Dart-3.13+-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart"/>
+  <img src="https://img.shields.io/badge/WebAssembly-Wasm%20%7C%20Skwasm-654FF0?style=for-the-badge&logo=webassembly&logoColor=white" alt="Wasm"/>
+  <img src="https://img.shields.io/badge/WCAG_2.2-Nivel_AA_(100%25)-2E7D32?style=for-the-badge&logo=w3c&logoColor=white" alt="WCAG"/>
+  <img src="https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI/CD"/>
+  <img src="https://img.shields.io/badge/Tests-43%20Passed%20(100%25)-success?style=for-the-badge" alt="Tests"/>
 </p>
 
 ---
 
 ## 📖 ¿De qué trata este proyecto?
 
-**ZooExplorer** es una aplicación móvil multiplataforma desarrollada en **Flutter** concebida para transformar por completo la visita tradicional a un parque zoológico. Integra un mapa topológico interactivo en alta resolución, navegación paso a paso con cálculo de rutas mínimas (pathfinding), fichas biológicas interactivas personalizadas por hábitat, audioguías con voz natural y un sistema de gamificación basado en un pasaporte de explorador.
+**Parque de las Leyendas · Safari Interactivo** es un sistema multiplataforma (**Android, iOS y Web**) desarrollado en **Flutter** diseñado para transformar por completo la experiencia de visita a un parque zoológico y centro de conservación. 
 
-El objetivo es ofrecer una experiencia **intuitiva, animalista y minimalista**, eliminando la fatiga visual de los mapas tradicionales en papel y facilitando el aprendizaje sobre la biodiversidad y conservación de la fauna silvestre.
-
----
-
-## 🌱 ¿De qué nació este proyecto? (Origen y Motivación)
-
-Este proyecto nació en el ámbito universitario al identificar una problemática común en los parques zoológicos y centros de rescate animal:
-
-1. **Desorientación y mapas estáticos**: Los visitantes suelen depender de folletos de papel que se deterioran fácilmente, no indican la posición del usuario ni ofrecen rutas optimizadas, ocasionando que muchas familias se pierdan o no alcancen a ver a sus animales favoritos.
-2. **Falta de accesibilidad y dinamismo**: Los carteles informativos en los recintos suelen tener textos densos que generan fatiga visual en niños y adultos mayores, careciendo de recursos auditivos para personas con baja visión o dificultades de lectura.
-3. **Pérdida de espectáculos y actividades**: Los horarios de funciones especiales (como espectáculos acuáticos y charlas biológicas) no cuentan con alertas ni cupos visibles, lo que provoca aglomeraciones o funciones perdidas.
-4. **Desconexión con la conservación**: La visita muchas veces se limita a observar sin interactuar ni registrar el aprendizaje.
-
-**La solución:** Crear una herramienta digital moderna que combine **tecnología móvil**, **accesibilidad inclusiva** y **diseño biofílico**, convirtiendo cada visita en una expedición educativa inolvidable.
+Integra navegación inteligente basada en grafos topológicos, cálculo de rutas mínimas asistidas (*pathfinding*), fichas biológicas interactivas adaptadas al hábitat natural, audioguías Text-To-Speech multilingües, pasaporte digital gamificado y un motor de **accesibilidad universal certificada con 100/100 en Google Lighthouse**.
 
 ---
 
-## 🎯 Propósito Central
+## 💡 Factores de Innovación y Propuesta de Valor (Para Reclutadores & Auditoría)
 
-* **Guiar al visitante en tiempo real:** Facilitar la orientación fluida desde el punto de entrada hacia cualquier recinto animal, servicio higiénico o punto de atención médica.
-* **Fomentar la educación y conservación animal:** Brindar datos científicos, dietas, comportamientos y curiosidades validadas sobre cada especie.
-* **Inclusión y accesibilidad:** Permitir que cualquier usuario pueda escuchar la audioguía narrada en español en alta voz con un solo toque.
-* **Gamificación sana:** Estimular a las familias y niños a recorrer todos los hábitats mediante un pasaporte de explorador con sello digital animado.
-
----
-
-## 🚀 Características Principales
-
-### 🗺️ 1. Mapa Interactivo y Navegación Inteligente
-* Mapa en alta definición con zoom y paneo continuo mediante `InteractiveViewer`.
-* **Cálculo de rutas en tiempo real:** Algoritmo de pathfinding basado en un grafo de senderos que traza la ruta más corta hacia el animal seleccionado con animaciones de trazo dinámico (`CustomPainter`).
-* **Filtro de Baños y Servicios:** Localización y direccionamiento inmediato al baño más cercano.
-* **Punto de ubicación actual:** Indicador visual tipo radar que marca en todo momento la posición del explorador.
-
-### 🦁 2. Fichas de Campo Personalizadas por Hábitat
-Cada ficha de animal adapta automáticamente sus tonalidades, gradientes y acentos de acuerdo con su hábitat natural:
-* 🦁 **Sabana Africana**: Paleta cálida safari y ámbar dorado.
-* 🌴 **Selva Tropical**: Fondo de bruma esmeralda y follaje selvático.
-* 🐬 **Mundo Acuático**: Tonos de agua cristalina y azul océano profundo.
-* 🚜 **La Granja**: Praderas campestres en tonos verde oliva suave.
-* 🏔️ **Bosque & Montaña**: Niebla de montaña y pizarra fresca.
-
-Incluye información clave de campo: nombre científico, dieta diaria, estado de conservación, horarios de exhibición y la sección **"¿Sabías que? 💡"**.
-
-### 🐾 3. Pasaporte de Explorador con Sello Animado
-* Al marcar un animal como visitado, la aplicación ejecuta una animación de impacto con rebote elástico (`Curves.elasticOut`) que estampa un **sello oficial de explorador** inclinado a -15° con estilo de tinta de pasaporte.
-* La tarjeta del animal conserva su sello de validación permanente.
-* Barra de progreso safari en tiempo real que contabiliza el porcentaje total de la expedición completada.
-
-### 🎧 4. Audioguía Oficial (Text-To-Speech Nativo)
-* Integración con síntesis de voz real (`flutter_tts`) configurada en español natural.
-* Reproductor minimalista con ecualizador de ondas animadas y controles de pausar/reanudar para cada animal y espectáculo.
-
-### 🐬 5. Show Acuático de Focas & Lobos Marinos
-* Presentación orgánica y tierna con la imagen transparente del animal marino sobre un header suave sin recortes artificiales.
-* Selector de turnos de funciones (mañana, estrella, atardecer) con cupos disponibles.
-* Sistema de recordatorios con notificaciones y botón directo de navegación hacia el anfiteatro de las focas.
-
-### 🚨 6. Asistencia de Emergencia SOS
-* Botón flotante accesible desde cualquier punto del mapa para desplegar el protocolo de auxilio inmediato, números del guardaparque y primeros auxilios.
+| Área de Innovación | Proyecto Móvil Convencional | Safari Interactivo (Este Proyecto) | Valor Técnico y de Negocio |
+| :--- | :--- | :--- | :--- |
+| 🌐 **Inclusión Cultural Andina** | Solo Español / Inglés básico | **4 Idiomas completos:** Español, Inglés, Quechua (`qu`) y Aimara (`ay`) con diccionarios y audios TTS. | Preservación del patrimonio lingüístico y accesibilidad real para comunidades nativas. |
+| 🧩 **Diseño Neurodivergente (TEA)** | No contemplado | **Zonas de Calma / Silencio** georreferenciadas con alertas de sobrecarga acústica. | Cumplimiento de accesibilidad cognitiva y diseño empático centrado en el usuario. |
+| ♿ **Accesibilidad Web Certificada** | Sin auditar o &lt; 60% | **Puntaje Perfecto de 100/100 en Google Lighthouse** (WCAG 2.2 AA). | Ratios de contraste ≥ 4.5:1, etiquetas semánticas, filtros de daltonismo y escala dinámica de fuentes. |
+| 🏛️ **Arquitectura de Software** | Código monolítico o acoplado | **Feature-First + Inyección de Dependencias con `GetIt` (`sl<T>`)**. | Modularidad desacoplada, alta cohesión y testabilidad con *Mocks* sin deuda técnica. |
+| ⚡ **Rendimiento Web Extremo** | JS pesado con carga &gt; 5s | **WebAssembly (`dart2wasm` + `Skwasm`) + Skeleton Screen nativo (&lt; 2 KB)**. | LCP récord de **0.4 segundos**, CLS de **0** y carga binaria multihilo instantánea. |
+| 🛡️ **DevOps y Calidad Continua** | Pruebas manuales sin pipeline | **Pipeline GitHub Actions inteligente** (CI en PR / CD en Main) + Git Pre-commit Hooks. | Cero regresiones, 43 pruebas automatizadas y compilación automática de APKs Release. |
 
 ---
 
-## 🛠️ Tecnologías y Librerías Utilizadas
+## 🛠️ Stack Tecnológico Completo
 
-| Tecnología | Insignia | Propósito en el Proyecto |
-| :--- | :---: | :--- |
-| **Flutter SDK** | ![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white) | Framework principal para el desarrollo de la interfaz de usuario multiplataforma (Android & iOS). |
-| **Dart** | ![Dart](https://img.shields.io/badge/Dart-0175C2?logo=dart&logoColor=white) | Lenguaje de programación reactivo, fuertemente tipado y de alto rendimiento. |
-| **Google Fonts** | ![Google Fonts](https://img.shields.io/badge/Google_Fonts-Urbanist-4285F4?logo=google&logoColor=white) | Tipografía oficial **Urbanist**, seleccionada por su legibilidad en pantallas móviles y aspecto moderno. |
-| **flutter_tts** | ![TTS](https://img.shields.io/badge/flutter__tts-4.2.5-FF6F00) | Motor de síntesis de voz nativo para la reproducción de las audioguías en español. |
-| **vector_math** | ![Vector](https://img.shields.io/badge/vector__math-2.1.4-9C27B0) | Cálculo de transformaciones matriciales 2D/3D para el paneo y centrado suave de la cámara del mapa. |
-| **shared_preferences** | ![Prefs](https://img.shields.io/badge/shared__preferences-2.5.6-00796B) | Persistencia local ligera para guardar el historial de visitas y estado del pasaporte. |
-| **flutter_launcher_icons** | ![Icons](https://img.shields.io/badge/launcher__icons-0.13.1-4CAF50) | Generación y estandarización automática del ícono oficial de la aplicación para todas las densidades de pantalla. |
-| **url_launcher** | ![URL](https://img.shields.io/badge/url__launcher-6.3.3-0288D1) | Enlaces externos para llamadas telefónicas de emergencia y servicios del parque. |
+* **Framework Principal:** Flutter 3.47+ & Dart 3.13+ (Sound Null Safety).
+* **Inyección de Dependencias:** `GetIt` (Service Locator Pattern con resolución O(1)).
+* **Compilación Web:** WebAssembly (`dart2wasm`), Skwasm Renderer, aislamiento COOP / COEP y servidor Gzip.
+* **Multimedia y Voz:** `flutter_tts` (Text-To-Speech multilingüe) y `speech_to_text` (Búsqueda por voz).
+* **Navegación & Gráficos:** `vector_math` (transformaciones matriciales 2D/3D), `path_drawing` y `CustomPainter`.
+* **Automatización y CI/CD:** GitHub Actions (Pipelines optimizados), Git Pre-commit Hooks y cobertura `lcov.info`.
+* **Testing:** 43 pruebas automatizadas (Unit, Widget y Flow Testing).
+* **Tipografía y UI:** Google Fonts *Urbanist* y sistema de diseño biofílico Safari.
 
 ---
 
-## 📁 Estructura del Proyecto
+## 🌟 Pilares y Características Principales
 
-El código está estructurado siguiendo los principios de **Feature-First Architecture** y **Clean Code**, separando la lógica transversal (`core`) de los módulos de funcionalidad (`features`):
+### ♿ 1. Accesibilidad Universal e Inclusión (WCAG 2.2 Nivel AA)
+* **4 Idiomas Nativos Integrados:** Soporte reactivo completo para **Español, English, Quechua (`qu`) y Aimara (`ay`)** en todas las pantallas y audioguías.
+* **Zonas de Calma / Silencio:** Señalización y guiado georreferenciado hacia espacios de regulación sensorial para visitantes neurodivergentes o con Trastorno del Espectro Autista (TEA).
+* **Modo Daltonismo:** Filtros cromáticos tácticos y símbolos geométricos adaptados para *Protanopia, Deuteranopia y Tritanopia*.
+* **Escala Tipográfica Dinámica:** Selector de tamaño de fuente en tiempo real (*Normal 1.0x, Medio 1.15x, Grande 1.30x*).
+* **Modo Fácil / Senior:** Interfaz de alto contraste simplificada con botones táctiles de 48×48 px, botón SOS de emergencia directo y búsqueda por voz.
+
+### 🗺️ 2. Navegación Asistida y Mapa Topológico
+* Mapa vectorial e interactivo con paneo y zoom fluido mediante transformaciones matriciales.
+* **Cálculo de Rutas en Tiempo Real:** Algoritmo de senderos que traza el camino más corto hacia el animal seleccionado con animaciones de trazo dinámico (`CustomPainter`).
+* **Filtros de Servicios Esenciales:** Ubicación inmediata de baños higiénicos, tópicos de primeros auxilios, zonas de descanso y accesos.
+
+### 🦁 3. Fichas de Campo y Pasaporte Gamificado
+* Fichas biológicas con diseño biofílico personalizado según el hábitat: *Costa, Sierra, Selva, Sabana Africana y Zona Internacional*.
+* **Pasaporte de Visitas:** Animación elástica de impacto que estampa un sello oficial inclinado al visitar cada especie, con cálculo de porcentaje de expedición.
+* **Audioguías Text-To-Speech (TTS):** Síntesis de voz pausada y natural para cada animal y espectáculo.
+
+### 🚀 4. Rendimiento Web de Última Generación
+* **WebAssembly Puro (`dart2wasm` + `Skwasm`):** Compilación nativa en código binario con aislamiento de origen cruzado (COOP / COEP) que erradica el tiempo de parseo de JavaScript.
+* **Skeleton Screen Interactivo:** Pantalla de precarga semántica con efecto *shimmer* en HTML/CSS puro (< 2 KB) que logra un **LCP de 0.4s** y **CLS de 0**.
+
+---
+
+## 🏛️ Arquitectura del Software e Inyección de Dependencias
+
+El código sigue una arquitectura modular **Feature-First** con inversión de control mediante **`GetIt` (Service Locator)**:
+
+```mermaid
+flowchart TD
+    subgraph UI ["Capa de Presentación (lib/features/)"]
+        Mapa["🗺️ Mapa & Senderos"]
+        Rutas["🐾 Rutas & Hábitats"]
+        Shows["🎭 Shows & Cartelera"]
+        Perfil["👤 Perfil & Pasaporte"]
+        ModoFacil["🛡️ Modo Fácil / Senior"]
+    end
+
+    subgraph DI ["Inyección de Dependencias (lib/core/di/)"]
+        SL["sl&lt;T&gt; (Service Locator GetIt)"]
+    end
+
+    subgraph Core ["Servicios del Core (lib/core/services/)"]
+        AnimalSvc["AnimalService"]
+        AccSvc["AccesibilidadService"]
+        IdiomaSvc["IdiomaService"]
+        AudioSvc["AudioGuiaService"]
+        SoundSvc["SoundService"]
+        EmergSvc["EmergencyService"]
+        NotifSvc["NotificationService"]
+    end
+
+    UI -->|sl&lt;T&gt;| SL
+    SL --> Core
+```
+
+* Para consultar la especificación exhaustiva de métodos, tipos de retorno y reglas de ciclo de vida (`dispose`), consulta la [📘 Documentación de API Interna](docs/API_INTERNA.md).
+
+---
+
+## 🛡️ DevOps: CI/CD y Calidad de Código (Estrategia PR-First)
+
+El repositorio implementa una estricta política de **Protección de Rama y Gobernanza de Código**:
+* 🚫 **`main` Protegida:** Está terminantemente prohibido hacer `git push origin main` directo. Todo cambio debe originarse en una rama secundaria y pasar por un **Pull Request**.
+* ⚡ **CI/CD Centralizado en Pull Request:** La auditoría completa (Análisis, 43 Pruebas, Compilación Web Wasm y Compilación del APK Android) se ejecuta **exclusivamente en el Pull Request**. De este modo, el revisor puede probar el APK y la Web antes de aprobar el merge, dejando la rama `main` limpia y libre de sobrecarga.
+
+```mermaid
+flowchart TD
+    subgraph Dev ["1. Rama del Desarrollador (Feature / Corrección)"]
+        D1["Trabajo local + Pre-commit Hook"] --> D2["git push origin mi-rama"]
+    end
+
+    subgraph PR ["2. Pull Request hacia Main (CI + CD Completo)"]
+        PR1["Se abre / actualiza Pull Request"] --> PR2["Etapa 1: Calidad (dart format + analyze + 43 tests)"]
+        PR2 --> PR3["Etapa 2: Compilación Web (WebAssembly O4)"]
+        PR2 --> PR4["Etapa 3: Compilación Móvil (APK Android Release)"]
+        PR3 --> PR5["🎁 Artefactos listos para descargar y probar"]
+        PR4 --> PR5
+    end
+
+    subgraph Main ["3. Rama Main (Producción Protegida)"]
+        M1["Aprobación y Merge"] --> M2["✓ Código integrado sin trabajo duplicado"]
+    end
+
+    Dev --> PR
+    PR --> Main
+```
+
+### 1. Pre-commit Hook Local
+Antes de cada `git commit`, el hook local ([.git/hooks/pre-commit](.git/hooks/pre-commit)):
+1. Formatea automáticamente el código con `dart format`.
+2. Ejecuta `flutter analyze --no-fatal-infos`.
+3. Corre las **43 pruebas unitarias**. Si algo falla, el commit se cancela automáticamente.
+*(Instalador para Windows disponible en `scripts/instalar_git_hooks.bat`)*.
+
+### 2. Integración Continua (CI) en Pull Requests
+* Evalúa formato, salud estática y suite de pruebas en menos de 1 minuto sin compilar instaladores innecesarios.
+
+### 3. Entrega Continua (CD) en Main
+* Al unirse el PR a la rama principal, empaqueta los instaladores listos para el usuario:
+  * 📁 `flutter-web-bundle`: Aplicación Web en WebAssembly optimizada.
+  * 📁 `android-release-apks`: Instaladores APK para dispositivos Android reales.
+
+---
+
+## 📁 Estructura del Directorio
 
 ```text
 zoologico_front/
-├── assets/
-│   └── images/
-│       ├── logo_zoologico.png               # Ícono y logotipo oficial
-│       ├── mapa_zoologico.png               # Mapa ilustrado de alta definición
-│       ├── animales_con_fondo/              # Ilustraciones de recintos por animal
-│       └── pantalla_principal/             # Assets (foca 3D, emergencia, fondo)
+├── .github/workflows/                       # Pipeline de Integración y Despliegue Continuo (CI/CD)
+│   └── flutter_ci_cd.yml
+├── docs/                                    # Documentación técnica corporativa
+│   └── API_INTERNA.md
+├── scripts/                                 # Utilidades y scripts de automatización
+│   └── instalar_git_hooks.bat
 ├── lib/
-│   ├── main.dart                            # Punto de entrada de la aplicación
-│   ├── core/                                # Núcleo compartido de la aplicación
-│   │   ├── data/                            # Datos base, coordenadas y nodos del mapa
-│   │   ├── models/                          # Modelos de datos (MarcadorMapa, DatosAnimal)
-│   │   ├── services/                        # Servicios singleton (Animal, AudioGuía, Sonido, SOS)
-│   │   └── theme/                           # Colores institucionales (AppColors)
-│   └── features/                            # Módulos por funcionalidad
-│       ├── carga_pagina/                    # Splash screen animado con hojas y logo
-│       ├── mapa/                            # Pantalla principal del mapa
-│       │   ├── screens/                     # PantallaMapa y PantallaDetalleAnimal
-│       │   ├── utils/                       # Algoritmo de pathfinding y rutas
-│       │   └── widgets/                     # BarraSuperior, BarraInferior, ModalVisitas, RutaPainter
-│       └── pantalla_principal/              # Pantalla de bienvenida, carrusel y show acuático
-│           ├── screens/                     # PantallaPrincipal y DetalleShowAcuático
-│           └── widgets/                     # HeroHeader, ShowAcuaticoCard, EmergenciaCard
-├── android/                                 # Configuración nativa de Android (manifiesto e íconos)
-├── ios/                                     # Configuración nativa de iOS (Runner y AppIcon)
-└── pubspec.yaml                             # Dependencias, assets y configuración del proyecto
+│   ├── main.dart                            # Inicialización e inyección de dependencias
+│   ├── core/                                # Componentes transversales del sistema
+│   │   ├── data/                            # Marcadores GPS, catálogo biológico y nodos
+│   │   ├── di/                              # InjectionContainer (Service Locator con GetIt)
+│   │   ├── models/                          # Entidades (MarcadorMapa, DatosAnimal)
+│   │   ├── services/                        # Servicios de negocio (Animal, Idioma, Accesibilidad, etc.)
+│   │   ├── theme/                           # Colores biofílicos e institucionales
+│   │   └── widgets/                         # Modales y widgets globales
+│   └── features/                            # Módulos encapsulados por dominio
+│       ├── carga_pagina/                    # Splash y precarga
+│       ├── mapa/                            # Mapa interactivo, rutas SVG y controles
+│       ├── modo_facil/                      # Interfaz inclusiva para adultos mayores y accesibilidad
+│       ├── pantalla_principal/              # Menú home, búsquedas y accesos rápidos
+│       ├── perfil/                          # Pasaporte, insignias e idiomas
+│       ├── rutas/                           # Exploración guiada por hábitat
+│       └── shows/                           # Cartelera, horarios y espectáculos
+├── test/                                    # Suite de 43 pruebas automatizadas
+│   ├── accesibilidad_inclusion_test.dart
+│   ├── idioma_y_footer_modo_facil_test.dart
+│   ├── injection_container_test.dart
+│   └── nuevas_funcionalidades_test.dart
+└── web/                                     # Maquetación WebAssembly con Skeleton Shimmer
+    ├── index.html
+    └── manifest.json
 ```
 
 ---
 
-## 🎨 Identidad Visual y Experiencia de Usuario (UI/UX)
+## 🧪 Pruebas Automatizadas y Calidad
 
-* **Paleta Safari Natural**: Tonos verde bosque (`#2D5A27`), verde azulado laguna (`#1B5E20` / `#00897B`), ámbar safari (`#D97706`) y fondos orgánicos no fatigantes (`#F9FBF9`).
-* **Protección contra la fatiga visual**: Se reemplazaron tarjetas saturadas por componentes con bordes suaves, microinteracciones táctiles y tipografía de alto peso visual (`Urbanist 900`).
-* **Zonas seguras respetadas**: Todos los modales y barras inferiores consideran dinámicamente el `SafeArea` y los botones de navegación del sistema operativo para evitar superposiciones.
+Para ejecutar la suite completa de pruebas unitarias y de widgets:
+```bash
+flutter test
+```
+
+Para verificar la cobertura de código:
+```bash
+flutter test --coverage
+```
+
+Para correr el análisis estático estandarizado:
+```bash
+flutter analyze
+```
 
 ---
 
-## 💻 Instalación y Ejecución
+## 💻 Instalación y Ejecución Local
 
 ### Requisitos previos
-* [Flutter SDK](https://docs.flutter.dev/get-started/install) (versión 3.19.0 o superior).
-* [Dart SDK](https://dart.dev/get-dart) (versión 3.3.0 o superior).
-* Android Studio / VS Code con extensiones de Flutter y Dart.
-* Dispositivo móvil o emulador Android/iOS con soporte de audio.
+* [Flutter SDK](https://docs.flutter.dev/get-started/install) (versión 3.22+ recomendada).
+* [Dart SDK](https://dart.dev/get-dart) (versión 3.13+).
+* Java JDK 17 (para compilación Android).
 
-### Pasos de instalación
-
-1. **Clonar o abrir el repositorio**:
+### Pasos
+1. **Clonar el repositorio:**
    ```bash
-   cd zoologico_front
+   git clone https://github.com/Isabelopez02/safari-world.git
+   cd safari-world
    ```
 
-2. **Instalar dependencias**:
+2. **Instalar dependencias:**
    ```bash
    flutter pub get
    ```
 
-3. **Verificar la integridad del código**:
-   ```bash
-   flutter analyze
-   ```
-
-4. **Ejecutar la aplicación en modo desarrollo**:
+3. **Ejecutar en Móvil (Emulador o Celular conectado):**
    ```bash
    flutter run
    ```
 
-5. **Compilar el archivo APK para producción (Android)**:
+4. **Compilar y Ejecutar en Web con WebAssembly:**
    ```bash
-   flutter build apk --release
+   flutter build web --wasm --release -O4 --no-source-maps
+   python gzip_server.py
    ```
-   El instalador se generará en: `build/app/outputs/flutter-apk/app-release.apk`.
+   Abre tu navegador en `http://localhost:8080` para disfrutar de la experiencia ultra-fluida.
 
 ---
 
 ## 📄 Licencia y Créditos
 
-Este proyecto ha sido desarrollado con fines académicos y de divulgación para el aprendizaje de desarrollo móvil avanzado en Flutter, arquitectura limpia y diseño de experiencia de usuario (UX) enfocado en la conservación animal.
+Este proyecto fue desarrollado con fines académicos y de divulgación científica para el aprendizaje de arquitectura limpia en Flutter, estándares internacionales de accesibilidad web (WCAG 2.2 AA) y diseño de experiencias inclusivas orientadas a la conservación de la fauna silvestre en el Parque de las Leyendas.
