@@ -1,12 +1,9 @@
 name: Flutter CI/CD Pipeline
 
 on:
-  # 1. CI: Se activa únicamente cuando se abre o actualiza un Pull Request hacia main o master
+  # El pipeline completo (CI + CD) se ejecuta EXCLUSIVAMENTE en el Pull Request.
+  # En la rama 'main' no se ejecuta nada: main queda 100% libre de sobrecarga.
   pull_request:
-    branches: [ main, master ]
-
-  # 2. CD: Se activa únicamente cuando se hace push o merge definitivo en main o master
-  push:
     branches: [ main, master ]
 
 concurrency:
@@ -15,12 +12,10 @@ concurrency:
 
 jobs:
   # ====================================================================
-  # ETAPA 1: CI (Control de Calidad Rápido) - SOLO EN PULL REQUEST
-  # Evalúa que el código esté sano antes de permitir el merge.
+  # ETAPA 1: CI (Control de Calidad Estático y Suite de Pruebas)
   # ====================================================================
   quality_checks:
     name: Análisis Estático y Pruebas Automatizadas
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Clonar Repositorio
@@ -54,12 +49,11 @@ jobs:
           retention-days: 7
 
   # ====================================================================
-  # ETAPA 2: CD (Compilación Web Wasm) - SOLO AL HACER MERGE EN MAIN
-  # Cero doble esfuerzo: main NO vuelve a correr las pruebas que ya aprobó el PR.
+  # ETAPA 2: CD (Compilación Web Wasm para Verificación Previa)
   # ====================================================================
   build_web:
     name: Compilación WebAssembly (Flutter Web)
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: quality_checks
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Clonar Repositorio
@@ -85,12 +79,11 @@ jobs:
           retention-days: 14
 
   # ====================================================================
-  # ETAPA 3: CD (Compilación APK Android) - SOLO AL HACER MERGE EN MAIN
-  # Cero doble esfuerzo: genera el instalador oficial final para el usuario.
+  # ETAPA 3: CD (Compilación APK Android para Probar antes del Merge)
   # ====================================================================
   build_android:
     name: Compilación APK Android (Release)
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: quality_checks
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Clonar Repositorio

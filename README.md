@@ -114,20 +114,32 @@ flowchart TD
 
 ---
 
-## 🛡️ DevOps: CI/CD y Calidad de Código
+## 🛡️ DevOps: CI/CD y Calidad de Código (Estrategia PR-First)
 
-El repositorio cuenta con un pipeline automatizado en **GitHub Actions** ([.github/workflows/flutter_ci_cd.yml](.github/workflows/flutter_ci_cd.yml)) con separación estricta para evitar trabajo duplicado:
+El repositorio implementa una estricta política de **Protección de Rama y Gobernanza de Código**:
+* 🚫 **`main` Protegida:** Está terminantemente prohibido hacer `git push origin main` directo. Todo cambio debe originarse en una rama secundaria y pasar por un **Pull Request**.
+* ⚡ **CI/CD Centralizado en Pull Request:** La auditoría completa (Análisis, 43 Pruebas, Compilación Web Wasm y Compilación del APK Android) se ejecuta **exclusivamente en el Pull Request**. De este modo, el revisor puede probar el APK y la Web antes de aprobar el merge, dejando la rama `main` limpia y libre de sobrecarga.
 
 ```mermaid
-flowchart LR
-    subgraph PR ["Pull Request (CI Rápido - 50s)"]
-        PR1["dart format"] --> PR2["flutter analyze"] --> PR3["flutter test (43 pruebas)"]
+flowchart TD
+    subgraph Dev ["1. Rama del Desarrollador (Feature / Corrección)"]
+        D1["Trabajo local + Pre-commit Hook"] --> D2["git push origin mi-rama"]
     end
 
-    subgraph Main ["Merge a Main (CD de Producción)"]
-        M1["main NO repite pruebas"] --> M2["Compilar WebAssembly O4"]
-        M1 --> M3["Compilar APK Release Android"]
+    subgraph PR ["2. Pull Request hacia Main (CI + CD Completo)"]
+        PR1["Se abre / actualiza Pull Request"] --> PR2["Etapa 1: Calidad (dart format + analyze + 43 tests)"]
+        PR2 --> PR3["Etapa 2: Compilación Web (WebAssembly O4)"]
+        PR2 --> PR4["Etapa 3: Compilación Móvil (APK Android Release)"]
+        PR3 --> PR5["🎁 Artefactos listos para descargar y probar"]
+        PR4 --> PR5
     end
+
+    subgraph Main ["3. Rama Main (Producción Protegida)"]
+        M1["Aprobación y Merge"] --> M2["✓ Código integrado sin trabajo duplicado"]
+    end
+
+    Dev --> PR
+    PR --> Main
 ```
 
 ### 1. Pre-commit Hook Local
