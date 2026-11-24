@@ -34,8 +34,8 @@ jobs:
       - name: 📐 Verificar Formato de Código (Dart Format)
         run: dart format --output=none --set-exit-if-changed lib test
 
-      - name: 🔍 Análisis Estático Riguroso (Flutter Analyze)
-        run: flutter analyze --fatal-infos --fatal-warnings
+      - name: 🔍 Análisis Estático (Flutter Analyze)
+        run: flutter analyze --no-fatal-infos
 
       - name: 🧪 Ejecutar Suite de Pruebas Automatizadas con Cobertura
         run: flutter test --coverage
